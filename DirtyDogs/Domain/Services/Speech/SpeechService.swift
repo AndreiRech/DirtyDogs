@@ -19,7 +19,7 @@ class SpeechService: SpeechServiceProtocol {
 
     func startListening(matchManager: MatchManager) {
         SFSpeechRecognizer.requestAuthorization { authStatus in
-            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+            AVAudioApplication.requestRecordPermission { granted in
                 Task { @MainActor in
                     if !(authStatus == .authorized && granted) {
                         print("Erro: Permissões de voz ou microfone negadas.")
