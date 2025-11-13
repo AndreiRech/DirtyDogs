@@ -12,29 +12,29 @@ import GameKit
 public final class PhysicsScene: SKScene {
     private var matchManager: MatchManager
     private var entityManager: EntityManager?
-
+    
     init(matchManager: MatchManager, size: CGSize) {
         self.matchManager = matchManager
         super.init(size: size)
     }
-
+    
     public override convenience init(size: CGSize) {
         fatalError("Use PhysicsScene(matchManager:size:) instead")
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     private var isDragging = false
     private var currentDrag: GKEntity?
     private var targetPoint: CGPoint?
-
+    
     override public func didMove(to view: SKView) {
         backgroundColor = .clear
         scaleMode = .resizeFill
         physicsWorld.gravity = .init(dx: 0, dy: 9.6)
-
+        
         physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
         physicsBody?.categoryBitMask = PhysicsCategory.edge
         
@@ -42,7 +42,7 @@ public final class PhysicsScene: SKScene {
         
         spawnBall()
     }
-
+    
     // MARK: - Touch funcs
     override public func touchesBegan(
         _ touches: Set<UITouch>,
@@ -60,13 +60,13 @@ public final class PhysicsScene: SKScene {
             let node = manager.node(for: entity),
             let body = node.physicsBody
         else { return }
-
+        
         isDragging = true
         currentDrag = entity
         targetPoint = location
         body.angularVelocity = 0
     }
-
+    
     override public func touchesMoved(
         _ touches: Set<UITouch>,
         with event: UIEvent?
@@ -74,21 +74,21 @@ public final class PhysicsScene: SKScene {
         guard let touch = touches.first else { return }
         targetPoint = touch.location(in: self)
     }
-
+    
     override public func touchesEnded(
         _ touches: Set<UITouch>,
         with event: UIEvent?
     ) {
         endDrag()
     }
-
+    
     override public func touchesCancelled(
         _ touches: Set<UITouch>,
         with event: UIEvent?
     ) {
         endDrag()
     }
-
+    
     private func endDrag() {
         isDragging = false
         
@@ -106,7 +106,7 @@ public final class PhysicsScene: SKScene {
         
         body.angularVelocity = 0
     }
-
+    
     override public func update(_ currentTime: TimeInterval) {
         handleMovementUpdate()
         
@@ -121,7 +121,7 @@ public final class PhysicsScene: SKScene {
             }
         }
     }
-
+    
     public override func didChangeSize(_ oldSize: CGSize) {
         super.didChangeSize(oldSize)
         physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
@@ -142,21 +142,26 @@ extension PhysicsScene {
         entityManager?.remove(entity: entity)
         let dxFromCenter = node.position.x - frame.midX
         let mirroredDx = -dxFromCenter
-
-        let ballPayload = BallData(
-            x: mirroredDx,
-            y: node.position.y,
-            side: side
-        )
         
-        do {
-            let data = try JSONEncoder().encode(ballPayload)
-            matchManager.sendData(data, mode: .reliable)
-        } catch {
-            print("Erro ao codificar e enviar 'BallData': \(error)")
+        var payload: PhysicsObjectData? = nil
+        
+        if entity is Ball {
+            payload = PhysicsObjectData(
+                objectType: .ball,
+                x: mirroredDx,
+                y: node.position.y,
+                side: side
+            )
+        }
+        
+        if let physicsData = payload {
+            let packet = GamePacket(type: .spawnPhysicsObject, physicsData: physicsData)
+            matchManager.sendPacket(packet, mode: .reliable)
+        } else {
+            print("AVISO: Entidade do tipo \(type(of: entity)) saiu da tela, mas não há lógica de rede para ela.")
         }
     }
-
+    
     // Cria a bola inicial
     func spawnBall() {
         let ball = Ball()
@@ -193,7 +198,7 @@ extension PhysicsScene {
             let body = node.physicsBody,
             let target = targetPoint
         else { return }
-
+        
         let pos = node.position
         let dx = target.x - pos.x
         let dy = target.y - pos.y
@@ -202,19 +207,19 @@ extension PhysicsScene {
             body.velocity = .zero
             return
         }
-
+        
         let stiffness: CGFloat = 20
         let damping: CGFloat = 10
-
+        
         let desiredVx = dx * stiffness
         let desiredVy = dy * stiffness
-
+        
         let steerX = desiredVx - body.velocity.dx
         let steerY = desiredVy - body.velocity.dy
-
+        
         let force = CGVector(dx: steerX * damping, dy: steerY * damping)
         body.applyForce(force)
-
+        
         let maxSpeed: CGFloat = 1000
         var velocity = body.velocity
         let speed = hypot(velocity.dx, velocity.dy)

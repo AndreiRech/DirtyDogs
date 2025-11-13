@@ -8,7 +8,14 @@
 import Foundation
 
 extension PhysicsScene: MatchManagerDelegate {
-    func spawnBall(at point: CGPoint, from side: EdgeSide) {
-        self.spawnBall(at: point, goingTo: side)
+    func spawnObject(with data: PhysicsObjectData) {
+        let spawnPoint = CGPoint(x: data.x, y: data.y)
+        let arrivingSide: EdgeSide = (data.side == .left ? .right : .left)
+        
+        switch data.objectType {
+            
+        case .ball:
+            self.spawnBall(at: spawnPoint, goingTo: arrivingSide)
+        }
     }
 }
