@@ -6,5 +6,6 @@
 //
 
 enum EdgeSide: String, Codable {
-    case left, right
+    case top
+//    case left, right
 }
