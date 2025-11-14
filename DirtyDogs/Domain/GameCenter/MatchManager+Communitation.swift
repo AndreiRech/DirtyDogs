@@ -67,7 +67,7 @@ extension MatchManager: GKMatchDelegate {
     }
     
     func match(_ match: GKMatch, player: GKPlayer, didChange state: GKPlayerConnectionState) {
-        if state == .disconnected {
+        if state == .disconnected || state == .unknown {
             inGame = false
             isGameOver = true
         }
