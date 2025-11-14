@@ -35,12 +35,34 @@ public final class PhysicsScene: SKScene {
         scaleMode = .resizeFill
         physicsWorld.gravity = .init(dx: 0, dy: 9.6)
         
-        physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
-        physicsBody?.categoryBitMask = PhysicsCategory.edge
+        setupBorders()
         
         self.entityManager = EntityManager(scene: self)
         
         spawnBall()
+    }
+    
+    private func setupBorders() {
+        self.physicsBody = nil
+        var bodies = [SKPhysicsBody]()
+
+        let bottomEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.maxX, y: frame.minY))
+        bodies.append(bottomEdge)
+
+        let leftEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.minX, y: frame.maxY))
+        bodies.append(leftEdge)
+
+        let rightEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.maxX, y: frame.minY), to: CGPoint(x: frame.maxX, y: frame.maxY))
+        bodies.append(rightEdge)
+
+        let edgeBody = SKPhysicsBody(bodies: bodies)
+        edgeBody.categoryBitMask = PhysicsCategory.edge
+
+        edgeBody.isDynamic = false
+        edgeBody.affectedByGravity = false
+        edgeBody.allowsRotation = false
+
+        self.physicsBody = edgeBody
     }
     
     // MARK: - Touch funcs
@@ -124,8 +146,8 @@ public final class PhysicsScene: SKScene {
     
     public override func didChangeSize(_ oldSize: CGSize) {
         super.didChangeSize(oldSize)
-        physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
-        physicsBody?.categoryBitMask = PhysicsCategory.edge
+        setupBorders()
+
         children.filter { $0.name?.hasPrefix("sensor.") == true }.forEach {
             $0.removeFromParent()
         }
@@ -140,15 +162,21 @@ extension PhysicsScene {
         entity: GKEntity
     ) {
         entityManager?.remove(entity: entity)
-        let dxFromCenter = node.position.x - frame.midX
-        let mirroredDx = -dxFromCenter
-        
         var payload: PhysicsObjectData? = nil
+        
+        let xDirection: CGFloat = node.position.x
+//        switch side {
+//        case .top:
+//            xDirection = node.position.x
+//        case .right, .left:
+//            let dxFromCenter = node.position.x - frame.midX
+//            xDirection = -dxFromCenter
+//        }
         
         if entity is Ball {
             payload = PhysicsObjectData(
                 objectType: .ball,
-                x: mirroredDx,
+                x: xDirection,
                 y: node.position.y,
                 side: side
             )
@@ -183,8 +211,14 @@ extension PhysicsScene {
         ball.setPosition(to: point)
         entityManager?.add(entity: ball)
         
-        let direction: CGFloat = side == .right ? 1 : -1
-        ball.body?.applyForce(.init(dx: 7500 * direction, dy: 0))
+        ball.body?.applyForce(.init(dx: 0, dy: -25000))
+//        switch side {
+//        case .top:
+//            ball.body?.applyForce(.init(dx: 0, dy: -25000))
+//        case .left, .right:
+//            let direction: CGFloat = side == .right ? 1 : -1
+//            ball.body?.applyForce(.init(dx: 2000 * direction, dy: 0))
+//        }
     }
 }
 
@@ -235,13 +269,17 @@ extension PhysicsScene {
         
         let accFrame = node.calculateAccumulatedFrame()
         
-        if accFrame.maxX < frame.minX + 20, body.velocity.dx < -velocity {
-            return .left
+        if accFrame.minY > frame.maxY - 20, body.velocity.dy > velocity {
+            return .top
         }
         
-        if accFrame.minX > frame.maxX - 20, body.velocity.dx > velocity {
-            return .right
-        }
+//        if accFrame.maxX < frame.minX + 20, body.velocity.dx < -velocity {
+//            return .left
+//        }
+//        
+//        if accFrame.minX > frame.maxX - 20, body.velocity.dx > velocity {
+//            return .right
+//        }
         
         return nil
     }

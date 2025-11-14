@@ -33,10 +33,13 @@ public class Ball: GKEntity {
         node.physicsBody = SKPhysicsBody(circleOfRadius: ballSize)
         node.physicsBody?.affectedByGravity = false
         node.physicsBody?.categoryBitMask = PhysicsCategory.parcel
-        node.physicsBody?.collisionBitMask = PhysicsCategory.parcel
+        node.physicsBody?.collisionBitMask = PhysicsCategory.parcel | PhysicsCategory.edge
         node.physicsBody?.contactTestBitMask = 0
-        node.physicsBody?.linearDamping = 7
-        node.physicsBody?.angularDamping = 7
+        node.physicsBody?.linearDamping = 5
+        node.physicsBody?.angularDamping = 5
+        node.physicsBody?.restitution = 0.9
+        node.physicsBody?.friction = 0.0
+        node.physicsBody?.usesPreciseCollisionDetection = true
         
         addComponent(GKSKNodeComponent(node: node))
         
