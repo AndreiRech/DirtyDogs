@@ -29,11 +29,11 @@ class GameViewModel: GameViewModelProtocol {
     }
     
     func onAppear() {
-        speechService.startListening(matchManager: matchManager)
+//        speechService.startListening(matchManager: matchManager)
     }
     
     func onDisappear() {
-        speechService.stopListening()
+//        speechService.stopListening()
     }
     
     func endGame() {
