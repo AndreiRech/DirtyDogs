@@ -14,6 +14,7 @@ struct DirtyDogsApp: App {
     var body: some Scene {
         WindowGroup {
             ControllerView(matchManager: matchManager)
+            //BombTestView()
         }
     }
 }
