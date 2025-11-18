@@ -11,7 +11,8 @@ import SpriteKit
 import GameplayKit
 
 public class Bomb: GKEntity, GameEntity {
-
+  
+    private var wasReceived: Bool = false
     private var bombSize: CGFloat = 45
 
     public var node: SKNode? {
@@ -90,4 +91,7 @@ public class Bomb: GKEntity, GameEntity {
         let pulseDown = SKAction.scale(to: 1.0, duration: 0.12)
         container.run(.repeatForever(.sequence([pulseUp, pulseDown])))
     }
+    
+    func setReceived(value: Bool) { wasReceived = value }
+    func getReceived() -> Bool { wasReceived }
 }
