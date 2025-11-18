@@ -15,7 +15,7 @@ extension PhysicsScene: MatchManagerDelegate {
         
         switch data.objectType {
         case .ball:
-            self.spawnBall(at: spawnPoint, goingTo: arrivingSide)
+            self.spawnBall(at: spawnPoint, goingTo: arrivingSide, entity: .ball)
         }
     }
 }
