@@ -55,7 +55,6 @@ public class Ball: GKEntity, GameEntity {
         component(ofType: GKSKNodeComponent.self)?.node.position = point
     }
     
-    func setReceived(value: Bool) {
-        wasReceived = value
-    }
+    func setReceived(value: Bool) { wasReceived = value }
+    func getReceived() -> Bool { wasReceived }
 }

@@ -45,23 +45,23 @@ public final class PhysicsScene: SKScene {
     private func setupBorders() {
         self.physicsBody = nil
         var bodies = [SKPhysicsBody]()
-
+        
         let bottomEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.maxX, y: frame.minY))
         bodies.append(bottomEdge)
-
+        
         let leftEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.minX, y: frame.maxY))
         bodies.append(leftEdge)
-
+        
         let rightEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.maxX, y: frame.minY), to: CGPoint(x: frame.maxX, y: frame.maxY))
         bodies.append(rightEdge)
-
+        
         let edgeBody = SKPhysicsBody(bodies: bodies)
         edgeBody.categoryBitMask = PhysicsCategory.edge
-
+        
         edgeBody.isDynamic = false
         edgeBody.affectedByGravity = false
         edgeBody.allowsRotation = false
-
+        
         self.physicsBody = edgeBody
     }
     
@@ -137,8 +137,7 @@ public final class PhysicsScene: SKScene {
         for entity in entities {
             if let node = entity.component(ofType: GKSKNodeComponent.self)?.node {
                 if let side = exitSide(for: node) {
-                    print("Bola saiu pelo lado \(side)")
-                    sendParcel(side: side, node: node, entity: entity)
+                    sendParcel(side: side, node: node, entity: entity as! GameEntity)
                 }
             }
         }
@@ -147,7 +146,7 @@ public final class PhysicsScene: SKScene {
     public override func didChangeSize(_ oldSize: CGSize) {
         super.didChangeSize(oldSize)
         setupBorders()
-
+        
         children.filter { $0.name?.hasPrefix("sensor.") == true }.forEach {
             $0.removeFromParent()
         }
@@ -159,19 +158,25 @@ extension PhysicsScene {
     private func sendParcel(
         side: EdgeSide,
         node: SKNode,
-        entity: GKEntity
+        entity: GameEntity
     ) {
+        if entity.getReceived() {
+            // TODO: Chamar função para acionar a ação do item
+            entityManager?.remove(entity: entity)
+            return
+        }
+        
         entityManager?.remove(entity: entity)
         var payload: PhysicsObjectData? = nil
         
         let xDirection: CGFloat = node.position.x
-//        switch side {
-//        case .top:
-//            xDirection = node.position.x
-//        case .right, .left:
-//            let dxFromCenter = node.position.x - frame.midX
-//            xDirection = -dxFromCenter
-//        }
+        //        switch side {
+        //        case .top:
+        //            xDirection = node.position.x
+        //        case .right, .left:
+        //            let dxFromCenter = node.position.x - frame.midX
+        //            xDirection = -dxFromCenter
+        //        }
         
         let objectType: PhysicsObjectType?
         
@@ -229,16 +234,17 @@ extension PhysicsScene {
         let value = getItemType(entity: entity)
         
         value.setPosition(to: point)
+        value.setReceived(value: true)
         entityManager?.add(entity: value)
         
         value.body?.applyForce(.init(dx: 0, dy: -25000))
-//        switch side {
-//        case .top:
-//            ball.body?.applyForce(.init(dx: 0, dy: -25000))
-//        case .left, .right:
-//            let direction: CGFloat = side == .right ? 1 : -1
-//            ball.body?.applyForce(.init(dx: 2000 * direction, dy: 0))
-//        }
+        //        switch side {
+        //        case .top:
+        //            ball.body?.applyForce(.init(dx: 0, dy: -25000))
+        //        case .left, .right:
+        //            let direction: CGFloat = side == .right ? 1 : -1
+        //            ball.body?.applyForce(.init(dx: 2000 * direction, dy: 0))
+        //        }
     }
 }
 
@@ -293,13 +299,13 @@ extension PhysicsScene {
             return .top
         }
         
-//        if accFrame.maxX < frame.minX + 20, body.velocity.dx < -velocity {
-//            return .left
-//        }
-//        
-//        if accFrame.minX > frame.maxX - 20, body.velocity.dx > velocity {
-//            return .right
-//        }
+        //        if accFrame.maxX < frame.minX + 20, body.velocity.dx < -velocity {
+        //            return .left
+        //        }
+        //
+        //        if accFrame.minX > frame.maxX - 20, body.velocity.dx > velocity {
+        //            return .right
+        //        }
         
         return nil
     }
