@@ -9,5 +9,7 @@ import GameplayKit
 
 protocol GameEntity: GKEntity {
     var body: SKPhysicsBody? { get }
+    func setReceived(value: Bool)
+    func getReceived() -> Bool
     func setPosition(to point: CGPoint)
 }
