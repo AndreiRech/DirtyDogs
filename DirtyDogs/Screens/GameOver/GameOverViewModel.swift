@@ -11,8 +11,25 @@ import Foundation
 class GameOverViewModel: GameOverViewModelProtocol {
     private var matchManager: MatchManager
     
+    var gameResult: GameState {
+        matchManager.gameState
+    }
+    
     init(matchManager: MatchManager) {
         self.matchManager = matchManager
+    }
+    
+    func getScreenText() -> String {
+        switch gameResult {
+        case .victory:
+            "You Won :)"
+        case .defeat:
+            "You Lost :("
+        case .quit:
+            "Your opponent left."
+        default:
+            "\(gameResult)"
+        }
     }
     
     func returnToMenu() {

@@ -6,5 +6,7 @@
 //
 
 protocol GameOverViewModelProtocol {
+    var gameResult: GameState { get }
     func returnToMenu()
+    func getScreenText() -> String
 }
