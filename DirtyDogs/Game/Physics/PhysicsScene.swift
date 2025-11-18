@@ -39,7 +39,7 @@ public final class PhysicsScene: SKScene {
         
         self.entityManager = EntityManager(scene: self)
         
-        spawnBall()
+        spawnBall(entity: .ball)
     }
     
     private func setupBorders() {
@@ -173,14 +173,24 @@ extension PhysicsScene {
 //            xDirection = -dxFromCenter
 //        }
         
-        if entity is Ball {
-            payload = PhysicsObjectData(
-                objectType: .ball,
-                x: xDirection,
-                y: node.position.y,
-                side: side
-            )
+        let objectType: PhysicsObjectType?
+        
+        switch entity {
+        case is Ball:
+            objectType = .ball
+        default:
+            objectType = nil
+            print("erro: entity type not found")
         }
+        
+        guard let objectType else { return }
+        
+        payload = PhysicsObjectData(
+            objectType: objectType,
+            x: xDirection,
+            y: node.position.y,
+            side: side
+        )
         
         if let physicsData = payload {
             let packet = GamePacket(type: .spawnPhysicsObject, physicsData: physicsData)
@@ -190,28 +200,38 @@ extension PhysicsScene {
         }
     }
     
-    // Cria a bola inicial
-    func spawnBall() {
-        let ball = Ball()
-        let point: CGPoint = .init(x: frame.midX, y: frame.midY)
-        ball.setPosition(to: point)
-        entityManager?.add(entity: ball)
+    private func getItemType(entity: PhysicsObjectType) -> GameEntity {
+        switch entity {
+        case .ball:
+            return Ball()
+        }
     }
     
-    // Cria uma bola em uma posição específica
-    func spawnBall(at point: CGPoint) {
-        let ball = Ball()
-        ball.setPosition(to: point)
-        entityManager?.add(entity: ball)
-    }
-    
-    // Cria uma bola em movimento
-    func spawnBall(at point: CGPoint, goingTo side: EdgeSide) {
-        let ball = Ball()
-        ball.setPosition(to: point)
-        entityManager?.add(entity: ball)
+    // Cria a entidade inicial
+    func spawnBall(entity: PhysicsObjectType) {
+        let value = getItemType(entity: entity)
         
-        ball.body?.applyForce(.init(dx: 0, dy: -25000))
+        let point: CGPoint = .init(x: frame.midX, y: frame.midY)
+        value.setPosition(to: point)
+        entityManager?.add(entity: value)
+    }
+    
+    // Cria uma entidade em uma posição específica
+    func spawnBall(at point: CGPoint, entity: PhysicsObjectType) {
+        let value = getItemType(entity: entity)
+        
+        value.setPosition(to: point)
+        entityManager?.add(entity: value)
+    }
+    
+    // Cria uma entidade em movimento
+    func spawnBall(at point: CGPoint, goingTo side: EdgeSide, entity: PhysicsObjectType) {
+        let value = getItemType(entity: entity)
+        
+        value.setPosition(to: point)
+        entityManager?.add(entity: value)
+        
+        value.body?.applyForce(.init(dx: 0, dy: -25000))
 //        switch side {
 //        case .top:
 //            ball.body?.applyForce(.init(dx: 0, dy: -25000))
