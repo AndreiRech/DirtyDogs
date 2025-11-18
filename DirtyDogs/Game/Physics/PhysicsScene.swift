@@ -9,9 +9,9 @@ import SpriteKit
 import GameplayKit
 import GameKit
 
-public final class PhysicsScene: SKScene {
+public class PhysicsScene: SKScene {
     private var matchManager: MatchManager
-    private var entityManager: EntityManager?
+    var entityManager: EntityManager?
     
     init(matchManager: MatchManager, size: CGSize) {
         self.matchManager = matchManager
@@ -29,6 +29,10 @@ public final class PhysicsScene: SKScene {
     private var isDragging = false
     private var currentDrag: GKEntity?
     private var targetPoint: CGPoint?
+    
+    //Stun
+    private var isStunned = false
+    private var stunOverlay: SKShapeNode?
     
     override public func didMove(to view: SKView) {
         backgroundColor = .clear
@@ -70,6 +74,7 @@ public final class PhysicsScene: SKScene {
         _ touches: Set<UITouch>,
         with event: UIEvent?
     ) {
+        if isStunned { return }
         guard
             let touch = touches.first,
             let manager = entityManager
@@ -93,6 +98,7 @@ public final class PhysicsScene: SKScene {
         _ touches: Set<UITouch>,
         with event: UIEvent?
     ) {
+        if isStunned { return }
         guard let touch = touches.first else { return }
         targetPoint = touch.location(in: self)
     }
@@ -183,6 +189,8 @@ extension PhysicsScene {
         switch entity {
         case is Ball:
             objectType = .ball
+        case is Bomb:
+            objectType = .bomb
         default:
             objectType = nil
             print("erro: entity type not found")
@@ -209,7 +217,10 @@ extension PhysicsScene {
         switch entity {
         case .ball:
             return Ball()
+        case .bomb:
+            return Bomb()
         }
+   
     }
     
     // Cria a entidade inicial
@@ -245,6 +256,165 @@ extension PhysicsScene {
         //            let direction: CGFloat = side == .right ? 1 : -1
         //            ball.body?.applyForce(.init(dx: 2000 * direction, dy: 0))
         //        }
+    }
+    
+    //Bomb functions:
+    @discardableResult
+    func spawnBomb(at point: CGPoint, goingTo side: EdgeSide) -> Bomb {
+        let bomb = Bomb()
+        bomb.setPosition(to: point)
+        entityManager?.add(entity: bomb)
+
+        // Força inicial
+        bomb.body?.applyForce(.init(dx: 0, dy: -25000))
+
+        return bomb
+    }
+    
+    func spawnBomb() {
+           let bomb = Bomb()
+           let point: CGPoint = .init(x: frame.midX, y: frame.midY)
+           bomb.setPosition(to: point)
+           entityManager?.add(entity: bomb)
+       }
+
+    func spawnBomb(at point: CGPoint) {
+        let bomb = Bomb()
+        bomb.setPosition(to: point)
+        entityManager?.add(entity: bomb)
+    }
+
+    func applyStun(duration: TimeInterval) {
+            guard !isStunned else { return }
+            isStunned = true
+               // Overlay escuro por cima da tela
+            let overlay = SKShapeNode(rectOf: CGSize(width: size.width * 1.3,
+                                                        height: size.height * 1.3),
+                                         cornerRadius: 0)
+            overlay.fillColor = UIColor.black.withAlphaComponent(0.35)
+            overlay.strokeColor = .clear
+            overlay.position = CGPoint(x: frame.midX, y: frame.midY)
+            overlay.zPosition = 1000
+
+            addChild(overlay)
+            stunOverlay = overlay
+
+            let wait = SKAction.wait(forDuration: duration)
+            run(wait) { [weak self] in
+                guard let self else { return }
+                self.stunOverlay?.removeFromParent()
+                self.stunOverlay = nil
+                self.isStunned = false
+            }
+    }
+       
+    func explode(node: SKNode, entity: GKEntity?) {
+            guard let parent = node.parent else { return }
+            let origin = node.position
+
+               // 1) Partículas de explosão
+               let emitter = SKEmitterNode()
+               emitter.particleTexture = nil                // bolinhas simples
+               emitter.particleColor = .orange
+               emitter.particleColorBlendFactor = 1.0
+               emitter.numParticlesToEmit = 80
+               emitter.particleBirthRate = 300
+               emitter.particleLifetime = 0.4
+               emitter.particleLifetimeRange = 0.1
+               emitter.emissionAngleRange = .pi * 2
+               emitter.particleSpeed = 320
+               emitter.particleSpeedRange = 120
+               emitter.particleAlpha = 0.9
+               emitter.particleAlphaRange = 0.1
+               emitter.particleAlphaSpeed = -2.0
+               emitter.particleScale = 0.22
+               emitter.particleScaleRange = 0.10
+               emitter.particleScaleSpeed = -0.6
+               emitter.particlePositionRange = CGVector(dx: 5, dy: 5)
+               emitter.particleRotationRange = .pi * 2
+
+               emitter.position = origin
+               emitter.zPosition = 998
+               parent.addChild(emitter)
+
+               emitter.run(.sequence([
+                   .wait(forDuration: 0.5),
+                   .removeFromParent()
+               ]))
+
+               // Flash circular rápido
+               let explosionCircle = SKShapeNode(circleOfRadius: 10)
+               explosionCircle.fillColor = .orange
+               explosionCircle.strokeColor = .yellow
+               explosionCircle.lineWidth = 4
+               explosionCircle.position = origin
+               explosionCircle.zPosition = 999
+               parent.addChild(explosionCircle)
+
+               let expand = SKAction.scale(to: 5.0, duration: 0.20)
+               let fade = SKAction.fadeOut(withDuration: 0.20)
+               let group = SKAction.group([expand, fade])
+               let removeCircle = SKAction.removeFromParent()
+               explosionCircle.run(.sequence([group, removeCircle]))
+
+
+               // Tremor de tela
+               shake(intensity: 18, duration: 0.35)
+
+               // Explosão física empurrando outros corpos
+               applyBlast(from: origin, radius: 260, strength: 2200)
+
+               // Stun no jogador local
+               applyStun(duration: 1.0)
+
+               // Remover a bomba em si
+               if let entity {
+                   entityManager?.remove(entity: entity)
+               } else {
+                   node.removeFromParent()
+               }
+           }
+
+    // Empurra outros objetos com impulso radial
+    func applyBlast(from origin: CGPoint, radius: CGFloat, strength: CGFloat) {
+        guard let entities = entityManager?.getEntities() else { return }
+
+           for entity in entities {
+            guard let node = entity.component(ofType: GKSKNodeComponent.self)?.node,
+                    let body = node.physicsBody else { continue }
+
+                let dx = node.position.x - origin.x
+                let dy = node.position.y - origin.y
+                let distance = sqrt(dx*dx + dy*dy)
+                if distance == 0 || distance > radius { continue }
+
+                let nx = dx / distance
+                let ny = dy / distance
+                let falloff = (1.0 - distance / radius) // mais forte se estiver perto
+                let impulseMag = falloff * strength
+
+                let impulse = CGVector(dx: nx * impulseMag, dy: ny * impulseMag)
+                body.applyImpulse(impulse)
+            }
+       }
+       
+    func shake(intensity: CGFloat = 15, duration: TimeInterval = 0.35) {
+        let amplitudeX = intensity
+        let amplitudeY = intensity
+            
+        let numberOfShakes = Int(duration / 0.015)
+        var actions: [SKAction] = []
+             
+        for _ in 0..<numberOfShakes {
+            let dx = CGFloat.random(in: -amplitudeX...amplitudeX)
+            let dy = CGFloat.random(in: -amplitudeY...amplitudeY)
+            let move = SKAction.moveBy(x: dx, y: dy, duration: 0.015)
+            let reverse = move.reversed()
+            actions.append(move)
+            actions.append(reverse)
+        }
+             
+        run(SKAction.sequence(actions))
     }
 }
 
