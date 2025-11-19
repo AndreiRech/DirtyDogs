@@ -19,10 +19,12 @@ struct ControllerView: View {
                 GameOverView(viewModel: viewModel)
                 
             } else if matchManager.inGame {
-                GameView(
-                    matchManager: matchManager,
-                    speechService: speechService
-                )
+                
+                GameView2(matchManager: matchManager)
+//                GameView2(
+//                    matchManager: matchManager,
+//                    speechService: speechService
+//                )
                 
             } else {
                 let viewModel = MenuViewModel(
