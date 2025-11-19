@@ -22,7 +22,7 @@ class MenuViewModel: MenuViewModelProtocol {
     }
     
     var isPlayButtonDisabled: Bool {
-        matchManager.authenticatingState != .authenticated || matchManager.inGame
+        matchManager.authenticatingState != .authenticated || matchManager.gameState == .inGame
     }
     
     func prepareHaptics() {

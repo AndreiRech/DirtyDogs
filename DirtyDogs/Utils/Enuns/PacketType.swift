@@ -9,6 +9,7 @@ import Foundation
 
 enum PacketType: String, Codable {
     case began
-    case gameOver
+    case victory
+    case quit
     case spawnPhysicsObject
 }

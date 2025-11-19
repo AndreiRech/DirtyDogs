@@ -9,9 +9,9 @@ import Foundation
 import SpriteKit
 import GameplayKit
 
-public class Ball: GKEntity {
-    
+public class Ball: GKEntity, GameEntity {
     private var ballSize: CGFloat = 40
+    private var wasReceived: Bool = false
     
     public var node: SKNode? {
         component(ofType: GKSKNodeComponent.self)?.node
@@ -54,4 +54,7 @@ public class Ball: GKEntity {
     public func setPosition(to point: CGPoint) {
         component(ofType: GKSKNodeComponent.self)?.node.position = point
     }
+    
+    func setReceived(value: Bool) { wasReceived = value }
+    func getReceived() -> Bool { wasReceived }
 }

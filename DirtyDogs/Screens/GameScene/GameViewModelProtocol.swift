@@ -11,5 +11,5 @@ protocol GameViewModelProtocol {
     
     func onAppear()
     func onDisappear()
-    func endGame()
+    func endGame(with event: PacketType)
 }

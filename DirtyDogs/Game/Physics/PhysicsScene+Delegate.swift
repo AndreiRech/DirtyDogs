@@ -15,7 +15,21 @@ extension PhysicsScene: MatchManagerDelegate {
         
         switch data.objectType {
         case .ball:
-            self.spawnBall(at: spawnPoint, goingTo: arrivingSide)
+            self.spawnBall(at: spawnPoint, goingTo: arrivingSide, entity: .ball)
+        case .bomb:
+            // Cria a bomba em movimento
+            let bomb = self.spawnBomb(at: spawnPoint, goingTo: arrivingSide)
+            // Começa a animar o pavio
+            bomb.startFuseAnimation()
+            // Explode quase instantaneamente (pequeno delay pra dar tempo do pavio piscar)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                if let node = bomb.node {
+                    self.explode(node: node, entity: bomb)
+                }
+            }
         }
     }
 }
+        
+  
+

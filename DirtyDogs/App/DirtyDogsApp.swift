@@ -15,6 +15,7 @@ struct DirtyDogsApp: App {
         WindowGroup {
 //            GridView(viewModel: GridViewModel())
             ControllerView(matchManager: matchManager)
+            //BombTestView()
         }
     }
 }

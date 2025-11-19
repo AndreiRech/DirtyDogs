@@ -18,7 +18,8 @@ struct ControllerView: View {
                 let viewModel = GameOverViewModel(matchManager: matchManager)
                 GameOverView(viewModel: viewModel)
                 
-            } else if matchManager.inGame {
+                       } else if matchManager.gameState == .inGame {
+
                 
                 GameView2(matchManager: matchManager)
 //                GameView2(

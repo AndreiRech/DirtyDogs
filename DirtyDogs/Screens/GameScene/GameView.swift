@@ -34,7 +34,7 @@ struct GameView: View {
                     Spacer()
                     
                     Button {
-                        viewModel.endGame()
+                        viewModel.endGame(with: .quit)
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .font(.largeTitle)
