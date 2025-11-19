@@ -12,6 +12,8 @@ import GameKit
 public class PhysicsScene: SKScene {
     private var matchManager: MatchManager
     var entityManager: EntityManager?
+    let haptics = HapticsService()
+
     
     init(matchManager: MatchManager, size: CGSize) {
         self.matchManager = matchManager
@@ -42,6 +44,9 @@ public class PhysicsScene: SKScene {
         setupBorders()
         
         self.entityManager = EntityManager(scene: self)
+        
+        haptics.prepareHaptics()
+
         
         spawnBall(entity: .ball)
     }
@@ -317,20 +322,20 @@ extension PhysicsScene {
                emitter.particleTexture = nil                // bolinhas simples
                emitter.particleColor = .orange
                emitter.particleColorBlendFactor = 1.0
-               emitter.numParticlesToEmit = 80
-               emitter.particleBirthRate = 300
+               emitter.numParticlesToEmit = 200
+               emitter.particleBirthRate = 800
                emitter.particleLifetime = 0.4
                emitter.particleLifetimeRange = 0.1
                emitter.emissionAngleRange = .pi * 2
-               emitter.particleSpeed = 320
-               emitter.particleSpeedRange = 120
+               emitter.particleSpeed = 520
+               emitter.particleSpeedRange = 220
                emitter.particleAlpha = 0.9
                emitter.particleAlphaRange = 0.1
                emitter.particleAlphaSpeed = -2.0
-               emitter.particleScale = 0.22
+               emitter.particleScale = 0.40
                emitter.particleScaleRange = 0.10
                emitter.particleScaleSpeed = -0.6
-               emitter.particlePositionRange = CGVector(dx: 5, dy: 5)
+               emitter.particlePositionRange = CGVector(dx: 20, dy: 20)
                emitter.particleRotationRange = .pi * 2
 
                emitter.position = origin
@@ -343,20 +348,21 @@ extension PhysicsScene {
                ]))
 
                // Flash circular rápido
-               let explosionCircle = SKShapeNode(circleOfRadius: 10)
+               let explosionCircle = SKShapeNode(circleOfRadius: 120)  
                explosionCircle.fillColor = .orange
                explosionCircle.strokeColor = .yellow
-               explosionCircle.lineWidth = 4
+               explosionCircle.lineWidth = 22
+               explosionCircle.alpha = 0.85
                explosionCircle.position = origin
                explosionCircle.zPosition = 999
                parent.addChild(explosionCircle)
 
-               let expand = SKAction.scale(to: 5.0, duration: 0.20)
-               let fade = SKAction.fadeOut(withDuration: 0.20)
+               let expand = SKAction.scale(to: 4.0, duration: 0.30)
+               let fade = SKAction.fadeOut(withDuration: 0.25)
                let group = SKAction.group([expand, fade])
                let removeCircle = SKAction.removeFromParent()
+               
                explosionCircle.run(.sequence([group, removeCircle]))
-
 
                // Tremor de tela
                shake(intensity: 18, duration: 0.35)
@@ -367,6 +373,9 @@ extension PhysicsScene {
                // Stun no jogador local
                applyStun(duration: 1.0)
 
+               //Haptics 
+               haptics.explosionBomb()
+        
                // Remover a bomba em si
                if let entity {
                    entityManager?.remove(entity: entity)

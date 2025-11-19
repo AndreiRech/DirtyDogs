@@ -13,9 +13,9 @@ class BombTestScene: PhysicsScene {
     // Inicializador simples para testes
     init() {
         let screenSize = UIScreen.main.bounds.size
-        let matchManager = MatchManager()          // ✅ MatchManager "fake" só pra cena
+        let matchManager = MatchManager()     // MatchManager fake só pra cena de teste
         super.init(matchManager: matchManager, size: screenSize)
-        matchManager.delegate = self               // se quiser, mas aqui nem é obrigatório
+        matchManager.delegate = self
     }
 
     required init?(coder: NSCoder) {
@@ -25,34 +25,54 @@ class BombTestScene: PhysicsScene {
     override func didMove(to view: SKView) {
         super.didMove(to: view)
 
-        // Opcional: muda fundo pra destacar a explosão
         backgroundColor = .black
 
-        // Opcional: se não quiser a bola padrão que o PhysicsScene spawna:
-        // remove todas as entidades/nodes que já estejam na cena
+        // Remove a bola padrão que o PhysicsScene spawna
         children.forEach { node in
             if node.name == "ball" {
                 node.removeFromParent()
             }
         }
+
+        // Haptics (já existe no PhysicsScene, mas reforçamos para testes)
+        haptics.prepareHaptics()
     }
 
-    // Função de teste: cria uma bomba e faz ela explodir
+    // MARK: - TESTE PRINCIPAL
     func spawnAndExplodeTestBomb() {
-        // 1) Cria a bomba no meio da tela
         let bomb = Bomb()
         let center = CGPoint(x: frame.midX, y: frame.midY)
+
         bomb.setPosition(to: center)
         entityManager?.add(entity: bomb)
 
-        // 2) Anima o pavio
         bomb.startFuseAnimation()
 
-        // 3) Explode depois de um pequeno delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             if let node = bomb.node {
                 self.explode(node: node, entity: bomb)
             }
         }
     }
+
+    // MARK: - OPCIONAIS PARA TESTAR INDIVIDUALMENTE
+    func spawnBombOnly() {
+        let bomb = Bomb()
+        bomb.setPosition(to: CGPoint(x: frame.midX, y: frame.midY))
+        entityManager?.add(entity: bomb)
+        bomb.startFuseAnimation()
+    }
+
+    func explodeWithoutSpawn() {
+        let fakeNode = SKNode()
+        fakeNode.position = CGPoint(x: frame.midX, y: frame.midY)
+        addChild(fakeNode)
+        explode(node: fakeNode, entity: nil)
+    }
+
+    func testShakeOnly() {
+        shake(intensity: 20, duration: 0.45)
+        haptics.explosionBomb()
+    }
 }
+
