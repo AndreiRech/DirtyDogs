@@ -36,7 +36,7 @@ class GameViewModel: GameViewModelProtocol {
 //        speechService.stopListening()
     }
     
-    func endGame() {
-        matchManager.endGame()
+    func endGame(with event: PacketType) {
+        matchManager.endGame(with: event)
     }
 }

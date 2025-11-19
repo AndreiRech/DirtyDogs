@@ -19,7 +19,7 @@ struct GameOverView: View {
                 Spacer()
                 
                 VStack(spacing: -32) {
-                    Text("Game ended")
+                    Text(viewModel.getScreenText())
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundStyle(Color(.label))

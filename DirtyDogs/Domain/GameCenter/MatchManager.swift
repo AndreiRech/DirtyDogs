@@ -14,7 +14,7 @@ class MatchManager: NSObject {
     weak var delegate: MatchManagerDelegate?
     
     var authenticatingState: PlayerAuthStateEnum = .authenticating
-    var inGame: Bool = false
+    var gameState: GameState = .none
     var isGameOver: Bool = false
     
     var match: GKMatch?
@@ -67,7 +67,7 @@ class MatchManager: NSObject {
     
     func returnToMenu() {
         isGameOver = false
-        inGame = false
+        gameState = .none
         match?.disconnect()
         match = nil
         delegate = nil

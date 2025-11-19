@@ -18,10 +18,18 @@ extension MatchManager: GKMatchDelegate {
         sendPacket(GamePacket(type: .began, uuid: playerUUIDKey))
     }
     
-    func endGame() {
-        inGame = false
+    func endGame(with event: PacketType) {
         isGameOver = true
-        sendPacket(GamePacket(type: .gameOver))
+        sendPacket(GamePacket(type: event))
+        
+        switch event {
+        case .victory:
+            gameState = .victory
+        case .quit:
+            returnToMenu()
+        default :
+            break
+        }
     }
     
     // MARK: Communication Functions
@@ -39,10 +47,14 @@ extension MatchManager: GKMatchDelegate {
                     sendPacket(GamePacket(type: .began, uuid: playerUUIDKey))
                     break
                 }
-                inGame = true
+                gameState = .inGame
+            
+            case .victory:
+                gameState = .defeat
+                isGameOver = true
                 
-            case .gameOver:
-                inGame = false
+            case .quit:
+                gameState = .quit
                 isGameOver = true
                 
             case .spawnPhysicsObject:
@@ -68,7 +80,7 @@ extension MatchManager: GKMatchDelegate {
     
     func match(_ match: GKMatch, player: GKPlayer, didChange state: GKPlayerConnectionState) {
         if state == .disconnected || state == .unknown {
-            inGame = false
+            gameState = .quit
             isGameOver = true
         }
     }
