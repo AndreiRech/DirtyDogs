@@ -9,9 +9,14 @@ import SpriteKit
 import GameplayKit
 import GameKit
 
-public final class PhysicsScene: SKScene {
+public class PhysicsScene: SKScene {
     private var matchManager: MatchManager
     private var entityManager: EntityManager?
+    weak var inventoryDelegate: InventoryDelegate?
+    
+    private var touchStartTime: TimeInterval = 0
+    private var touchStartLocation: CGPoint = .zero
+
 
     init(matchManager: MatchManager, size: CGSize) {
         self.matchManager = matchManager
@@ -55,6 +60,9 @@ public final class PhysicsScene: SKScene {
         
         let location = touch.location(in: self)
         
+        touchStartTime = CACurrentMediaTime()
+        touchStartLocation = touch.location(in: self)
+        
         guard
             let entity = manager.entity(at: location),
             let node = manager.node(for: entity),
@@ -79,7 +87,38 @@ public final class PhysicsScene: SKScene {
         _ touches: Set<UITouch>,
         with event: UIEvent?
     ) {
+//        endDrag()
+        guard let touch = touches.first,
+              let manager = entityManager
+        else { return }
+
+        let location = touch.location(in: self)
+        let dt = CACurrentMediaTime() - touchStartTime
+        let dist = hypot(
+            location.x - touchStartLocation.x,
+            location.y - touchStartLocation.y
+        )
+        
+        let isTap = dt < 0.20 && dist < 20
+
+        if isTap {
+            handleTap(at: location)
+            return
+        }
+
+        // Drag normal
         endDrag()
+    }
+    
+    private func handleTap(at location: CGPoint) {
+        guard let manager = entityManager else { return }
+
+        if let entity = manager.entity(at: location) {
+            manager.remove(entity: entity)
+
+            let item = InventoryItem(imageName: "ball_icon")
+            inventoryDelegate?.didCollect(item: item)
+        }
     }
 
     override public func touchesCancelled(

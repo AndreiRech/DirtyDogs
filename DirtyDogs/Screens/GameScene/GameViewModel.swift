@@ -10,9 +10,15 @@ import SpriteKit
 
 @Observable
 class GameViewModel: GameViewModelProtocol {
+    
     var physicsScene: PhysicsScene
     var matchManager: MatchManager
     private var speechService: SpeechServiceProtocol
+    
+    var availableItems: [InventoryItem] = [
+        // mocked items
+        InventoryItem(imageName: "mockItem")
+    ]
     
     init(matchManager: MatchManager, speechService: SpeechServiceProtocol) {
         self.matchManager = matchManager
@@ -24,6 +30,8 @@ class GameViewModel: GameViewModelProtocol {
         )
         scene.scaleMode = .resizeFill
         self.physicsScene = scene
+        
+        scene.inventoryDelegate = self
         
         self.matchManager.delegate = scene
     }
@@ -38,5 +46,24 @@ class GameViewModel: GameViewModelProtocol {
     
     func endGame() {
         matchManager.endGame()
+    }
+    
+}
+
+extension GameViewModel: InventoryDelegate {
+    
+    func didCollect(item: InventoryItem) {
+        availableItems.append(item)
+    }
+    
+    func didUse(item: InventoryItem) {
+        //        availableItems.removeAll(where: { $0 == item})
+        
+        // arremessar
+//        physicsScene.arremessar(item: item)
+        
+        availableItems.removeAll(where: { _item in
+            return item == _item
+        })
     }
 }
