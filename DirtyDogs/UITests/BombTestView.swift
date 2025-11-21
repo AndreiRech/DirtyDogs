@@ -17,28 +17,26 @@ struct BombTestView: View {
             SpriteView(scene: scene)
                 .ignoresSafeArea()
 
-            VStack {
+            VStack(spacing: 16) {
+
                 Spacer()
 
                 Button {
                     scene.spawnAndExplodeTestBomb()
                 } label: {
-                    Text("Testar Explosão 💣")
-                        .font(.title2)
+                    Text("💣 Testar Bomba")
+                        .font(.title3)
                         .padding()
                         .background(Color.red)
                         .foregroundColor(.white)
                         .cornerRadius(12)
                 }
-                .padding(.bottom, 40)
+
+                Spacer().frame(height: 40)
             }
         }
-        .onAppear {
-            scene.scaleMode = .resizeFill
-        }
+        .onAppear { scene.scaleMode = .resizeFill }
     }
 }
 
-#Preview {
-    BombTestView()
-}
+#Preview { BombTestView() }

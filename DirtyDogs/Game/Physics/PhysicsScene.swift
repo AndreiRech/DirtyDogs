@@ -12,6 +12,8 @@ import GameKit
 public class PhysicsScene: SKScene {
     private var matchManager: MatchManager
     var entityManager: EntityManager?
+    let haptics = HapticsService()
+
     
     init(matchManager: MatchManager, size: CGSize) {
         self.matchManager = matchManager
@@ -44,6 +46,9 @@ public class PhysicsScene: SKScene {
         setupBorders()
         
         self.entityManager = EntityManager(scene: self)
+        
+        haptics.prepareHaptics()
+
     }
     
     private func setupBorders() {
@@ -175,7 +180,6 @@ extension PhysicsScene {
         var payload: PhysicsObjectData? = nil
         
         let xDirection: CGFloat = node.position.x
-        
         let objectType: PhysicsObjectType?
         
         switch entity {
@@ -183,6 +187,8 @@ extension PhysicsScene {
             objectType = .ball
         case is Bomb:
             objectType = .bomb
+        case is Poop:
+            objectType = .poop
         default:
             objectType = nil
             print("❌ erro: entity type not found")
@@ -212,6 +218,8 @@ extension PhysicsScene {
             return Ball()
         case .bomb:
             return Bomb()
+        case .poop:
+            return Poop()
         }
     }
     
@@ -223,14 +231,18 @@ extension PhysicsScene {
         value.setPosition(to: point)
         entityManager?.add(entity: value)
         print("🎾 Criada bolinha local na posição: \(point)")
+        
+        executeAction(value: value)
     }
     
     // Cria uma entidade em uma posição específica
-    func spawnBall(at point: CGPoint, entity: PhysicsObjectType) {
+    func spawnItem(at point: CGPoint, entity: PhysicsObjectType) {
         let value = getItemType(entity: entity)
         value.setPosition(to: point)
         entityManager?.add(entity: value)
         print("🎾 Criada bolinha em posição específica: \(point)")
+        
+        executeAction(value: value)
     }
     
     // Cria uma entidade em movimento (recebida da rede)
@@ -271,6 +283,30 @@ extension PhysicsScene {
         bomb.setPosition(to: point)
         entityManager?.add(entity: bomb)
         print("💣 Criada bomba em posição específica: \(point)")
+        
+        executeAction(value: value)
+    }
+    
+    private func executeAction(value: GameEntity) {
+        if let bomb = value as? Bomb {
+            bomb.startFuseAnimation()
+
+            // explode após pequena animação do pavio
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                if let node = bomb.node {
+                    self.explode(node: node, entity: bomb)
+                }
+            }
+        }
+        
+        if let poop = value as? Poop {
+            // explode após pequeno delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                if let node = poop.node {
+                    self.explodePoop(node: node, entity: poop)
+                }
+            }
+        }
     }
 
     func applyStun(duration: TimeInterval) {
@@ -300,61 +336,66 @@ extension PhysicsScene {
     func explode(node: SKNode, entity: GKEntity?) {
         guard let parent = node.parent else { return }
         let origin = node.position
-
-        // Partículas de explosão
+        
+        // 1) Partículas de explosão
         let emitter = SKEmitterNode()
-        emitter.particleTexture = nil
+        emitter.particleTexture = nil                // bolinhas simples
         emitter.particleColor = .orange
         emitter.particleColorBlendFactor = 1.0
-        emitter.numParticlesToEmit = 80
-        emitter.particleBirthRate = 300
+        emitter.numParticlesToEmit = 200
+        emitter.particleBirthRate = 800
         emitter.particleLifetime = 0.4
         emitter.particleLifetimeRange = 0.1
         emitter.emissionAngleRange = .pi * 2
-        emitter.particleSpeed = 320
-        emitter.particleSpeedRange = 120
+        emitter.particleSpeed = 520
+        emitter.particleSpeedRange = 220
         emitter.particleAlpha = 0.9
         emitter.particleAlphaRange = 0.1
         emitter.particleAlphaSpeed = -2.0
-        emitter.particleScale = 0.22
+        emitter.particleScale = 0.40
         emitter.particleScaleRange = 0.10
         emitter.particleScaleSpeed = -0.6
-        emitter.particlePositionRange = CGVector(dx: 5, dy: 5)
+        emitter.particlePositionRange = CGVector(dx: 20, dy: 20)
         emitter.particleRotationRange = .pi * 2
-
+        
         emitter.position = origin
         emitter.zPosition = 998
         parent.addChild(emitter)
-
+        
         emitter.run(.sequence([
             .wait(forDuration: 0.5),
             .removeFromParent()
         ]))
-
+        
         // Flash circular rápido
-        let explosionCircle = SKShapeNode(circleOfRadius: 10)
+        let explosionCircle = SKShapeNode(circleOfRadius: 120)  
         explosionCircle.fillColor = .orange
         explosionCircle.strokeColor = .yellow
-        explosionCircle.lineWidth = 4
+        explosionCircle.lineWidth = 22
+        explosionCircle.alpha = 0.85
         explosionCircle.position = origin
         explosionCircle.zPosition = 999
         parent.addChild(explosionCircle)
-
-        let expand = SKAction.scale(to: 5.0, duration: 0.20)
-        let fade = SKAction.fadeOut(withDuration: 0.20)
+        
+        let expand = SKAction.scale(to: 4.0, duration: 0.30)
+        let fade = SKAction.fadeOut(withDuration: 0.25)
         let group = SKAction.group([expand, fade])
         let removeCircle = SKAction.removeFromParent()
+        
         explosionCircle.run(.sequence([group, removeCircle]))
-
+        
         // Tremor de tela
         shake(intensity: 18, duration: 0.35)
-
+        
         // Explosão física empurrando outros corpos
         applyBlast(from: origin, radius: 260, strength: 2200)
-
+        
         // Stun no jogador local
         applyStun(duration: 1.0)
-
+        
+        //Haptics 
+        haptics.explosionBomb()
+        
         // Remover a bomba em si
         if let entity {
             entityManager?.remove(entity: entity)
@@ -363,7 +404,6 @@ extension PhysicsScene {
         }
     }
 
-    // Empurra outros objetos com impulso radial
     func applyBlast(from origin: CGPoint, radius: CGFloat, strength: CGFloat) {
         guard let entities = entityManager?.getEntities() else { return }
 
@@ -403,6 +443,101 @@ extension PhysicsScene {
         }
              
         run(SKAction.sequence(actions))
+    }
+
+    func explodePoop(node: SKNode, entity: GKEntity?) {
+        guard let parent = node.parent else { return }
+        let origin = node.position
+
+        // ============================
+        // 1) Partículas de cocô
+        // ============================
+        let poopEmitter = SKEmitterNode()
+        poopEmitter.particleTexture = nil
+        poopEmitter.particleColor = UIColor(red: 0.32, green: 0.17, blue: 0.06, alpha: 1.0)
+        poopEmitter.particleColorBlendFactor = 1.0
+        poopEmitter.numParticlesToEmit = 180
+        poopEmitter.particleBirthRate = 900
+        poopEmitter.particleLifetime = 0.8
+        poopEmitter.particleSpeed = 460
+        poopEmitter.particleSpeedRange = 260
+        poopEmitter.particleScale = 0.55
+        poopEmitter.particleScaleRange = 0.30
+        poopEmitter.emissionAngleRange = .pi * 2
+        poopEmitter.position = origin
+        poopEmitter.zPosition = 998
+        parent.addChild(poopEmitter)
+
+        poopEmitter.run(.sequence([ .wait(forDuration: 1.0), .removeFromParent() ]))
+
+        // ============================
+        // 2) Flash de explosão
+        // ============================
+        let poopFlash = SKShapeNode(circleOfRadius: 130)
+        poopFlash.fillColor = UIColor(red: 0.8, green: 0.65, blue: 0.3, alpha: 1.0)
+        poopFlash.strokeColor = .brown
+        poopFlash.lineWidth = 22
+        poopFlash.position = origin
+        poopFlash.zPosition = 999
+        parent.addChild(poopFlash)
+
+        poopFlash.run(.sequence([
+            .group([
+                .scale(to: 3.8, duration: 0.25),
+                .fadeOut(withDuration: 0.25)
+            ]),
+            .removeFromParent()
+        ]))
+
+        // ============================
+        // 3) TELA COMPLETA SUJA 💩💩💩
+        // ============================
+        // Cria um overlay gigante cobrindo toda a tela
+        let poopOverlay = SKSpriteNode(color: UIColor(
+            red: 0.22, green: 0.12, blue: 0.03, alpha: 1.0
+        ), size: CGSize(width: size.width * 2.5, height: size.height * 2.5))
+
+        poopOverlay.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        poopOverlay.zPosition = 2000
+        poopOverlay.alpha = 0
+
+        addChild(poopOverlay)
+
+        let appear = SKAction.fadeAlpha(to: 0.95, duration: 0.25)       // SUJA TOTAL
+        let wait = SKAction.wait(forDuration: 5.0)                      // 5 SEGUNDOS
+        let disappear = SKAction.fadeOut(withDuration: 0.7)             // limpa aos poucos
+        let remove = SKAction.removeFromParent()
+
+        poopOverlay.run(.sequence([appear, wait, disappear, remove]))
+
+        // ============================
+        // 4) Tremor + Haptics fortes
+        // ============================
+        shake(intensity: 25, duration: 0.45)
+        haptics.explosionBomb()
+
+        // ============================
+        // 5) Onda de impacto física
+        // ============================
+        applyBlast(
+            from: origin,
+            radius: 350,
+            strength: 5000
+        )
+
+        // ============================
+        // 6) Stun prolongado
+        // ============================
+        applyStun(duration: 1.5)
+
+        // ============================
+        // 7) Remove entidade
+        // ============================
+        if let entity {
+            entityManager?.remove(entity: entity)
+        } else {
+            node.removeFromParent()
+        }
     }
 }
 
