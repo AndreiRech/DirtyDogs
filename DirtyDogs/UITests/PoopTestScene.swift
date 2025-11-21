@@ -8,7 +8,7 @@
 import SpriteKit
 import GameplayKit
 
-class PoopTestScene: PhysicsScene {
+class PoopTestScene: GameScene {
 
     init() {
         let screenSize = UIScreen.main.bounds.size
@@ -22,23 +22,24 @@ class PoopTestScene: PhysicsScene {
     override func didMove(to view: SKView) {
         super.didMove(to: view)
         backgroundColor = .black
-        haptics.prepareHaptics()
     }
 
     /// Testa o cocô usando a nova arquitetura (executeAction cuida da explosão)
     func spawnAndExplodeTestPoop() {
-        spawnItem(entity: .poop) // explode automaticamente via executeAction
+        let center = CGPoint(x: frame.midX, y: frame.midY)
+        spawnManager.spawnItem(at: center, entity: .poop)
     }
 
     func spawnPoopOnly() {
-        spawnItem(entity: .poop)
+        let center = CGPoint(x: frame.midX, y: frame.midY)
+        spawnManager.spawnItem(at: center, entity: .poop)
     }
 
     func explodePoopAlone() {
         let fake = SKNode()
         fake.position = CGPoint(x: frame.midX, y: frame.midY)
         addChild(fake)
-        explodePoop(node: fake, entity: nil)
+//        spawnManager.executeAction(value: fake)
     }
 }
 

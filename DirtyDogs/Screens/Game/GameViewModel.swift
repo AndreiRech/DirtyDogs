@@ -10,7 +10,7 @@ import SpriteKit
 
 @Observable
 class GameViewModel: GameViewModelProtocol {
-    var physicsScene: PhysicsScene
+    var physicsScene: GameScene
     var matchManager: MatchManager
     private var speechService: SpeechServiceProtocol
     
@@ -18,7 +18,7 @@ class GameViewModel: GameViewModelProtocol {
         self.matchManager = matchManager
         self.speechService = speechService
         
-        let scene = PhysicsScene(
+        let scene = GameScene(
             matchManager: matchManager,
             size: .zero
         )

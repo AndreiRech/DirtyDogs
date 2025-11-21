@@ -9,7 +9,7 @@ import SpriteKit
 import GameplayKit
 
 
-class BombTestScene: PhysicsScene {
+class BombTestScene: GameScene {
 
     init() {
         let screenSize = UIScreen.main.bounds.size
@@ -23,12 +23,12 @@ class BombTestScene: PhysicsScene {
     override func didMove(to view: SKView) {
         super.didMove(to: view)
         backgroundColor = .black
-        haptics.prepareHaptics()
     }
 
     /// Testa a bomba usando a nova arquitetura (executeAction cuida da explosão)
     func spawnAndExplodeTestBomb() {
-        spawnItem(entity: .bomb) // explode automaticamente via executeAction
+        let center = CGPoint(x: frame.midX, y: frame.midY)
+        spawnManager.spawnItem(at: center, entity: .bomb) // explode automaticamente via executeAction
     }
 }
 

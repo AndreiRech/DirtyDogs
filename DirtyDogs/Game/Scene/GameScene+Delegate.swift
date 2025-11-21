@@ -7,7 +7,7 @@
 
 import Foundation
 
-extension PhysicsScene: MatchManagerDelegate {
+extension GameScene: MatchManagerDelegate {
     func spawnObject(with data: PhysicsObjectData) {
         let spawnPoint = CGPoint(x: data.x, y: data.y)
         let arrivingSide: EdgeSide = data.side
@@ -15,11 +15,11 @@ extension PhysicsScene: MatchManagerDelegate {
         
         switch type {
         case .ball:
-            self.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .ball)
+            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .ball)
         case .bomb:
-            self.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .bomb)
+            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .bomb)
         case .poop:
-            self.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .poop)
+            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .poop)
         }
     }
 }

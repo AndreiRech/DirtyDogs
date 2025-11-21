@@ -6,7 +6,7 @@
 //
 
 protocol GameViewModelProtocol {
-    var physicsScene: PhysicsScene { get }
+    var physicsScene: GameScene { get }
     var matchManager: MatchManager { get }
     
     func onAppear()
