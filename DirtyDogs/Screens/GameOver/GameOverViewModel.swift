@@ -19,16 +19,16 @@ class GameOverViewModel: GameOverViewModelProtocol {
         self.matchManager = matchManager
     }
     
-    func getScreenText() -> String {
+    var screenTextLines: [String] {
         switch gameResult {
         case .victory:
-            "You Won :)"
+            return ["You", "Won!"]
         case .defeat:
-            "You Lost :("
+            return ["You", "Lost!"]
         case .quit:
-            "Your opponent left."
+            return ["Your", "Enemy", "Left"]
         default:
-            "\(gameResult)"
+            return ["\(gameResult)"]
         }
     }
     
