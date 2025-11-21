@@ -28,7 +28,8 @@ class BombTestScene: PhysicsScene {
 
     /// Testa a bomba usando a nova arquitetura (executeAction cuida da explosão)
     func spawnAndExplodeTestBomb() {
-        spawnItem(entity: .bomb) // explode automaticamente via executeAction
+        let point: CGPoint = .init(x: frame.midX, y: frame.maxY - 100)
+        spawnItem(at: point, entity: .bomb) // explode automaticamente via executeAction
     }
 }
 

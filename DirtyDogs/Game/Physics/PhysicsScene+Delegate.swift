@@ -15,12 +15,11 @@ extension PhysicsScene: MatchManagerDelegate {
         
         switch type {
         case .ball:
-            self.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .ball)
+            self.spawnItem(at: spawnPoint,  entity: .ball)
         case .bomb:
-            self.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .bomb)
+            self.spawnItem(at: spawnPoint, entity: .bomb)
         case .poop:
-            self.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .poop)
+            self.spawnItem(at: spawnPoint,  entity: .poop)
         }
     }
 }
-

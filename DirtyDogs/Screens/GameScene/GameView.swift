@@ -35,6 +35,22 @@ struct GameView: View {
                     }
             }
             
+            VStack {
+                HStack {
+                    Spacer()
+                    
+                    Button {
+                        matchManager.endGame()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.largeTitle)
+                            .foregroundColor(.red)
+                            .padding()
+                    }
+                }
+                Spacer()
+            }
+            
             // UI sobre a cena
             VStack {
                 Spacer()

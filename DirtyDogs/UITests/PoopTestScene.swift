@@ -27,11 +27,15 @@ class PoopTestScene: PhysicsScene {
 
     /// Testa o cocô usando a nova arquitetura (executeAction cuida da explosão)
     func spawnAndExplodeTestPoop() {
-        spawnItem(entity: .poop) // explode automaticamente via executeAction
+        let point: CGPoint = .init(x: frame.midX, y: frame.maxY - 100)
+      
+        spawnItem(at: point, entity: .poop) // explode automaticamente via executeAction
     }
 
     func spawnPoopOnly() {
-        spawnItem(entity: .poop)
+        let point: CGPoint = .init(x: frame.midX, y: frame.maxY - 100)
+      
+        spawnItem(at: point, entity: .poop)
     }
 
     func explodePoopAlone() {
