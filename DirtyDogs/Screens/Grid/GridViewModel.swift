@@ -19,8 +19,14 @@ class GridViewModel: GridViewModelProtocol {
     
     var matchManager: MatchManager?
     
+    var shouldSpawnBall: Bool = false
+    
     init(matchManager: MatchManager? = nil) {
         self.matchManager = matchManager
     }
     
+    // Função para enviar a bolinha
+    func sendBall() {
+        shouldSpawnBall = true
+    }
 }

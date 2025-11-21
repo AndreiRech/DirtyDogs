@@ -13,9 +13,7 @@ struct DirtyDogsApp: App {
     
     var body: some Scene {
         WindowGroup {
-//            GridView(viewModel: GridViewModel())
             ControllerView(matchManager: matchManager)
-            //BombTestView()
         }
     }
 }
