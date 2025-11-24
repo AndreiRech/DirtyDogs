@@ -23,4 +23,3 @@ extension GameScene: MatchManagerDelegate {
         }
     }
 }
-

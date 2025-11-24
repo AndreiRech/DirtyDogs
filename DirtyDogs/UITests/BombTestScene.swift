@@ -28,7 +28,7 @@ class BombTestScene: GameScene {
     /// Testa a bomba usando a nova arquitetura (executeAction cuida da explosão)
     func spawnAndExplodeTestBomb() {
         let center = CGPoint(x: frame.midX, y: frame.midY)
-        spawnManager.spawnItem(at: center, entity: .bomb) // explode automaticamente via executeAction
+        spawnManager?.spawnItem(at: center, entity: .bomb) // explode automaticamente via executeAction
     }
 }
 
