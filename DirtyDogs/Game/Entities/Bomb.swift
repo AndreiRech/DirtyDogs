@@ -26,20 +26,17 @@ public class Bomb: GKEntity, GameEntity {
     override public init() {
         super.init()
 
-        // Corpo principal da bomba
         let circle = SKShapeNode(circleOfRadius: bombSize)
         circle.fillColor = .black
         circle.strokeColor = .gray
         circle.lineWidth = 4
 
-        // Pavio da bomba
         let fuse = SKShapeNode(rectOf: CGSize(width: 10, height: 22), cornerRadius: 3)
         fuse.fillColor = .orange
         fuse.strokeColor = .red
         fuse.position = CGPoint(x: 0, y: bombSize + 12)
-        fuse.name = "fuse" // importante para animar depois
+        fuse.name = "fuse"
 
-        // Nó container
         let container = SKNode()
         container.name = "bomb"
         container.addChild(circle)
@@ -55,6 +52,7 @@ public class Bomb: GKEntity, GameEntity {
         container.physicsBody?.restitution = 0.9
         container.physicsBody?.friction = 0.0
         container.physicsBody?.usesPreciseCollisionDetection = true
+        container.zPosition = 100
 
         addComponent(GKSKNodeComponent(node: container))
 
@@ -70,7 +68,6 @@ public class Bomb: GKEntity, GameEntity {
         component(ofType: GKSKNodeComponent.self)?.node.position = point
     }
 
-    // Pavio piscando rapidinho (amarelo/vermelho)
     public func startFuseAnimation() {
         guard
             let container = component(ofType: GKSKNodeComponent.self)?.node,
@@ -86,7 +83,6 @@ public class Bomb: GKEntity, GameEntity {
 
         fuse.run(.repeatForever(flicker))
         
-        // Bombinha “pulsando” levemente
         let pulseUp = SKAction.scale(to: 1.08, duration: 0.12)
         let pulseDown = SKAction.scale(to: 1.0, duration: 0.12)
         container.run(.repeatForever(.sequence([pulseUp, pulseDown])))

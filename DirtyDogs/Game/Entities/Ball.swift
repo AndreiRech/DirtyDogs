@@ -29,6 +29,7 @@ public class Ball: GKEntity, GameEntity {
         node.name = "ball"
         node.fillColor = .systemBlue
         node.strokeColor = .white
+        node.zPosition = 100 
 
         node.physicsBody = SKPhysicsBody(circleOfRadius: ballSize)
         node.physicsBody?.affectedByGravity = false

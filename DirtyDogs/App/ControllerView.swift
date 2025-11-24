@@ -15,21 +15,11 @@ struct ControllerView: View {
     var body: some View {
         ZStack {
             if matchManager.isGameOver {
-                let viewModel = GameOverViewModel(matchManager: matchManager)
-                GameOverView(viewModel: viewModel)
-                
+                GameOverView(viewModel: GameOverViewModel(matchManager: matchManager))
             } else if matchManager.gameState == .inGame {
-                GameView(
-                    matchManager: matchManager,
-                    speechService: speechService
-                )
-                
+                GameView(viewModel: GameViewModel(matchManager: matchManager, speechService: speechService))
             } else {
-                let viewModel = MenuViewModel(
-                    matchManager: matchManager,
-                    hapticsService: hapticsService
-                )
-                MenuView(viewModel: viewModel)
+                MenuView(viewModel: MenuViewModel(matchManager: matchManager, hapticsService: hapticsService))
             }
         }
         .onAppear {
