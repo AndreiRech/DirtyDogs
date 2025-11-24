@@ -16,30 +16,30 @@ public class PhysicsScene: SKScene {
     
     private var touchStartTime: TimeInterval = 0
     private var touchStartLocation: CGPoint = .zero
-
-
+    
+    
     init(matchManager: MatchManager, size: CGSize) {
         self.matchManager = matchManager
         super.init(size: size)
     }
-
+    
     public override convenience init(size: CGSize) {
         fatalError("Use PhysicsScene(matchManager:size:) instead")
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     private var isDragging = false
     private var currentDrag: GKEntity?
     private var targetPoint: CGPoint?
-
+    
     override public func didMove(to view: SKView) {
         backgroundColor = .clear
         scaleMode = .resizeFill
         physicsWorld.gravity = .init(dx: 0, dy: 9.6)
-
+        
         physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
         physicsBody?.categoryBitMask = PhysicsCategory.edge
         
@@ -47,7 +47,7 @@ public class PhysicsScene: SKScene {
         
         spawnBall()
     }
-
+    
     // MARK: - Touch funcs
     override public func touchesBegan(
         _ touches: Set<UITouch>,
@@ -68,13 +68,13 @@ public class PhysicsScene: SKScene {
             let node = manager.node(for: entity),
             let body = node.physicsBody
         else { return }
-
+        
         isDragging = true
         currentDrag = entity
         targetPoint = location
         body.angularVelocity = 0
     }
-
+    
     override public func touchesMoved(
         _ touches: Set<UITouch>,
         with event: UIEvent?
@@ -82,16 +82,16 @@ public class PhysicsScene: SKScene {
         guard let touch = touches.first else { return }
         targetPoint = touch.location(in: self)
     }
-
+    
     override public func touchesEnded(
         _ touches: Set<UITouch>,
         with event: UIEvent?
     ) {
-//        endDrag()
+        //        endDrag()
         guard let touch = touches.first,
               let manager = entityManager
         else { return }
-
+        
         let location = touch.location(in: self)
         let dt = CACurrentMediaTime() - touchStartTime
         let dist = hypot(
@@ -100,34 +100,34 @@ public class PhysicsScene: SKScene {
         )
         
         let isTap = dt < 0.20 && dist < 20
-
+        
         if isTap {
             handleTap(at: location)
             return
         }
-
+        
         // Drag normal
         endDrag()
     }
     
     private func handleTap(at location: CGPoint) {
         guard let manager = entityManager else { return }
-
+        
         if let entity = manager.entity(at: location) {
             manager.remove(entity: entity)
-
+            
             let item = InventoryItem(imageName: "ball_icon")
             inventoryDelegate?.didCollect(item: item)
         }
     }
-
+    
     override public func touchesCancelled(
         _ touches: Set<UITouch>,
         with event: UIEvent?
     ) {
         endDrag()
     }
-
+    
     private func endDrag() {
         isDragging = false
         
@@ -145,7 +145,7 @@ public class PhysicsScene: SKScene {
         
         body.angularVelocity = 0
     }
-
+    
     override public func update(_ currentTime: TimeInterval) {
         handleMovementUpdate()
         
@@ -160,7 +160,7 @@ public class PhysicsScene: SKScene {
             }
         }
     }
-
+    
     public override func didChangeSize(_ oldSize: CGSize) {
         super.didChangeSize(oldSize)
         physicsBody = SKPhysicsBody(edgeLoopFrom: frame)
@@ -181,7 +181,7 @@ extension PhysicsScene {
         entityManager?.remove(entity: entity)
         let dxFromCenter = node.position.x - frame.midX
         let mirroredDx = -dxFromCenter
-
+        
         let ballPayload = BallData(
             x: mirroredDx,
             y: node.position.y,
@@ -195,7 +195,7 @@ extension PhysicsScene {
             print("Erro ao codificar e enviar 'BallData': \(error)")
         }
     }
-
+    
     // Cria a bola inicial
     func spawnBall() {
         let ball = Ball()
@@ -232,7 +232,7 @@ extension PhysicsScene {
             let body = node.physicsBody,
             let target = targetPoint
         else { return }
-
+        
         let pos = node.position
         let dx = target.x - pos.x
         let dy = target.y - pos.y
@@ -241,19 +241,19 @@ extension PhysicsScene {
             body.velocity = .zero
             return
         }
-
+        
         let stiffness: CGFloat = 20
         let damping: CGFloat = 10
-
+        
         let desiredVx = dx * stiffness
         let desiredVy = dy * stiffness
-
+        
         let steerX = desiredVx - body.velocity.dx
         let steerY = desiredVy - body.velocity.dy
-
+        
         let force = CGVector(dx: steerX * damping, dy: steerY * damping)
         body.applyForce(force)
-
+        
         let maxSpeed: CGFloat = 1000
         var velocity = body.velocity
         let speed = hypot(velocity.dx, velocity.dy)
@@ -279,4 +279,24 @@ extension PhysicsScene {
         
         return nil
     }
+    
+    func throwItemFromInventory(_ item: InventoryItem) {
+        let point = CGPoint(x: frame.midX, y: frame.midY)
+
+        let entity = GKEntity()
+        let sprite = SKSpriteNode(imageNamed: item.imageName)
+        sprite.position = point
+
+        // Física inicial: parado, sem gravidade
+        let body = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
+        body.affectedByGravity = false
+        body.allowsRotation = true
+        body.velocity = .zero
+        body.angularVelocity = 0
+        sprite.physicsBody = body
+
+        entity.addComponent(GKSKNodeComponent(node: sprite))
+        entityManager?.add(entity: entity)
+    }
+
 }

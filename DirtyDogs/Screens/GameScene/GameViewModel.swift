@@ -54,6 +54,9 @@ extension GameViewModel: InventoryDelegate {
     
     func didCollect(item: InventoryItem) {
         availableItems.append(item)
+        for aux in availableItems {
+            print(aux)
+        }
     }
     
     func didUse(item: InventoryItem) {
@@ -65,5 +68,7 @@ extension GameViewModel: InventoryDelegate {
         availableItems.removeAll(where: { _item in
             return item == _item
         })
+        
+        physicsScene.throwItemFromInventory(item)
     }
 }
