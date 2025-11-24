@@ -8,3 +8,8 @@
 protocol GameSceneDelegate: AnyObject {
     func didTapBlock(_ index: Int)
 }
+
+protocol InventoryDelegate: AnyObject {
+    func didCollect(item: InventoryItem)
+    func didUse(item: InventoryItem)
+}

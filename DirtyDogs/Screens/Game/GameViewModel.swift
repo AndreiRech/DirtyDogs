@@ -10,10 +10,14 @@ import SpriteKit
 import SwiftUI
 
 @Observable
-class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
+class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate {
     var gameScene: GameScene
     var matchManager: MatchManager
     var selectedIndex: Int? = nil
+    
+    var availableItems: [InventoryItem] = [
+        InventoryItem(imageName: "mockItem")
+    ]
     
     private var speechService: SpeechServiceProtocol
     
@@ -30,6 +34,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
         
         self.matchManager.delegate = scene
         self.gameScene.uiDelegate = self
+        self.gameScene.inventoryDelegate = self
     }
     
     func onAppear() {
@@ -44,7 +49,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     func endGame(with event: PacketType) {
         matchManager.endGame(with: event)
     }
-        
+    
     func resetGrid() {
         gameScene.gridManager.resetGrid()
     }
@@ -71,5 +76,22 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
         Task { @MainActor in
             self.selectedIndex = index
         }
+    }
+    
+    func didCollect(item: InventoryItem) {
+        withAnimation {
+            availableItems.append(item)
+        }
+        print("Item coletado: \(item.imageName)")
+    }
+    
+    func didUse(item: InventoryItem) {
+        if let index = availableItems.firstIndex(of: item) {
+            withAnimation {
+                availableItems.remove(at: index)
+            }
+        }
+
+        spawnItem(type: .ball)
     }
 }

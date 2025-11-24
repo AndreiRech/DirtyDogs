@@ -9,7 +9,7 @@ import SwiftUI
 import SpriteKit
 
 struct GameView: View {
-    @State var viewModel: GameViewModel
+    @State var viewModel: GameViewModelProtocol
     
     var body: some View {
         ZStack {
@@ -34,25 +34,43 @@ struct GameView: View {
             VStack {
                 Spacer()
                 
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(viewModel.availableItems) { item in
+                            Image(item.imageName)
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .background(Color.white.opacity(0.3))
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                                .onTapGesture {
+                                    viewModel.didUse(item: item)
+                                }
+                        }
+                    }
+                    .padding()
+                }
+                .frame(height: 70)
+                
                 HStack(spacing: 16) {
                     Button("Resetar grade") {
                         viewModel.resetGrid()
                     }
                     .buttonStyle(.borderedProminent)
                     
-                    Button("Spawnar bolinha") {
-                        viewModel.spawnItem(type: .ball)
+                    Button("Bolinha") {
+                        viewModel.spawnItem(type: .poop)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.orange)
                     
-                    Button("Enviar bomba") {
+                    Button("Bomba") {
                         viewModel.spawnItem(type: .bomb)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.red)
                 }
-                .padding(.bottom, 40)
+                .padding(.bottom, 20)
             }
         }
         .sheet(item: Binding(

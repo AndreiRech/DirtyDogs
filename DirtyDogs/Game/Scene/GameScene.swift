@@ -23,6 +23,7 @@ public class GameScene: SKScene {
             gridManager?.uiDelegate = uiDelegate
         }
     }
+    weak var inventoryDelegate: InventoryDelegate?
     
     init(matchManager: MatchManager, size: CGSize) {
         self.matchManager = matchManager
@@ -65,12 +66,34 @@ public class GameScene: SKScene {
     // MARK: - Touch Functions
     override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
+        let location = touch.location(in: self)
         
         if inputManager.handleTouchesBegan(touches) {
             return
         }
         
-        _ = gridManager.handleTouch(touch)
+        if handleCollectionTap(at: location) {
+            return
+        }
+        
+        if gridManager.handleTouch(touch) {
+            return
+        }
+    }
+    
+    func handleCollectionTap(at location: CGPoint) -> Bool {
+        guard let manager = entityManager else { return false }
+        
+        if let entity = manager.entity(at: location) {
+            manager.remove(entity: entity)
+
+            let imageName = (entity is Bomb) ? "mockItem" : "mockItem"
+            let item = InventoryItem(imageName: imageName)
+            
+            inventoryDelegate?.didCollect(item: item)
+            return true
+        }
+        return false
     }
     
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -184,6 +207,17 @@ public class GameScene: SKScene {
             matchManager.sendPacket(packet, mode: .reliable)
         } else {
             print("AVISO: Entidade do tipo \(type(of: entity)) saiu da tela, mas não há lógica de rede para ela.")
+        }
+    }
+    
+    private func handleTap(at location: CGPoint) {
+        guard let manager = entityManager else { return }
+        
+        if let entity = manager.entity(at: location) {
+            manager.remove(entity: entity)
+            
+            let item = InventoryItem(imageName: "ball_icon")
+            inventoryDelegate?.didCollect(item: item)
         }
     }
 }

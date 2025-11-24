@@ -45,7 +45,7 @@ class InputManager {
         
         return false
     }
-    
+        
     func handleTouchesMoved(_ touches: Set<UITouch>) {
         if fxManager?.isStunned == true { return }
         guard let scene = scene, let touch = touches.first else { return }
