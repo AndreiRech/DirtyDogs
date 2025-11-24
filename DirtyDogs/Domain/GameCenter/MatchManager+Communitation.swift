@@ -10,7 +10,6 @@ import GameKit
 import SpriteKit
 
 extension MatchManager: GKMatchDelegate {
-    // MARK: Gameplay Functions
     func startGame(newMatch: GKMatch) {
         self.match = newMatch
         match?.delegate = self
@@ -19,20 +18,21 @@ extension MatchManager: GKMatchDelegate {
     }
     
     func endGame(with event: PacketType) {
-        isGameOver = true
         sendPacket(GamePacket(type: event))
         
         switch event {
         case .victory:
             gameState = .victory
+            isGameOver = true
         case .quit:
-            returnToMenu()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                self.returnToMenu()
+            }
         default :
             break
         }
     }
     
-    // MARK: Communication Functions
     func match(_ match: GKMatch, didReceive data: Data, fromRemotePlayer player: GKPlayer) {
         do {
             let packet = try JSONDecoder().decode(GamePacket.self, from: data)
@@ -48,7 +48,7 @@ extension MatchManager: GKMatchDelegate {
                     break
                 }
                 gameState = .inGame
-            
+                
             case .victory:
                 gameState = .defeat
                 isGameOver = true

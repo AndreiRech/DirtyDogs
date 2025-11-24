@@ -34,6 +34,8 @@ class SpawnManager {
         entityManager?.add(entity: value)
         
         value.body?.applyForce(.init(dx: 0, dy: -25000))
+        
+        executeAction(value: value)
     }
     
     private func getItemType(entity: PhysicsObjectType) -> GameEntity {

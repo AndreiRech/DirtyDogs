@@ -7,11 +7,14 @@
 
 import Foundation
 import SpriteKit
+import SwiftUI
 
 @Observable
-class GameViewModel: GameViewModelProtocol {
-    var physicsScene: GameScene
+class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
+    var gameScene: GameScene
     var matchManager: MatchManager
+    var selectedIndex: Int? = nil
+    
     private var speechService: SpeechServiceProtocol
     
     init(matchManager: MatchManager, speechService: SpeechServiceProtocol) {
@@ -23,20 +26,50 @@ class GameViewModel: GameViewModelProtocol {
             size: .zero
         )
         scene.scaleMode = .resizeFill
-        self.physicsScene = scene
+        self.gameScene = scene
         
         self.matchManager.delegate = scene
+        self.gameScene.uiDelegate = self
     }
     
     func onAppear() {
-//        speechService.startListening(matchManager: matchManager)
+        // speechService.startListening(matchManager: matchManager)
     }
     
     func onDisappear() {
-//        speechService.stopListening()
+        matchManager.endGame(with: .quit)
+        // speechService.stopListening()
     }
     
     func endGame(with event: PacketType) {
         matchManager.endGame(with: event)
+    }
+        
+    func resetGrid() {
+        gameScene.gridManager.resetGrid()
+    }
+    
+    func spawnItem(type: PhysicsObjectType) {
+        let spawnPoint = CGPoint(
+            x: gameScene.frame.midX,
+            y: gameScene.frame.maxY - 100
+        )
+        gameScene.spawnManager.spawnItem(at: spawnPoint, entity: type)
+    }
+    
+    func completeScratch(at index: Int) {
+        let currentLayer = gameScene.gridManager.blocks[index].layer
+        gameScene.gridManager.updateBlockLayer(at: index, to: currentLayer + 1)
+        self.selectedIndex = nil
+    }
+    
+    func cancelScratch() {
+        self.selectedIndex = nil
+    }
+
+    func didTapBlock(_ index: Int) {
+        Task { @MainActor in
+            self.selectedIndex = index
+        }
     }
 }

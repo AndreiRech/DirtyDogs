@@ -23,11 +23,11 @@ class InputManager {
         self.fxManager = fxManager
     }
     
-    func handleTouchesBegan(_ touches: Set<UITouch>) {
-        if fxManager?.isStunned == true { return }
+    func handleTouchesBegan(_ touches: Set<UITouch>) -> Bool {
+        if fxManager?.isStunned == true { return false }
         
-        guard let scene = scene, let manager = entityManager else { return }
-        guard let touch = touches.first else { return }
+        guard let scene = scene, let manager = entityManager else { return false }
+        guard let touch = touches.first else { return false }
         
         let location = touch.location(in: scene)
         
@@ -39,8 +39,12 @@ class InputManager {
             currentDrag = entity
             targetPoint = location
             body.angularVelocity = 0
+            
+            return true
         }
-    }    
+        
+        return false
+    }
     
     func handleTouchesMoved(_ touches: Set<UITouch>) {
         if fxManager?.isStunned == true { return }

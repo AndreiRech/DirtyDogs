@@ -1,5 +1,5 @@
 //
-//  PhysicsScene.swift
+//  GameScene.swift
 //  DirtyDogs
 //
 //  Created by Andrei Rech on 12/11/25.
@@ -11,10 +11,18 @@ import GameKit
 
 public class GameScene: SKScene {
     private var matchManager: MatchManager
+    
     var entityManager: EntityManager!
     var fxManager: ScreenFXManager!
     var inputManager: InputManager!
     var spawnManager: SpawnManager!
+    var gridManager: GridManager!
+    
+    weak var uiDelegate: GameSceneDelegate? {
+        didSet {
+            gridManager?.uiDelegate = uiDelegate
+        }
+    }
     
     init(matchManager: MatchManager, size: CGSize) {
         self.matchManager = matchManager
@@ -24,10 +32,11 @@ public class GameScene: SKScene {
         self.fxManager = ScreenFXManager(scene: self, entityManager: entityManager)
         self.inputManager = InputManager(scene: self, entityManager: entityManager, fxManager: fxManager)
         self.spawnManager = SpawnManager(entityManager: entityManager, fxManager: fxManager)
+        self.gridManager = GridManager(scene: self) // NOVO
     }
     
     public override convenience init(size: CGSize) {
-        fatalError("Use PhysicsScene(matchManager:size:) instead")
+        fatalError("Use GameScene(matchManager:size:) instead")
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -37,9 +46,11 @@ public class GameScene: SKScene {
     public override func didMove(to view: SKView) {
         backgroundColor = .clear
         scaleMode = .resizeFill
-        physicsWorld.gravity = .init(dx: 0, dy: 9.6)
+        physicsWorld.gravity = .init(dx: 0, dy: -9.6)
         
         setupBorders()
+        
+        gridManager.setupGrid()
         
         // TODO: Remover isso quando não precisar de um item inicial
         let center = CGPoint(x: frame.midX, y: frame.midY)
@@ -51,18 +62,15 @@ public class GameScene: SKScene {
         checkExits()
     }
     
-    // MARK: Touch Functions
-    public override func didChangeSize(_ oldSize: CGSize) {
-        super.didChangeSize(oldSize)
-        setupBorders()
-        
-        children.filter { $0.name?.hasPrefix("sensor.") == true }.forEach {
-            $0.removeFromParent()
-        }
-    }
-    
+    // MARK: - Touch Functions
     override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        inputManager.handleTouchesBegan(touches)
+        guard let touch = touches.first else { return }
+        
+        if inputManager.handleTouchesBegan(touches) {
+            return
+        }
+        
+        _ = gridManager.handleTouch(touch)
     }
     
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -77,7 +85,20 @@ public class GameScene: SKScene {
         inputManager.handleTouchesEnded()
     }
     
-    // MARK: Auxiliar Functions
+    public override func didChangeSize(_ oldSize: CGSize) {
+        super.didChangeSize(oldSize)
+        
+        guard let _ = self.view, gridManager != nil else { return }
+        
+        setupBorders()
+        gridManager.setupGrid()
+        
+        children.filter { $0.name?.hasPrefix("sensor.") == true }.forEach {
+            $0.removeFromParent()
+        }
+    }
+    
+    // MARK: - Physics & Logic
     private func checkExits() {
         let entities = entityManager.getEntities()
         
