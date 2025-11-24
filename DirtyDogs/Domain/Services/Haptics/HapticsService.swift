@@ -47,4 +47,47 @@ class HapticsService: HapticsServiceProtocol {
             print("Failed to play pattern: \(error.localizedDescription).")
         }
     }
+    
+    func explosionBomb() {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
+
+        var events = [CHHapticEvent]()
+
+        // Pulso forte de impacto
+        let impact = CHHapticEvent(
+            eventType: .hapticTransient,
+            parameters: [
+                CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
+                CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
+            ],
+            relativeTime: 0
+        )
+        events.append(impact)
+
+        // Ondas de vibração diminuindo — sensação de explosão
+        for i in stride(from: 0.05, through: 0.35, by: 0.05) {
+            let intensity = Float(max(0.5, 1.0 - i * 1.5))
+            let sharpness = Float(max(0.2, 1.0 - i))
+
+            let wave = CHHapticEvent(
+                eventType: .hapticTransient,
+                parameters: [
+                    CHHapticEventParameter(parameterID: .hapticIntensity, value: intensity),
+                    CHHapticEventParameter(parameterID: .hapticSharpness, value: sharpness)
+                ],
+                relativeTime: i
+            )
+
+            events.append(wave)
+        }
+
+        do {
+            let pattern = try CHHapticPattern(events: events, parameters: [])
+            let player = try engine?.makePlayer(with: pattern)
+            try player?.start(atTime: 0)
+        } catch {
+            print("Failed to play explosion haptic: \(error.localizedDescription)")
+        }
+    }
+
 }

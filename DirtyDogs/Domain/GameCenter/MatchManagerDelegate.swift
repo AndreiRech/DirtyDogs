@@ -8,5 +8,5 @@
 import Foundation
 
 protocol MatchManagerDelegate: AnyObject {
-    func spawnBall(at point: CGPoint, from side: EdgeSide)
+    func spawnObject(with data: PhysicsObjectData)
 }
