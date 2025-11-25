@@ -20,6 +20,7 @@ class ScratchViewModel: ScratchViewModelProtocol {
     var revealRatio: CGFloat = 0
     let brushRadius: CGFloat = 40
     let targetRevealRatio: CGFloat = 0.8
+    var wasCleared: Bool = false
     
     init(layer: Int, onComplete: @escaping () -> Void, onCancel: @escaping () -> Void, clearedCells: Set<Int> = [], gridPoints: [CGPoint] = [], cols: Int = 26, rows: Int = 0, revealRatio: CGFloat = 0) {
         self.layer = layer

@@ -67,6 +67,9 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
             switch entity {
             case .bone:
                 bonesFound += 1
+                if bonesFound == 3 {
+                    endGame(with: .victory)
+                }
                 gameScene.fxManager.playComplex()
             case .bomb, .seed, .poop:
                 guard let entityFound = entity.toPhysicsObject else { break }
@@ -87,8 +90,16 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     }
 
     func didTapBlock(_ index: Int) {
+        let block = gameScene.gridManager.blocks[index]
+
+        // Se o bloco já está no positivo (cleared), não abre a raspadinha
+        if block.cleared {   // layer == 3
+            return
+        }
+
         Task { @MainActor in
             self.selectedIndex = index
         }
     }
+
 }
