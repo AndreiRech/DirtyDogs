@@ -11,10 +11,12 @@ import GameplayKit
 class SpawnManager {
     weak var entityManager: EntityManager?
     weak var fxManager: ScreenFXManager?
+    weak var gridManager: GridManager?
     
-    init(entityManager: EntityManager?, fxManager: ScreenFXManager?) {
+    init(entityManager: EntityManager?, fxManager: ScreenFXManager?, gridManager: GridManager? = nil) {
         self.entityManager = entityManager
         self.fxManager = fxManager
+        self.gridManager = gridManager
     }
     
     // Cria uma entidade em uma posição específica
@@ -46,6 +48,8 @@ class SpawnManager {
             return Bomb()
         case .poop:
             return Poop()
+        case .seed:
+            return Seed()
         }
     }
     
@@ -66,6 +70,15 @@ class SpawnManager {
                 guard let self = self, let fx = self.fxManager else { return }
                 if let node = poop.node {
                     fx.explodePoop(node: node, entity: poop)
+                }
+            }
+        }
+        
+        if let seed = value as? Seed {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                guard let self = self, let fx = self.fxManager else { return }
+                if let node = seed.node {
+                    fx.explodeSeed(node: node, entity: seed, gridManager: self.gridManager)
                 }
             }
         }

@@ -186,4 +186,124 @@ class ScreenFXManager {
         }
         scene.run(.sequence(actions))
     }
+    
+    func explodeSeed(node: SKNode, entity: GKEntity?, gridManager: GridManager?) {
+        guard let parent = node.parent else { return }
+        let origin = node.position
+        
+        // Emitter de partículas rosa/verde (semente)
+        let seedEmitter = SKEmitterNode()
+        seedEmitter.particleTexture = nil
+        seedEmitter.particleColor = .systemPink
+        seedEmitter.particleColorBlendFactor = 1.0
+        seedEmitter.numParticlesToEmit = 150
+        seedEmitter.particleBirthRate = 800
+        seedEmitter.particleLifetime = 0.6
+        seedEmitter.particleSpeed = 400
+        seedEmitter.particleAlpha = 0.9
+        seedEmitter.particleScale = 0.35
+        seedEmitter.position = origin
+        seedEmitter.zPosition = 998
+        parent.addChild(seedEmitter)
+        
+        seedEmitter.run(.sequence([.wait(forDuration: 0.8), .removeFromParent()]))
+        
+        // Flash rosa
+        let seedFlash = SKShapeNode(circleOfRadius: 100)
+        seedFlash.fillColor = .systemPink
+        seedFlash.strokeColor = .systemGreen
+        seedFlash.lineWidth = 18
+        seedFlash.alpha = 0.8
+        seedFlash.position = origin
+        seedFlash.zPosition = 999
+        parent.addChild(seedFlash)
+        
+        seedFlash.run(.sequence([
+            .group([.scale(to: 3.5, duration: 0.28), .fadeOut(withDuration: 0.25)]),
+            .removeFromParent()
+        ]))
+        
+        // Animação de "plantio" - bolinhas nos blocos do grid
+        if let gridManager = gridManager {
+            animatePlanting(gridManager: gridManager)
+        }
+        
+        shake(intensity: 15, duration: 0.3)
+        haptics.explosionBomb()
+        applyStun(duration: 0.8)
+        
+        if let entity = entity {
+            entityManager?.remove(entity: entity)
+        } else {
+            node.removeFromParent()
+        }
+    }
+    
+    private func animatePlanting(gridManager: GridManager) {
+        guard let scene = scene else { return }
+        
+        let totalBlocks = gridManager.blocks.count
+        
+        // Verifica se todos os blocos já estão no nível mínimo (grama = layer 0)
+        let allAtMinimum = gridManager.blocks.allSatisfy { $0.layer == 0 }
+        
+        for i in 0..<totalBlocks {
+            let block = gridManager.blocks[i]
+            
+            // Se todos estão no mínimo, reconstrói (aumenta layer)
+            // Senão, desconstrói (diminui layer)
+            let shouldReconstruct = allAtMinimum
+            
+            // Se está desconstruindo e já está no mínimo, pula
+            if !shouldReconstruct && block.layer <= 0 { continue }
+            
+            // Se está reconstruindo e já está no máximo, pula
+            if shouldReconstruct && block.layer >= 2 { continue }
+            
+            // Pega a posição do bloco
+            if let blockNode = gridManager.blockNodes.first(where: { $0.name == "block_\(i)" }) {
+                let blockPosition = scene.convert(blockNode.position, from: gridManager.gridContainer)
+                
+                // Cria a bolinha de "plantio"
+                let seedBall = SKShapeNode(circleOfRadius: 20)
+                seedBall.fillColor = .systemPink
+                seedBall.strokeColor = .systemGreen
+                seedBall.lineWidth = 3
+                seedBall.alpha = 0
+                seedBall.position = blockPosition
+                seedBall.zPosition = 2000 // Bem acima de tudo
+                scene.addChild(seedBall)
+                
+                // Animação: aparece, pulsa e desaparece
+                let delay = Double(i) * 0.08 // Delay progressivo para efeito em cascata
+                
+                seedBall.run(.sequence([
+                    .wait(forDuration: delay),
+                    .group([
+                        .fadeIn(withDuration: 0.15),
+                        .scale(to: 1.2, duration: 0.15)
+                    ]),
+                    .wait(forDuration: 0.1),
+                    .group([
+                        .fadeOut(withDuration: 0.15),
+                        .scale(to: 0.8, duration: 0.15)
+                    ]),
+                    .removeFromParent()
+                ]))
+                
+                // Atualiza o layer do bloco após a animação
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.3) {
+                    let newLayer: Int
+                    if shouldReconstruct {
+                        // Reconstrói: aumenta uma camada (max 2)
+                        newLayer = min(block.layer + 1, 2)
+                    } else {
+                        // Desconstrói: diminui uma camada (min 0)
+                        newLayer = max(block.layer - 1, 0)
+                    }
+                    gridManager.updateBlockLayer(at: i, to: newLayer)
+                }
+            }
+        }
+    }
 }

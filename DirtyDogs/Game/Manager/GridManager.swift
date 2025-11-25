@@ -13,9 +13,8 @@ class GridManager {
     weak var uiDelegate: GameSceneDelegate?
     
     var blocks: [GridBlock]
-    private var blockNodes: [SKSpriteNode] = []
-    private var gridContainer: SKNode
-
+    var blockNodes: [SKSpriteNode] = []
+    var gridContainer: SKNode
     
     private let rows = 4
     private let cols = 3
@@ -148,3 +147,4 @@ class GridManager {
         setupGrid()
     }
 }
+
