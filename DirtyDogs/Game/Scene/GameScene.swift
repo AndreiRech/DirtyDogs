@@ -33,7 +33,7 @@ public class GameScene: SKScene {
         self.fxManager = ScreenFXManager(scene: self, entityManager: entityManager)
         self.inputManager = InputManager(scene: self, entityManager: entityManager, fxManager: fxManager)
         self.spawnManager = SpawnManager(entityManager: entityManager, fxManager: fxManager)
-        self.gridManager = GridManager(scene: self) // NOVO
+        self.gridManager = GridManager(scene: self)
     }
     
     public override convenience init(size: CGSize) {
@@ -57,7 +57,7 @@ public class GameScene: SKScene {
         
         setupBorders()
         
-        gridManager.setupGrid()
+        _ = gridManager.createMap(horizontal: 3, vertical: 4)
         
         // TODO: Remover isso quando não precisar de um item inicial
         let center = CGPoint(x: frame.midX, y: frame.midY)

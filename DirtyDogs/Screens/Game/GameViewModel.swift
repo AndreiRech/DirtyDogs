@@ -14,9 +14,11 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     var gameScene: GameScene
     var matchManager: MatchManager
     var selectedIndex: Int? = nil
+    var bonesFound: Int = 0
     
     private var speechService: SpeechServiceProtocol
     
+    // MARK: Init and StateControll functions
     init(matchManager: MatchManager, speechService: SpeechServiceProtocol) {
         self.matchManager = matchManager
         self.speechService = speechService
@@ -45,6 +47,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
         matchManager.endGame(with: event)
     }
         
+    // MARK: Game functions
     func resetGrid() {
         gameScene.gridManager.resetGrid()
     }
@@ -58,8 +61,27 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     }
     
     func completeScratch(at index: Int) {
-        let currentLayer = gameScene.gridManager.blocks[index].layer
-        gameScene.gridManager.updateBlockLayer(at: index, to: currentLayer + 1)
+        let entity = gameScene.gridManager.completeScratch(at: index)
+        
+        if let entity = entity {
+            switch entity {
+            case .bone:
+                bonesFound += 1
+                if bonesFound == 3 {
+                    endGame(with: .victory)
+                }
+                gameScene.fxManager.playComplex()
+            case .bomb, .seed, .poop:
+                guard let entityFound = entity.toPhysicsObject else { break }
+                
+                print("entidade encontrada: \(entityFound)")
+                spawnItem(type: entityFound)
+                gameScene.fxManager.playItemFind()
+            default:
+                break
+            }
+        }
+        
         self.selectedIndex = nil
     }
     
@@ -68,8 +90,16 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     }
 
     func didTapBlock(_ index: Int) {
+        let block = gameScene.gridManager.blocks[index]
+
+        // Se o bloco já está no positivo (cleared), não abre a raspadinha
+        if block.cleared {   // layer == 3
+            return
+        }
+
         Task { @MainActor in
             self.selectedIndex = index
         }
     }
+
 }
