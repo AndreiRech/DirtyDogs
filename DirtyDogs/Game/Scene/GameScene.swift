@@ -57,7 +57,7 @@ public class GameScene: SKScene {
         
         setupBorders()
         
-        gridManager.setupGrid()
+        _ = gridManager.createMap(horizontal: 3, vertical: 4)
         
         // TODO: Remover isso quando não precisar de um item inicial
         let center = CGPoint(x: frame.midX, y: frame.midY)

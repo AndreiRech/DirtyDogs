@@ -104,7 +104,8 @@ struct ScratchView: View {
                 viewModel.setupGrid(in: newValue)
             }
             .onChange(of: viewModel.clearedCells) {
-                if viewModel.revealRatio >= viewModel.targetRevealRatio {
+                if viewModel.wasCleared == false && viewModel.revealRatio >= viewModel.targetRevealRatio {
+                    viewModel.wasCleared = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                         viewModel.onComplete()
                         dismiss()

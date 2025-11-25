@@ -9,7 +9,7 @@ import SpriteKit
 import GameplayKit
 
 class GridManager {
-    weak var scene: SKScene?
+    weak var scene: GameScene?
     weak var uiDelegate: GameSceneDelegate?
     
     var blocks: [GridBlock]
@@ -21,10 +21,9 @@ class GridManager {
     private let spacing: CGFloat = -4
     private var blockSize: CGSize = .zero
     
-    init(scene: SKScene) {
+    init(scene: GameScene) {
         self.scene = scene
         self.gridContainer = SKNode()
-        self.blocks = Array(repeating: GridBlock(), count: rows * cols)
         self.gridContainer.zPosition = 10
         scene.addChild(gridContainer)
     }
@@ -32,21 +31,18 @@ class GridManager {
     func setupGrid() {
         guard let scene = scene else { return }
         
-        // Screen Size Grid
         let availableWidth = scene.frame.width - (CGFloat(cols - 1) * spacing) - 16
         let availableHeight = scene.frame.height - 400 - (CGFloat(rows - 1) * spacing)
-
+        
         let blockWidth = availableWidth / CGFloat(cols)
         let blockHeight = availableHeight / CGFloat(rows)
-
+        
         blockSize = CGSize(width: blockWidth, height: blockHeight)
         
-        // Limpa tudo primeiro
         blockNodes.forEach { $0.removeFromParent() }
         blockNodes.removeAll()
         gridContainer.removeAllChildren()
         
-        // Background
         let background = SKSpriteNode(imageNamed: "background2")
         background.size = CGSize(
             width: CGFloat(cols) * blockSize.width + CGFloat(cols - 1) * spacing + 20,
@@ -56,7 +52,6 @@ class GridManager {
         background.zPosition = -1
         gridContainer.addChild(background)
         
-        // Grid - blocos por cima do background
         let totalWidth = CGFloat(cols) * blockSize.width + CGFloat(cols - 1) * spacing
         let startX = scene.frame.midX - totalWidth / 2 + blockSize.width / 2
         let startY = scene.frame.maxY - 200 - blockSize.height / 2
@@ -85,6 +80,44 @@ class GridManager {
                 blockNodes.append(node)
             }
         }
+    }
+    
+    func createMap(horizontal cols: Int, vertical rows: Int) -> [GridBlock] {
+        // Deve sempre existir 3 ossos
+        //  - 0 na camada 0 (grama)
+        //  - 1 na camada 1 (terra)
+        //  - 2 na camada 2 (pedra)
+        // Para os itens, deve existir entre 2 até 3 de cada e devem ser espalhados pelas 3 camadas
+        // Para o restante, deve ser .none
+        
+        let totalBlocks = cols * rows
+        var newBlocks = Array(repeating: GridBlock(reward: .none, rewardLayer: 0), count: totalBlocks)
+        var availableIndices = Array(0..<totalBlocks).shuffled()
+        
+        let boneDepths = [1, 2, 2]
+        for depth in boneDepths {
+            if let index = availableIndices.popLast() {
+                newBlocks[index].reward = .bone
+                newBlocks[index].rewardLayer = depth
+            }
+        }
+        
+        let possibleItems: [Reward] = [.bomb, .poop]
+        let itemCount = Int.random(in: 2...3)
+        
+        for _ in 0..<itemCount {
+            if let index = availableIndices.popLast() {
+                let randomItem = possibleItems.randomElement() ?? .poop
+                let randomDepth = Int.random(in: 0...2)
+                
+                newBlocks[index].reward = randomItem
+                newBlocks[index].rewardLayer = randomDepth
+            }
+        }
+        
+        updateData(blocks: newBlocks)
+        
+        return self.blocks
     }
     
     private func textureForLayer(layer: Int, index: Int) -> SKTexture {
@@ -117,6 +150,29 @@ class GridManager {
         return false
     }
     
+    func completeScratch(at index: Int) -> Reward? {
+        guard index < blocks.count else { return nil }
+        
+        blocks[index].layer += 1
+        let block = blocks[index]
+        
+        updateBlockLayer(at: index, to: block.layer)
+        
+        if block.reward != .none && block.rewardLayer == block.layer - 1 {
+            switch block.reward {
+            case .bone:
+                print("Osso encontrado")
+                return .bone
+            case .bomb, .poop:
+                return block.reward
+            default :
+                break
+            }
+        }
+        
+        return nil
+    }
+    
     func updateBlockLayer(at index: Int, to newLayer: Int) {
         guard index < blocks.count, index < blockNodes.count else { return }
         
@@ -143,7 +199,12 @@ class GridManager {
     }
     
     func resetGrid() {
-        blocks = Array(repeating: GridBlock(), count: rows * cols)
+        blocks = createMap(horizontal: rows, vertical: cols)
+        setupGrid()
+    }
+    
+    func updateData(blocks: [GridBlock]) {
+        self.blocks = blocks
         setupGrid()
     }
 }

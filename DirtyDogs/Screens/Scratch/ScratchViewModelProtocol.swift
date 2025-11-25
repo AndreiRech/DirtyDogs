@@ -18,6 +18,7 @@ protocol ScratchViewModelProtocol {
     var revealRatio: CGFloat { get set }
     var brushRadius: CGFloat { get }
     var targetRevealRatio: CGFloat { get }
+    var wasCleared: Bool { get set }
     
     func layerMaskColor(for layer: Int) -> Color
     func layerSymbol(for layer: Int) -> String

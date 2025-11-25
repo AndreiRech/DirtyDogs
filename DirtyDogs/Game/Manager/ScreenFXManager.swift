@@ -22,6 +22,14 @@ class ScreenFXManager {
         haptics.prepareHaptics()
     }
     
+    func playItemFind() {
+        haptics.findItem()
+    }
+    
+    func playComplex() {
+        haptics.complexSuccess()
+    }
+    
     func applyStun(duration: TimeInterval) {
         guard let scene = scene, !isStunned else { return }
         isStunned = true
