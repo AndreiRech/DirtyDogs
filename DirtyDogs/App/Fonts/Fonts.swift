@@ -9,6 +9,6 @@ import SwiftUI
 
 extension Font {
     static func machineGunk(_ size: CGFloat) -> Font {
-        return .custom("MachineGunk", size: size)
+        return .custom("MachineGunk.otf", size: size)
     }
 }

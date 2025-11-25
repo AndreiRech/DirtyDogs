@@ -31,7 +31,7 @@ struct InventoryView: View {
                     .offset(y: 65)
                 
                 Text("Items")
-                    .font(.custom("MachineGunk", size: 19))
+                    .font(.machineGunk(19))
                     .offset(y:10)
                 
                 HStack{
