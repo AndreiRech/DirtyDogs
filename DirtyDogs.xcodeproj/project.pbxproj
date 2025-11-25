@@ -291,8 +291,10 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7K37UYKQLZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DirtyDogs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Dirty Dogs";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Permita o microfone para utilizar mecânicas do jogo.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Permita o reconhecimento de voz para utilizar mecânicas do jogo.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -335,8 +337,10 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7K37UYKQLZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = DirtyDogs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Dirty Dogs";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Permita o microfone para utilizar mecânicas do jogo.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Permita o reconhecimento de voz para utilizar mecânicas do jogo.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

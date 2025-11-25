@@ -9,19 +9,19 @@ import SpriteKit
 import GameplayKit
 
 class GridManager {
-    weak var scene: SKScene?
+    weak var scene: GameScene?
     weak var uiDelegate: GameSceneDelegate?
     
     var blocks: [GridBlock] = []
     private var blockNodes: [SKSpriteNode] = []
-    private var gridContainer: SKNode!
+    private var gridContainer: SKNode
     
-    private let rows = 3
+    private let rows = 4
     private let cols = 3
-    private let spacing: CGFloat = 12
-    private let blockSize = CGSize(width: 110, height: 110)
+    private let spacing: CGFloat = -4
+    private var blockSize: CGSize = .zero
     
-    init(scene: SKScene) {
+    init(scene: GameScene) {
         self.scene = scene
         self.gridContainer = SKNode()
         self.gridContainer.zPosition = 10
@@ -31,9 +31,26 @@ class GridManager {
     func setupGrid() {
         guard let scene = scene else { return }
         
+        let availableWidth = scene.frame.width - (CGFloat(cols - 1) * spacing) - 16
+        let availableHeight = scene.frame.height - 400 - (CGFloat(rows - 1) * spacing)
+        
+        let blockWidth = availableWidth / CGFloat(cols)
+        let blockHeight = availableHeight / CGFloat(rows)
+        
+        blockSize = CGSize(width: blockWidth, height: blockHeight)
+        
         blockNodes.forEach { $0.removeFromParent() }
         blockNodes.removeAll()
         gridContainer.removeAllChildren()
+        
+        let background = SKSpriteNode(imageNamed: "background2")
+        background.size = CGSize(
+            width: CGFloat(cols) * blockSize.width + CGFloat(cols - 1) * spacing + 20,
+            height: CGFloat(rows) * blockSize.height + CGFloat(rows - 1) * spacing + 20
+        )
+        background.position = CGPoint(x: scene.frame.midX, y: scene.frame.maxY - 190 - background.size.height / 2)
+        background.zPosition = -1
+        gridContainer.addChild(background)
         
         let totalWidth = CGFloat(cols) * blockSize.width + CGFloat(cols - 1) * spacing
         let startX = scene.frame.midX - totalWidth / 2 + blockSize.width / 2
@@ -42,7 +59,7 @@ class GridManager {
         for row in 0..<rows {
             for col in 0..<cols {
                 let index = row * cols + col
-                let texture = textureForLayer(blocks[index].layer)
+                let texture = textureForLayer(layer: blocks[index].layer, index: index)
                 let node = SKSpriteNode(texture: texture)
                 
                 node.size = blockSize
@@ -54,11 +71,6 @@ class GridManager {
                 node.name = "block_\(index)"
                 node.zPosition = 1
                 
-                let border = SKShapeNode(rectOf: blockSize, cornerRadius: 20)
-                border.strokeColor = .white.withAlphaComponent(0.15)
-                border.lineWidth = 2
-                border.zPosition = 2
-                node.addChild(border)
                 
                 if blocks[index].cleared {
                     addCheckmark(to: node)
@@ -90,7 +102,7 @@ class GridManager {
             }
         }
         
-        let possibleItems: [Reward] = [.bomb, .seed, .poop]
+        let possibleItems: [Reward] = [.bomb, .poop]
         let itemCount = Int.random(in: 2...3)
         
         for _ in 0..<itemCount {
@@ -108,12 +120,17 @@ class GridManager {
         return self.blocks
     }
     
-    private func textureForLayer(_ layer: Int) -> SKTexture {
+    private func textureForLayer(layer: Int, index: Int) -> SKTexture {
+        let isEven = index % 2 == 0
         switch layer {
-        case 0: return SKTexture(imageNamed: "grass")
-        case 1: return SKTexture(imageNamed: "earth")
-        case 2: return SKTexture(imageNamed: "rocks")
-        default: return SKTexture()
+        case 0:
+            return SKTexture(imageNamed: isEven ? "grama1" : "grama2")
+        case 1:
+            return SKTexture(imageNamed: isEven ? "terra1" : "terra2")
+        case 2:
+            return SKTexture(imageNamed: isEven ? "pedra1" : "pedra2")
+        default:
+            return SKTexture()
         }
     }
     
@@ -133,6 +150,29 @@ class GridManager {
         return false
     }
     
+    func completeScratch(at index: Int) -> Reward? {
+        guard index < blocks.count else { return nil }
+        
+        blocks[index].layer += 1
+        let block = blocks[index]
+        
+        updateBlockLayer(at: index, to: block.layer)
+        
+        if block.reward != .none && block.rewardLayer == block.layer - 1 {
+            switch block.reward {
+            case .bone:
+                print("Osso encontrado")
+                return .bone
+            case .bomb, .poop:
+                return block.reward
+            default :
+                break
+            }
+        }
+        
+        return nil
+    }
+    
     func updateBlockLayer(at index: Int, to newLayer: Int) {
         guard index < blocks.count, index < blockNodes.count else { return }
         
@@ -143,7 +183,7 @@ class GridManager {
             blockNodes[index].color = .black.withAlphaComponent(0.3)
             addCheckmark(to: blockNodes[index])
         } else {
-            blockNodes[index].texture = textureForLayer(newLayer)
+            blockNodes[index].texture = textureForLayer(layer: newLayer, index: index)
         }
     }
     
@@ -159,24 +199,12 @@ class GridManager {
     }
     
     func resetGrid() {
-        blocks = createMap(horizontal: 3, vertical: 4)
+        blocks = createMap(horizontal: rows, vertical: cols)
         setupGrid()
     }
     
     func updateData(blocks: [GridBlock]) {
         self.blocks = blocks
         setupGrid()
-    }
-    
-    func updateBlockLayer(at index: Int, to newLayer: Int, isCleared: Bool) {
-        guard index < blockNodes.count else { return }
-        
-        if isCleared {
-            blockNodes[index].texture = nil
-            blockNodes[index].color = .black.withAlphaComponent(0.3)
-            addCheckmark(to: blockNodes[index])
-        } else {
-            blockNodes[index].texture = textureForLayer(newLayer)
-        }
     }
 }

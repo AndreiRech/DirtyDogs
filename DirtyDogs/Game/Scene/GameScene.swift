@@ -17,6 +17,7 @@ public class GameScene: SKScene {
     var inputManager: InputManager!
     var spawnManager: SpawnManager!
     var gridManager: GridManager!
+    var backgroundNode: SKSpriteNode?
     
     weak var uiDelegate: GameSceneDelegate? {
         didSet {
@@ -44,7 +45,13 @@ public class GameScene: SKScene {
     }
     
     public override func didMove(to view: SKView) {
-        backgroundColor = .clear
+        let bg = SKSpriteNode(imageNamed: "background")
+        bg.zPosition = -999
+        bg.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        addChild(bg)
+
+        backgroundNode = bg
+        
         scaleMode = .resizeFill
         physicsWorld.gravity = .init(dx: 0, dy: -9.6)
         
@@ -89,6 +96,9 @@ public class GameScene: SKScene {
         super.didChangeSize(oldSize)
         
         guard let _ = self.view, gridManager != nil else { return }
+        
+        backgroundNode?.size = self.size
+        backgroundNode?.position = CGPoint(x: frame.midX, y: frame.midY)
         
         setupBorders()
         gridManager.setupGrid()
