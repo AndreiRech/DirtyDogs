@@ -33,7 +33,7 @@ public class GameScene: SKScene {
         self.fxManager = ScreenFXManager(scene: self, entityManager: entityManager)
         self.inputManager = InputManager(scene: self, entityManager: entityManager, fxManager: fxManager)
         self.spawnManager = SpawnManager(entityManager: entityManager, fxManager: fxManager)
-        self.gridManager = GridManager(scene: self) // NOVO
+        self.gridManager = GridManager(scene: self)
     }
     
     public override convenience init(size: CGSize) {
