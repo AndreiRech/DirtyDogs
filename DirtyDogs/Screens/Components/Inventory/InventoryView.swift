@@ -19,9 +19,8 @@ struct InventoryView: View {
                 .frame(width: 295, height: 115)
                 .scaledToFit()
             
-            BoneBarView(boneBarStatus: .firstHalf)
+            BoneBarView(boneBarStatus: .secondHalf)
                 .offset(y: -30)
-            
             
             ZStack{
                 Image("Chon")
@@ -30,9 +29,8 @@ struct InventoryView: View {
                     .scaledToFit()
                     .offset(y: 65)
                 
-                Text("Items")
-                    .font(.machineGunk(19))
-                    .offset(y:10)
+                Image(.itemsLabel)
+                    .offset(y: 12)
                 
                 HStack{
                     ForEach(0..<3){_ in
