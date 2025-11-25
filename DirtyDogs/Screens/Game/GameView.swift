@@ -22,9 +22,10 @@ struct GameView: View {
                     Button {
                         viewModel.endGame(with: .quit)
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.largeTitle)
-                            .foregroundColor(.red)
+                        Image("closeButton")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 48, height: 48)
                             .padding()
                     }
                 }
@@ -78,4 +79,14 @@ struct GameView: View {
             viewModel.onDisappear()
         }
     }
+}
+
+#Preview {
+    GameView(
+        viewModel:
+            GameViewModel(
+                matchManager: MatchManager(),
+                speechService: SpeechService()
+            )
+    )
 }
