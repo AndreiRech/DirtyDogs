@@ -238,6 +238,7 @@ class ScreenFXManager {
             
             shake(intensity: 15, duration: 0.3)
             haptics.explosionBomb()
+            haptics.complexSuccess()
             applyStun(duration: 0.8)
             
             if let entity = entity {
@@ -273,7 +274,7 @@ class ScreenFXManager {
                     scene.addChild(seedBall)
                     
                     // Animação: aparece, pulsa e desaparece
-                    let delay = Double(i) * 0.08 // Delay progressivo para efeito em cascata
+                    let delay = Double(i) * 0.08 
                     
                     seedBall.run(.sequence([
                         .wait(forDuration: delay),
@@ -289,21 +290,30 @@ class ScreenFXManager {
                         .removeFromParent()
                     ]))
                     
-                    // Atualiza o layer do bloco após a animação (diminui uma camada)
+                    // Animaçao pra mexer os quadradinhos
+                    let wiggleLeft = SKAction.rotate(byAngle: .pi / 32, duration: 0.05)
+                    let wiggleRight = SKAction.rotate(byAngle: -.pi / 32, duration: 0.05)
+                    let wiggleSequence = SKAction.sequence([wiggleLeft, wiggleRight, wiggleRight, wiggleLeft])
+                    let wiggleRepeat = SKAction.repeat(wiggleSequence, count: 2)
+
+                    blockNode.run(.sequence([
+                        .wait(forDuration: delay),
+                        wiggleRepeat
+                    ]))
+                    
+                    // Atualiza o layer do bloco após a animação
                     DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.3) {
                         let newLayer: Int
-                        // Se estiver finalizado (camada 3), volta para a pedra (camada 2)
+
+                        // Se finalizado (camada 3), volta para pedra (2)
                         if block.layer == 3 {
                             newLayer = 2
                         }
-                        // Se estiver na camada 0 (grama), volta para a pedra (camada 2)
-                        else if block.layer == 0 {
-                            newLayer = 2
-                        }
-                        // Caso normal: reduz uma camada
+                        // Caso normal: diminui a camada (inclui a camada 0 também, se quiser)
                         else {
-                            newLayer = block.layer - 1
+                            newLayer = max(block.layer - 1, 0)
                         }
+
                         gridManager.updateBlockLayer(at: i, to: newLayer)
                     }
                 }

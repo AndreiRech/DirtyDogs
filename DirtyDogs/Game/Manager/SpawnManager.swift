@@ -75,7 +75,7 @@ class SpawnManager {
         }
         
         if let seed = value as? Seed {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                 guard let self = self, let fx = self.fxManager else { return }
                 if let node = seed.node {
                     fx.explodeSeed(node: node, entity: seed, gridManager: self.gridManager)
