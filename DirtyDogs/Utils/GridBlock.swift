@@ -11,6 +11,8 @@ struct GridBlock: Identifiable, Hashable {
     let id = UUID()
     var layer: Int = 0
     var cleared: Bool { layer >= 3 }
+    var reward: Reward
+    var rewardLayer: Int = 0
 }
 
 struct SheetIndex: Identifiable {
