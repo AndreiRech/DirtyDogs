@@ -19,6 +19,9 @@ struct InventoryView: View {
                 .frame(width: 295, height: 115)
                 .scaledToFit()
             
+            BoneBarView(boneBarStatus: .firstHalf)
+                .offset(y: -30)
+            
             
             ZStack{
                 Image("Chon")

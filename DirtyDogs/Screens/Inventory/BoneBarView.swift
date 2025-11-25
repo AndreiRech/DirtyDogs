@@ -8,37 +8,105 @@
 import SwiftUI
 import Speech
 import SpriteKit
-//import SVGKit
 
 enum BoneStatusEnum: Int {
     case empty = 0
-    case half = 1
-    case full = 2
+    case firstHalf = 1
+    case secondHalf = 2
+    case full = 3
 }
 
 struct BoneBarView: View {
-    let boneBarStatus: BoneStatusEnum;
+    let boneBarStatus: BoneStatusEnum
     
     var body: some View {
-        if(boneBarStatus == .empty){
-            ZStack{
-                GeometryReader { geo in
-                    Image("BoneBarEmpty")
-
+        ZStack {
+            Image("BoneBarEmpty")
+                .resizable()
+                .scaledToFit()
+            
+            GeometryReader { geo in
+                switch boneBarStatus {
+                case .empty:
                     Image("BoneEmpty")
-                        .position(
-                            x: geo.size.width / 3,   // 👉 1/3 da largura
-                        )
+                        .position(x: geo.size.width * 1/3, y: geo.size.height / 2)
+                    Image("BoneEmpty")
+                        .position(x: geo.size.width * 2/3, y: geo.size.height / 2)
+                    Image("BoneEmpty")
+                        .position(x: geo.size.width * 3/3, y: geo.size.height / 2)
+                    
+                case .firstHalf:
+                    Image("whiteProgressBar")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geo.size.width / 3)
+                        .position(x: geo.size.width / 6, y: geo.size.height / 2)
+                    
+                    Image("BoneFull")
+                        .position(x: geo.size.width * 1/3, y: geo.size.height / 2)
+                    Image("BoneEmpty")
+                        .position(x: geo.size.width * 2/3, y: geo.size.height / 2)
+                    Image("BoneEmpty")
+                        .position(x: geo.size.width * 3/3, y: geo.size.height / 2)
+                    
+                case .secondHalf:
+                    Image("whiteProgressBar")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geo.size.width / 3)
+                        .position(x: geo.size.width / 6, y: geo.size.height / 2)
+                    
+                    Image("whiteProgressBar")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geo.size.width / 3)
+                        .position(x: geo.size.width / 2, y: geo.size.height / 2)
+                    
+                    Image("BoneFull")
+                        .position(x: geo.size.width * 1/3, y: geo.size.height / 2)
+                    Image("BoneFull")
+                        .position(x: geo.size.width * 2/3, y: geo.size.height / 2)
+                    Image("BoneEmpty")
+                        .position(x: geo.size.width * 3/3, y: geo.size.height / 2)
+                    
+                case .full:
+                    Image("whiteProgressBar")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geo.size.width / 3)
+                        .position(x: geo.size.width / 6, y: geo.size.height / 2)
+                    
+                    Image("whiteProgressBar")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geo.size.width / 3)
+                        .position(x: geo.size.width / 2, y: geo.size.height / 2)
+                    
+                    Image("whiteProgressBar")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: geo.size.width / 3)
+                        .position(x: geo.size.width * (5.0 / 6.0), y: geo.size.height / 2)
+                    
+                    Image("BoneFull")
+                        .position(x: geo.size.width * 1/3, y: geo.size.height / 2)
+                    Image("BoneFull")
+                        .position(x: geo.size.width * 2/3, y: geo.size.height / 2)
+                    Image("BoneFull")
+                        .position(x: geo.size.width * 3/3, y: geo.size.height / 2)
                 }
             }
-        } else if (boneBarStatus == .half){
-            
-        } else {
-            
         }
+        .frame(width: 200, height: 24)
     }
 }
 
 #Preview {
-    BoneBarView(boneBarStatus: .empty)
+    VStack(spacing: 10) {
+        BoneBarView(boneBarStatus: .empty)
+        BoneBarView(boneBarStatus: .firstHalf)
+        BoneBarView(boneBarStatus: .secondHalf)
+        BoneBarView(boneBarStatus: .full)
+    }
+    .padding()
 }
