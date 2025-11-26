@@ -7,6 +7,8 @@
 
 import SpriteKit
 import GameplayKit
+import CoreHaptics
+import UIKit
 
 class GridManager {
     weak var scene: GameScene?
@@ -135,6 +137,22 @@ class GridManager {
         }
     }
     
+
+    func triggerHaptic() {
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.prepare()
+        generator.impactOccurred()
+    }
+    
+    func shake(node: SKNode) {
+        let moveLeft = SKAction.moveBy(x: -4, y: 0, duration: 0.04)
+        let moveRight = SKAction.moveBy(x: 8, y: 0, duration: 0.04)
+        let moveCenter = SKAction.moveBy(x: -4, y: 0, duration: 0.04)
+
+        let sequence = SKAction.sequence([moveLeft, moveRight, moveCenter])
+        node.run(sequence)
+    }
+    
     func handleTouch(_ touch: UITouch) -> Bool {
         guard let scene = scene else { return false }
         let locationInScene = touch.location(in: scene)
@@ -144,9 +162,13 @@ class GridManager {
             if let name = tappedNode.name,
                let index = Int(name.replacingOccurrences(of: "block_", with: "")) {
                 
+                shake(node: tappedNode)
+                triggerHaptic()
                 uiDelegate?.didTapBlock(index)
                 return true
             }
+            
+            
         }
         return false
     }
@@ -233,4 +255,6 @@ class GridManager {
         self.blocks = blocks
         setupGrid()
     }
+    
+   
 }
