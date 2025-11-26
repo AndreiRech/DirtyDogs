@@ -31,7 +31,7 @@ class ScreenFXManager {
         case .bombExploded:
             haptics.explosionBomb()
         case .poopSplash:
-            haptics.explosionBomb() // TODO: Alterar para o do coco
+            haptics.cleanScreen() // TODO: Alterar para o do coco
         }
     }
     
@@ -204,10 +204,8 @@ class ScreenFXManager {
     func cleanPoopOverlayOnShake() {
         guard let scene = scene else { return }
 
-        // toca um haptic especial de "limpeza"
-        haptics.cleanScreen()
+        playHaptics(with: .poopSplash)
         
-        // procura overlays de cocô
         let overlays = scene.children.filter { $0.name == "poopOverlay" }
 
         for overlay in overlays {
