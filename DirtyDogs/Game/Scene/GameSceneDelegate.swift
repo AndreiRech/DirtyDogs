@@ -12,4 +12,5 @@ protocol GameSceneDelegate: AnyObject {
 protocol InventoryDelegate: AnyObject {
     func didCollect(item: InventoryItem)
     func didUse(item: InventoryItem)
+    func isInventoryFull() -> Bool
 }

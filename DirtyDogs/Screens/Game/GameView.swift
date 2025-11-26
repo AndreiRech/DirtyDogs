@@ -22,9 +22,10 @@ struct GameView: View {
                     Button {
                         viewModel.endGame(with: .quit)
                     } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.largeTitle)
-                            .foregroundColor(.red)
+                        Image("closeButton")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 48, height: 48)
                             .padding()
                     }
                 }
@@ -34,43 +35,27 @@ struct GameView: View {
             VStack {
                 Spacer()
                 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(viewModel.availableItems) { item in
-                            Image(item.imageName)
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .background(Color.white.opacity(0.3))
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(Color.white, lineWidth: 2))
-                                .onTapGesture {
-                                    viewModel.didUse(item: item)
-                                }
-                        }
-                    }
-                    .padding()
-                }
-                .frame(height: 70)
-                
-                HStack(spacing: 16) {
-                    Button("Resetar grade") {
-                        viewModel.resetGrid()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    
-                    Button("Bolinha") {
-                        viewModel.spawnItem(type: .poop)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.orange)
-                    
+//                HStack(spacing: 16) {
+//                    Button("Resetar grade") {
+//                        viewModel.resetGrid()
+//                    }
+//                    .buttonStyle(.borderedProminent)
+//                    
+//                    Button("Bolinha") {
+//                        viewModel.spawnItem(type: .poop)
+//                    }
+//                    .buttonStyle(.borderedProminent)
+//                    .tint(.orange)
+//                    
                     Button("Bomba") {
                         viewModel.spawnItem(type: .bomb)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.red)
-                }
-                .padding(.bottom, 20)
+//                }
+//                .padding(.bottom, 20)
+                
+                InventoryView(bonesFound: viewModel.bonesFound, availableItems: viewModel.availableItems)
             }
         }
         .sheet(item: Binding(
@@ -96,4 +81,14 @@ struct GameView: View {
             viewModel.onDisappear()
         }
     }
+}
+
+#Preview {
+    GameView(
+        viewModel:
+            GameViewModel(
+                matchManager: MatchManager(),
+                speechService: SpeechService()
+            )
+    )
 }

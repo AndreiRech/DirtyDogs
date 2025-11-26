@@ -9,4 +9,5 @@ protocol HapticsServiceProtocol {
     func prepareHaptics()
     func complexSuccess()
     func explosionBomb()
+    func findItem()
 }

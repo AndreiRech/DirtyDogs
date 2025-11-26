@@ -17,6 +17,7 @@ public class GameScene: SKScene {
     var inputManager: InputManager!
     var spawnManager: SpawnManager!
     var gridManager: GridManager!
+    var backgroundNode: SKSpriteNode?
     
     weak var uiDelegate: GameSceneDelegate? {
         didSet {
@@ -33,7 +34,7 @@ public class GameScene: SKScene {
         self.fxManager = ScreenFXManager(scene: self, entityManager: entityManager)
         self.inputManager = InputManager(scene: self, entityManager: entityManager, fxManager: fxManager)
         self.spawnManager = SpawnManager(entityManager: entityManager, fxManager: fxManager)
-        self.gridManager = GridManager(scene: self) // NOVO
+        self.gridManager = GridManager(scene: self)
     }
     
     public override convenience init(size: CGSize) {
@@ -45,13 +46,19 @@ public class GameScene: SKScene {
     }
     
     public override func didMove(to view: SKView) {
-        backgroundColor = .clear
+        let bg = SKSpriteNode(imageNamed: "background")
+        bg.zPosition = -999
+        bg.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        addChild(bg)
+        
+        backgroundNode = bg
+        
         scaleMode = .resizeFill
         physicsWorld.gravity = .init(dx: 0, dy: -9.6)
         
         setupBorders()
         
-        gridManager.setupGrid()
+        _ = gridManager.createMap(horizontal: 3, vertical: 4)
         
         // TODO: Remover isso quando não precisar de um item inicial
         let center = CGPoint(x: frame.midX, y: frame.midY)
@@ -61,6 +68,7 @@ public class GameScene: SKScene {
     public override func update(_ currentTime: TimeInterval) {
         inputManager.update()
         checkExits()
+        checkBottomCollection()
     }
     
     // MARK: - Touch Functions
@@ -73,6 +81,7 @@ public class GameScene: SKScene {
         }
         
         if handleCollectionTap(at: location) {
+            print("✨ Coletou item!")
             return
         }
         
@@ -86,8 +95,8 @@ public class GameScene: SKScene {
         
         if let entity = manager.entity(at: location) {
             manager.remove(entity: entity)
-
-            let imageName = (entity is Bomb) ? "mockItem" : "mockItem"
+            
+            let imageName = (entity is Bomb) ? "Bomb" : "Bomb"
             let item = InventoryItem(imageName: imageName)
             
             inventoryDelegate?.didCollect(item: item)
@@ -113,6 +122,9 @@ public class GameScene: SKScene {
         
         guard let _ = self.view, gridManager != nil else { return }
         
+        backgroundNode?.size = self.size
+        backgroundNode?.position = CGPoint(x: frame.midX, y: frame.midY)
+        
         setupBorders()
         gridManager.setupGrid()
         
@@ -134,6 +146,43 @@ public class GameScene: SKScene {
         }
     }
     
+    private func checkBottomCollection() {
+        let entities = entityManager.getEntities()
+        
+        for entity in entities {
+            guard let node = entity.component(ofType: GKSKNodeComponent.self)?.node else { continue }
+            
+            let collectionLineY = frame.minY + 120
+            
+            if node.position.y < collectionLineY {
+                collect(entity: entity as! GameEntity)
+            }
+        }
+    }
+    
+    private func collect(entity: GameEntity) {
+        entityManager.remove(entity: entity)
+        
+        let itemName: String
+        switch entity {
+        case is Bomb:
+            itemName = "Bomb"
+        case is Ball:
+            itemName = "Ball"
+        case is Poop:
+            itemName = "Poop"
+        default:
+            itemName = "Unknown"
+        }
+        
+        let item = InventoryItem(imageName: itemName)
+        
+        inventoryDelegate?.didCollect(item: item)
+        
+        print("✨ Coletou item arrastado para baixo: \(itemName)")
+        
+    }
+    
     private func exitSide(for node: SKNode, minExitVelocity velocity: CGFloat = 1) -> EdgeSide? {
         guard let body = node.physicsBody else { return nil }
         let accFrame = node.calculateAccumulatedFrame()
@@ -149,8 +198,11 @@ public class GameScene: SKScene {
         self.physicsBody = nil
         var bodies = [SKPhysicsBody]()
         
-        let bottomEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.maxX, y: frame.minY))
-        bodies.append(bottomEdge)
+//        let bottomEdge = SKPhysicsBody(
+//            edgeFrom: CGPoint(x: frame.minX, y: frame.minY),
+//            to: CGPoint(x: frame.maxX, y: frame.minY)
+//        )
+//        bodies.append(bottomEdge)
         
         let leftEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.minX, y: frame.maxY))
         bodies.append(leftEdge)
@@ -210,14 +262,14 @@ public class GameScene: SKScene {
         }
     }
     
-    private func handleTap(at location: CGPoint) {
-        guard let manager = entityManager else { return }
-        
-        if let entity = manager.entity(at: location) {
-            manager.remove(entity: entity)
-            
-            let item = InventoryItem(imageName: "ball_icon")
-            inventoryDelegate?.didCollect(item: item)
-        }
-    }
+    //    private func handleTap(at location: CGPoint) {
+    //        guard let manager = entityManager else { return }
+    //
+    //        if let entity = manager.entity(at: location) {
+    //            manager.remove(entity: entity)
+    //
+    //            let item = InventoryItem(imageName: "ball_icon")
+    //            inventoryDelegate?.didCollect(item: item)
+    //        }
+    //    }
 }

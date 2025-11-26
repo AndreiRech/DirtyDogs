@@ -25,10 +25,16 @@ class PoopTestScene: GameScene {
     }
 
     /// Testa o cocô usando a nova arquitetura (executeAction cuida da explosão)
-    func spawnAndExplodeTestPoop() {
-        let center = CGPoint(x: frame.midX, y: frame.midY)
-        spawnManager.spawnItem(at: center, entity: .poop)
-    }
+   func spawnAndExplodeTestPoop() {
+       let center = CGPoint(x: frame.midX, y: frame.midY)
+       if let spawn = spawnManager {
+           let entity = Poop()
+           entity.setPosition(to: center)
+           entityManager.add(entity: entity)
+           spawn.executeAction(value: entity)   //força a explosão
+       }
+   }
+
 
     func spawnPoopOnly() {
         let center = CGPoint(x: frame.midX, y: frame.midY)

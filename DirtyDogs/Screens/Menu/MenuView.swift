@@ -28,7 +28,7 @@ struct MenuView: View {
             } label: {
                 Text("Play")
                     .foregroundStyle(Color(.secondarySystemBackground))
-                    .font(.largeTitle)
+                    .font(.machineGunk(32))
                     .bold()
             }
             .disabled(viewModel.isPlayButtonDisabled)

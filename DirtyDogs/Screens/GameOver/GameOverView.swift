@@ -20,7 +20,7 @@ struct GameOverView: View {
                 
                 ForEach(Array(viewModel.screenTextLines.enumerated()), id: \.offset) { index, text in
                     Text(text)
-                        .font(.custom("MachineGunk", size: 120))
+                        .font(.machineGunk(120))
                         .multilineTextAlignment(.center)
                         .foregroundStyle(index % 2 == 0 ? .softRed : .softBlue)
                 }

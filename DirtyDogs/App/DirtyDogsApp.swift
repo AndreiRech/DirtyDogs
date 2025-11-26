@@ -13,7 +13,16 @@ struct DirtyDogsApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ControllerView(matchManager: matchManager)
+//             ControllerView(matchManager: matchManager)
+//            InventoryView(bonesFound: 1, availableItems: [])
+//            ControllerView(matchManager: matchManager)
+            GameView(viewModel:
+                        GameViewModel(
+                            matchManager: MatchManager(),
+                            speechService: SpeechService()
+                        ))
+            //BombTestView()
+            //PoopTestView()
         }
     }
 }
