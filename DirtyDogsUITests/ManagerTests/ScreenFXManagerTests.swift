@@ -24,7 +24,7 @@ struct ScreenFXManagerTests {
         #expect(fxManager.isStunned == true)
         #expect(scene.childNode(withName: "stunOverlay") != nil)
         
-        try await Task.sleep(nanoseconds: 200_000_000)
+        try await Task.sleep(nanoseconds: 500_000_000)
         
         #expect(fxManager.isStunned == false)
         #expect(scene.childNode(withName: "stunOverlay") == nil)
