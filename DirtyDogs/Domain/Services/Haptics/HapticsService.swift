@@ -6,6 +6,7 @@
 //
 
 import CoreHaptics
+import UIKit
 
 class HapticsService: HapticsServiceProtocol {
     private var engine: CHHapticEngine?
@@ -109,4 +110,10 @@ class HapticsService: HapticsServiceProtocol {
             print("Failed to play pattern: \(error.localizedDescription).")
         }
     }
+    
+    func cleanScreen() {
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.success)
+    }
+
 }

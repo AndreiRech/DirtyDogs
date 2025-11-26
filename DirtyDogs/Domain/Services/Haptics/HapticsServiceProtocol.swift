@@ -10,4 +10,5 @@ protocol HapticsServiceProtocol {
     func complexSuccess()
     func explosionBomb()
     func findItem()
+    func cleanScreen()
 }
