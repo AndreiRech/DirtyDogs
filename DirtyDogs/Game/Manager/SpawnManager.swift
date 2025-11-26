@@ -53,7 +53,8 @@ class SpawnManager {
         if let bomb = value as? Bomb {
             bomb.startFuseAnimation()
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) { [weak self] in
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(0.75))
                 guard let self = self, let fx = self.fxManager else { return }
                 if let node = bomb.node {
                     fx.explode(node: node, entity: bomb)
@@ -62,7 +63,8 @@ class SpawnManager {
         }
         
         if let poop = value as? Poop {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(0.4))
                 guard let self = self, let fx = self.fxManager else { return }
                 if let node = poop.node {
                     fx.explodePoop(node: node, entity: poop)

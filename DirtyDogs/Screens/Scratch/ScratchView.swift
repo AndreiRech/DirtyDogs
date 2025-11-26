@@ -105,7 +105,8 @@ struct ScratchView: View {
             }
             .onChange(of: viewModel.clearedCells) {
                 if viewModel.revealRatio >= viewModel.targetRevealRatio {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    Task { @MainActor in
+                        try? await Task.sleep(for: .seconds(0.25))
                         viewModel.onComplete()
                         dismiss()
                     }
