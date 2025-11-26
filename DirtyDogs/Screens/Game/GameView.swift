@@ -9,7 +9,7 @@ import SwiftUI
 import SpriteKit
 
 struct GameView: View {
-    @State var viewModel: GameViewModel
+    @State var viewModel: GameViewModelProtocol
     
     var body: some View {
         ZStack {

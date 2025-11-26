@@ -44,8 +44,8 @@ class ScreenFXManager {
         scene.addChild(overlay)
         self.stunOverlay = overlay
         
-        let wait = SKAction.wait(forDuration: duration)
-        scene.run(wait) { [weak self] in
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(duration))
             self?.removeStun()
         }
     }
@@ -136,6 +136,7 @@ class ScreenFXManager {
         poopOverlay.position = CGPoint(x: scene.size.width / 2, y: scene.size.height / 2)
         poopOverlay.zPosition = 2000
         poopOverlay.alpha = 0
+        poopOverlay.name = "poopOverlay"
         scene.addChild(poopOverlay)
         
         poopOverlay.run(.sequence([
@@ -193,6 +194,23 @@ class ScreenFXManager {
             actions.append(move.reversed())
         }
         scene.run(.sequence(actions))
+    }
+  
+   func cleanPoopOverlayOnShake() {
+        guard let scene = scene else { return }
+
+        // toca um haptic especial de "limpeza"
+        haptics.cleanScreen()
+        
+        // procura overlays de cocô
+        let overlays = scene.children.filter { $0.name == "poopOverlay" }
+
+        for overlay in overlays {
+            overlay.run(.sequence([
+                .fadeOut(withDuration: 1.9),
+                .removeFromParent()
+            ]))
+        }
     }
     
     func explodeSeed(node: SKNode, entity: GKEntity?, gridManager: GridManager?) {
