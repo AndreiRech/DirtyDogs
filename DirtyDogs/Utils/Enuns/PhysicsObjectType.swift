@@ -10,6 +10,6 @@ import Foundation
 enum PhysicsObjectType: String, Codable {
     case ball
     case bomb
-    // case seed
+    case seed
     case poop
 }

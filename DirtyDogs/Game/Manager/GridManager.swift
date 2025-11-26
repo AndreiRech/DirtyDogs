@@ -13,8 +13,8 @@ class GridManager {
     weak var uiDelegate: GameSceneDelegate?
     
     var blocks: [GridBlock] = []
-    private var blockNodes: [SKSpriteNode] = []
-    private var gridContainer: SKNode
+    var blockNodes: [SKSpriteNode] = []
+    var gridContainer: SKNode
     
     private let rows = 4
     private let cols = 3
@@ -26,6 +26,7 @@ class GridManager {
         self.gridContainer = SKNode()
         self.gridContainer.zPosition = 10
         scene.addChild(gridContainer)
+        
     }
     
     func setupGrid() {
@@ -178,12 +179,37 @@ class GridManager {
         
         blocks[index].layer = newLayer
         
+        let node = blockNodes[index]
+        
         if blocks[index].cleared {
-            blockNodes[index].texture = nil
-            blockNodes[index].color = .black.withAlphaComponent(0.3)
-            addCheckmark(to: blockNodes[index])
+            node.texture = nil
+            node.color = .black.withAlphaComponent(0.3)
+            addCheckmark(to: node)
         } else {
-            blockNodes[index].texture = textureForLayer(layer: newLayer, index: index)
+            // remove checkmark se existir
+            node.children.forEach { child in
+                if let label = child as? SKLabelNode, label.text == "✓" {
+                    label.removeFromParent()
+                }
+            }
+            
+            node.color = .clear
+            // Natural growth animation for the new layer
+            let newTexture = textureForLayer(layer: newLayer, index: index)
+            
+            let growNode = SKSpriteNode(texture: newTexture)
+            growNode.size = node.size
+            growNode.position = .zero
+            growNode.zPosition = node.zPosition + 1
+            growNode.anchorPoint = CGPoint(x: 0.5, y: 0.0)
+            growNode.yScale = 0.0
+            node.addChild(growNode)
+
+            let growAction = SKAction.scaleY(to: 1.0, duration: 0.25)
+            growNode.run(growAction) {
+                node.texture = newTexture
+                growNode.removeFromParent()
+            }
         }
     }
     

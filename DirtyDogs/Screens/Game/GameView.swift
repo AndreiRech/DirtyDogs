@@ -47,6 +47,12 @@ struct GameView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.orange)
                     
+                    Button("Spawnar seed") {
+                        viewModel.spawnItem(type: .seed)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.pink)
+                    
                     Button("Enviar bomba") {
                         viewModel.spawnItem(type: .bomb)
                     }
