@@ -25,8 +25,9 @@ extension MatchManager: GKMatchDelegate {
             gameState = .victory
             isGameOver = true
         case .quit:
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                self.returnToMenu()
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(3))
+                self?.returnToMenu()
             }
         default :
             break

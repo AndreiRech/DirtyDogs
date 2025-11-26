@@ -13,10 +13,21 @@
 		8B09AE382ED4CED000DD0C9A /* SVGKitSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8B09AE372ED4CED000DD0C9A /* SVGKitSwift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		4D89BDB22ED7275100F76819 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4D3F08C62EC4F119000BF6B7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D3F08CD2EC4F119000BF6B7;
+			remoteInfo = DirtyDogs;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		4D3F08CE2EC4F119000BF6B7 /* DirtyDogs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DirtyDogs.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D3F08DE2EC4F1BB000BF6B7 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = System/Library/Frameworks/CoreHaptics.framework; sourceTree = SDKROOT; };
 		4D3F08E02EC4F1C3000BF6B7 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		4D89BDAE2ED7275100F76819 /* DirtyDogsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DirtyDogsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -38,6 +49,11 @@
 			path = DirtyDogs;
 			sourceTree = "<group>";
 		};
+		4D89BDAF2ED7275100F76819 /* DirtyDogsUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = DirtyDogsUITests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +68,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4D89BDAB2ED7275100F76819 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -59,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				4D3F08D02EC4F119000BF6B7 /* DirtyDogs */,
+				4D89BDAF2ED7275100F76819 /* DirtyDogsUITests */,
 				4D3F08DD2EC4F1BB000BF6B7 /* Frameworks */,
 				4D3F08CF2EC4F119000BF6B7 /* Products */,
 			);
@@ -68,6 +92,7 @@
 			isa = PBXGroup;
 			children = (
 				4D3F08CE2EC4F119000BF6B7 /* DirtyDogs.app */,
+				4D89BDAE2ED7275100F76819 /* DirtyDogsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,6 +133,29 @@
 			productReference = 4D3F08CE2EC4F119000BF6B7 /* DirtyDogs.app */;
 			productType = "com.apple.product-type.application";
 		};
+		4D89BDAD2ED7275100F76819 /* DirtyDogsUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D89BDB42ED7275100F76819 /* Build configuration list for PBXNativeTarget "DirtyDogsUITests" */;
+			buildPhases = (
+				4D89BDAA2ED7275100F76819 /* Sources */,
+				4D89BDAB2ED7275100F76819 /* Frameworks */,
+				4D89BDAC2ED7275100F76819 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4D89BDB32ED7275100F76819 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4D89BDAF2ED7275100F76819 /* DirtyDogsUITests */,
+			);
+			name = DirtyDogsUITests;
+			packageProductDependencies = (
+			);
+			productName = DirtyDogsUITests;
+			productReference = 4D89BDAE2ED7275100F76819 /* DirtyDogsUITests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -120,6 +168,10 @@
 				TargetAttributes = {
 					4D3F08CD2EC4F119000BF6B7 = {
 						CreatedOnToolsVersion = 26.0;
+					};
+					4D89BDAD2ED7275100F76819 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = 4D3F08CD2EC4F119000BF6B7;
 					};
 				};
 			};
@@ -141,12 +193,20 @@
 			projectRoot = "";
 			targets = (
 				4D3F08CD2EC4F119000BF6B7 /* DirtyDogs */,
+				4D89BDAD2ED7275100F76819 /* DirtyDogsUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		4D3F08CC2EC4F119000BF6B7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D89BDAC2ED7275100F76819 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -163,7 +223,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4D89BDAA2ED7275100F76819 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4D89BDB32ED7275100F76819 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D3F08CD2EC4F119000BF6B7 /* DirtyDogs */;
+			targetProxy = 4D89BDB22ED7275100F76819 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		4D3F08D72EC4F11A000BF6B7 /* Debug */ = {
@@ -379,6 +454,48 @@
 			};
 			name = Release;
 		};
+		4D89BDB52ED7275100F76819 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7K37UYKQLZ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Academy.DirtyDogsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DirtyDogs.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DirtyDogs";
+			};
+			name = Debug;
+		};
+		4D89BDB62ED7275100F76819 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7K37UYKQLZ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Academy.DirtyDogsUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DirtyDogs.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DirtyDogs";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -396,6 +513,15 @@
 			buildConfigurations = (
 				4D3F08DA2EC4F11A000BF6B7 /* Debug */,
 				4D3F08DB2EC4F11A000BF6B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4D89BDB42ED7275100F76819 /* Build configuration list for PBXNativeTarget "DirtyDogsUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D89BDB52ED7275100F76819 /* Debug */,
+				4D89BDB62ED7275100F76819 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
