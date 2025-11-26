@@ -25,6 +25,7 @@ public class GameScene: SKScene {
         }
     }
     
+    // MARK: Init functions
     init(matchManager: MatchManager, size: CGSize) {
         self.matchManager = matchManager
         super.init(size: size)
@@ -49,7 +50,7 @@ public class GameScene: SKScene {
         bg.zPosition = -999
         bg.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         addChild(bg)
-
+        
         backgroundNode = bg
         
         scaleMode = .resizeFill
@@ -195,5 +196,26 @@ public class GameScene: SKScene {
         } else {
             print("AVISO: Entidade do tipo \(type(of: entity)) saiu da tela, mas não há lógica de rede para ela.")
         }
+    }
+    
+    // MARK: Delegate Functions
+    func resetGameGrid() {
+        gridManager.resetGrid()
+    }
+    
+    func spawnItem(type: PhysicsObjectType) {
+        let spawnPoint = CGPoint(
+            x: frame.midX,
+            y: frame.maxY - 100
+        )
+        spawnManager.spawnItem(at: spawnPoint, entity: type)
+    }
+    
+    func revealItem(at index: Int) -> Reward? {
+        gridManager.completeScratch(at: index)
+    }
+    
+    func playSoundEffect(sound: SoundEffect) {
+        fxManager.playHaptics(with: sound)
     }
 }

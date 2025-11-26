@@ -22,12 +22,17 @@ class ScreenFXManager {
         haptics.prepareHaptics()
     }
     
-    func playItemFind() {
-        haptics.findItem()
-    }
-    
-    func playComplex() {
-        haptics.complexSuccess()
+    func playHaptics(with sound: SoundEffect) {
+        switch sound {
+        case .itemFound:
+            haptics.findItem()
+        case .success:
+            haptics.complexSuccess()
+        case .bombExploded:
+            haptics.explosionBomb()
+        case .poopSplash:
+            haptics.explosionBomb() // TODO: Alterar para o do coco
+        }
     }
     
     func applyStun(duration: TimeInterval) {
@@ -93,7 +98,7 @@ class ScreenFXManager {
         shake(intensity: 18, duration: 0.35)
         applyBlast(from: origin, radius: 260, strength: 2200)
         applyStun(duration: 1.0)
-        haptics.explosionBomb()
+        playHaptics(with: .bombExploded)
         
         if let entity = entity {
             entityManager?.remove(entity: entity)
@@ -146,7 +151,7 @@ class ScreenFXManager {
         ]))
         
         shake(intensity: 25, duration: 0.45)
-        haptics.explosionBomb() // TODO: Alterar para o haptics do coco
+        playHaptics(with: .poopSplash)
         applyBlast(from: origin, radius: 350, strength: 5000)
         applyStun(duration: 1.5)
         
