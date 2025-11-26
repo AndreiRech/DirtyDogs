@@ -10,20 +10,22 @@ import SwiftUI
 @Observable
 class ScratchViewModel: ScratchViewModelProtocol {
     let layer: Int
+    let isClear: Bool
     let onComplete: () -> Void
     let onCancel: () -> Void
     
     var clearedCells: Set<Int> = []
     var gridPoints: [CGPoint] = []
-    var cols: Int = 26
+    var cols: Int = 60
     var rows: Int = 0
     var revealRatio: CGFloat = 0
-    let brushRadius: CGFloat = 40
-    let targetRevealRatio: CGFloat = 0.8
+    let brushRadius: CGFloat = 20
+    let targetRevealRatio: CGFloat = 0.7
     var wasCleared: Bool = false
     
-    init(layer: Int, onComplete: @escaping () -> Void, onCancel: @escaping () -> Void, clearedCells: Set<Int> = [], gridPoints: [CGPoint] = [], cols: Int = 26, rows: Int = 0, revealRatio: CGFloat = 0) {
+    init(layer: Int, isClear: Bool, onComplete: @escaping () -> Void, onCancel: @escaping () -> Void, clearedCells: Set<Int> = [], gridPoints: [CGPoint] = [], cols: Int = 26, rows: Int = 0, revealRatio: CGFloat = 0) {
         self.layer = layer
+        self.isClear = isClear
         self.onComplete = onComplete
         self.onCancel = onCancel
         self.clearedCells = clearedCells
@@ -33,28 +35,24 @@ class ScratchViewModel: ScratchViewModelProtocol {
         self.revealRatio = revealRatio
     }
     
-    // Cor da máscara de sujeira
-    func layerMaskColor(for layer: Int) -> Color {
-        switch layer {
-        case 0: return .green.opacity(0.9)
-        case 1: return .brown.opacity(0.9)
-        case 2: return .gray.opacity(0.9)
-        default: return .clear
-        }
-    }
-    
-    // Ícone de cada camada
-    func layerSymbol(for layer: Int) -> String {
-        switch layer {
-        case 0: return "leaf.fill"
-        case 1: return "mountain.2.fill"
-        case 2: return "cube.fill"
-        default: return "star.fill"
+    func getImage(nextLayer: Bool = false) -> String {
+        var actualLayer = layer
+        if nextLayer { actualLayer += 1 }
+        
+        switch actualLayer {
+        case 0:
+            return isClear ? "Grass-Light" : "Grass-Dark"
+        case 1:
+            return isClear ? "Dirt-Dark" : "Dirt-Light"
+        case 2:
+            return isClear ? "Stone-Dark" : "Stone-Light"
+        default:
+            return "checkmark.circle.fill"
         }
     }
     
     func setupGrid(in size: CGSize) {
-        let inset: CGFloat = 24
+        let inset: CGFloat = 4
         let w = size.width - inset * 2
         let h = size.height - inset * 2
         

@@ -69,6 +69,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
                 gameScene.playSoundEffect(sound: .success)
             case .bomb, .seed, .poop:
                 guard let entityFound = entity.toPhysicsObject else { break }
+                print("entidade: \(entityFound)")
                 spawnItem(type: entityFound)
                 gameScene.playSoundEffect(sound: .itemFound)
             default:
