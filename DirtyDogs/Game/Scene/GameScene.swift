@@ -59,10 +59,6 @@ public class GameScene: SKScene {
         setupBorders()
         
         _ = gridManager.createMap(horizontal: 3, vertical: 4)
-        
-        // TODO: Remover isso quando não precisar de um item inicial
-        let center = CGPoint(x: frame.midX, y: frame.midY)
-        spawnManager.spawnItem(at: center, entity: .ball)
     }
     
     public override func update(_ currentTime: TimeInterval) {
