@@ -7,12 +7,12 @@
 
 import SpriteKit
 import GameplayKit
-import CoreHaptics
-import UIKit
 
 class GridManager {
     weak var scene: GameScene?
     weak var uiDelegate: GameSceneDelegate?
+    var hapticsService: HapticsServiceProtocol?
+    var fxManager: ScreenFXManager?
     
     var blocks: [GridBlock] = []
     var blockNodes: [SKSpriteNode] = []
@@ -22,9 +22,13 @@ class GridManager {
     private let cols = 3
     private let spacing: CGFloat = -4
     private var blockSize: CGSize = .zero
+    private var lastDraggedIndex: Int?
     
-    init(scene: GameScene) {
+    init(scene: GameScene, hapticsService: HapticsServiceProtocol? = nil, fxManager: ScreenFXManager? = nil) {
         self.scene = scene
+        self.hapticsService = hapticsService
+        self.fxManager = fxManager
+        
         self.gridContainer = SKNode()
         self.gridContainer.zPosition = 10
         scene.addChild(gridContainer)
@@ -137,22 +141,6 @@ class GridManager {
         }
     }
     
-
-    func triggerHaptic() {
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.prepare()
-        generator.impactOccurred()
-    }
-    
-    func shake(node: SKNode) {
-        let moveLeft = SKAction.moveBy(x: -4, y: 0, duration: 0.04)
-        let moveRight = SKAction.moveBy(x: 8, y: 0, duration: 0.04)
-        let moveCenter = SKAction.moveBy(x: -4, y: 0, duration: 0.04)
-
-        let sequence = SKAction.sequence([moveLeft, moveRight, moveCenter])
-        node.run(sequence)
-    }
-    
     func handleTouch(_ touch: UITouch) -> Bool {
         guard let scene = scene else { return false }
         let locationInScene = touch.location(in: scene)
@@ -162,12 +150,11 @@ class GridManager {
             if let name = tappedNode.name,
                let index = Int(name.replacingOccurrences(of: "block_", with: "")) {
                 
-                shake(node: tappedNode)
-                triggerHaptic()
+                fxManager?.shakeSquare(node: tappedNode)
+                hapticsService?.feedbackGenerator(.medium)
                 uiDelegate?.didTapBlock(index)
                 return true
             }
-            
             
         }
         return false
@@ -226,7 +213,7 @@ class GridManager {
             growNode.anchorPoint = CGPoint(x: 0.5, y: 0.0)
             growNode.yScale = 0.0
             node.addChild(growNode)
-
+            
             let growAction = SKAction.scaleY(to: 1.0, duration: 0.25)
             growNode.run(growAction) {
                 node.texture = newTexture
@@ -256,5 +243,17 @@ class GridManager {
         setupGrid()
     }
     
-   
+    func handleDrag(at position: CGPoint) {
+        let locationInGrid = scene?.convert(position, to: gridContainer) ?? .zero
+        
+        if let draggedNode = gridContainer.nodes(at: locationInGrid).first(where: { $0.name?.contains("block_") == true }),
+           let name = draggedNode.name,
+           let index = Int(name.replacingOccurrences(of: "block_", with: "")), index != lastDraggedIndex {
+            
+            fxManager?.shakeSquare(node: draggedNode)
+            hapticsService?.feedbackGenerator(.medium)
+            lastDraggedIndex = index
+        }
+        
+    }
 }

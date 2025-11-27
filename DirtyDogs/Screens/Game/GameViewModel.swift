@@ -13,19 +13,22 @@ import SwiftUI
 class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     var gameScene: GameScene
     var matchManager: MatchManager
+    var hapticsService: HapticsServiceProtocol
     var selectedIndex: Int? = nil
     var bonesFound: Int = 0
     
     private var speechService: SpeechServiceProtocol
     
     // MARK: Init and StateControll functions
-    init(matchManager: MatchManager, speechService: SpeechServiceProtocol) {
+    init(matchManager: MatchManager, speechService: SpeechServiceProtocol, hapticsService: HapticsServiceProtocol) {
         self.matchManager = matchManager
         self.speechService = speechService
+        self.hapticsService = hapticsService
         
         let scene = GameScene(
             matchManager: matchManager,
-            size: .zero
+            size: .zero,
+            hapticService: hapticsService
         )
         scene.scaleMode = .resizeFill
         self.gameScene = scene

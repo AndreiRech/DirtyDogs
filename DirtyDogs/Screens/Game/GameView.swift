@@ -92,7 +92,8 @@ struct GameView: View {
         viewModel:
             GameViewModel(
                 matchManager: MatchManager(),
-                speechService: SpeechService()
+                speechService: SpeechService(),
+                hapticsService: HapticsService()
             )
     )
 }
