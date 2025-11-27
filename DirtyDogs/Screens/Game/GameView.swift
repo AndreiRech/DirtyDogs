@@ -20,7 +20,11 @@ struct GameView: View {
                 HStack {
                     Spacer()
                     Button {
-                        viewModel.endGame(with: .quit)
+                        if let _ = viewModel.selectedIndex {
+                            viewModel.cancelScratch()
+                        } else {
+                            viewModel.showQuitConfirmation = true
+                        }
                     } label: {
                         Image("closeButton")
                             .resizable()
@@ -31,59 +35,49 @@ struct GameView: View {
                 }
                 Spacer()
             }
+            .zIndex(1)
             
-            VStack {
-                Spacer()
+            if let index = viewModel.selectedIndex {
+                let block = viewModel.gameScene.gridManager.blocks[index]
+                let rewardForThisLayer: Reward = (block.rewardLayer == block.layer) ? block.reward : .none
                 
-                HStack(spacing: 16) {
-                    Button("Resetar grade") {
-                        viewModel.resetGrid()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    
-                    Button("Spawnar bolinha") {
-                        viewModel.spawnItem(type: .ball)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.orange)
-                    
-                    Button("Spawnar seed") {
-                        viewModel.spawnItem(type: .seed)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.pink)
-                    
-                    Button("Enviar bomba") {
-                        viewModel.spawnItem(type: .bomb)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.red)
-                }
-                .padding(.bottom, 40)
-            }
-        }
-        .sheet(item: Binding(
-            get: { viewModel.selectedIndex.map { SheetIndex(value: $0) } },
-            set: { newVal in viewModel.selectedIndex = newVal?.value }
-        )) { sheet in
-            ScratchView(
-                viewModel: ScratchViewModel(
-                    layer: viewModel.gameScene.gridManager.blocks[sheet.value].layer,
-                    onComplete: {
-                        viewModel.completeScratch(at: sheet.value)
-                    },
-                    onCancel: {
-                        viewModel.cancelScratch()
-                    }
+                ScratchView(
+                    viewModel: ScratchViewModel(
+                        layer: viewModel.gameScene.gridManager.blocks[index].layer,
+                        isClear: index % 2 == 0,
+                        reward: rewardForThisLayer,
+                        onComplete: {
+                            viewModel.completeScratch(at: index)
+                        },
+                        playHaptics: {
+                            switch rewardForThisLayer {
+                            case .bomb, .poop, .seed:
+                                viewModel.playHaptics(sound: .itemFound)
+                            case .bone:
+                                viewModel.playHaptics(sound: .success)
+                            default:
+                                break
+                            }
+                        }
+                    )
                 )
-            )
+                .id("\(index)-\(block.layer)")
+                .zIndex(0)
+                .transition(.opacity)
+            }
+            
         }
+        .animation(.easeInOut(duration: 0.3), value: viewModel.selectedIndex)
         .onAppear {
             viewModel.onAppear()
         }
         .onDisappear {
             viewModel.onDisappear()
         }
+        .alert("Leave the game?", isPresented: $viewModel.showQuitConfirmation) {
+            Button("Cancel", role: .cancel) { }
+            Button("Leave", role: .destructive) { viewModel.endGame(with: .quit) }
+        } message: { Text("Are you sure that you want to leave?") }
     }
 }
 
@@ -92,7 +86,6 @@ struct GameView: View {
         viewModel:
             GameViewModel(
                 matchManager: MatchManager(),
-                speechService: SpeechService(),
                 hapticsService: HapticsService()
             )
     )

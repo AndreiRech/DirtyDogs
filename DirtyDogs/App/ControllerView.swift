@@ -10,7 +10,7 @@ import SwiftUI
 struct ControllerView: View {
     @State var matchManager: MatchManager
     @State var hapticsService: HapticsServiceProtocol = HapticsService()
-    @State var speechService: SpeechServiceProtocol = SpeechService()
+   
     
     var body: some View {
         ZStack {
