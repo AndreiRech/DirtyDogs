@@ -52,13 +52,13 @@ class GridManager {
             width: CGFloat(cols) * blockSize.width + CGFloat(cols - 1) * spacing + 20,
             height: CGFloat(rows) * blockSize.height + CGFloat(rows - 1) * spacing + 20
         )
-        background.position = CGPoint(x: scene.frame.midX, y: scene.frame.maxY - 190 - background.size.height / 2)
+        background.position = CGPoint(x: scene.frame.midX, y: scene.frame.maxY - 150 - background.size.height / 2)
         background.zPosition = -1
         gridContainer.addChild(background)
         
         let totalWidth = CGFloat(cols) * blockSize.width + CGFloat(cols - 1) * spacing
         let startX = scene.frame.midX - totalWidth / 2 + blockSize.width / 2
-        let startY = scene.frame.maxY - 200 - blockSize.height / 2
+        let startY = scene.frame.maxY - 160 - blockSize.height / 2
         
         for row in 0..<rows {
             for col in 0..<cols {

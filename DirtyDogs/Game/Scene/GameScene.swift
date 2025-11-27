@@ -25,6 +25,7 @@ public class GameScene: SKScene {
             gridManager?.uiDelegate = uiDelegate
         }
     }
+    weak var inventoryDelegate: InventoryDelegate?
     
     init(matchManager: MatchManager, size: CGSize, hapticService: HapticsServiceProtocol) {
         self.matchManager = matchManager
@@ -65,6 +66,7 @@ public class GameScene: SKScene {
     public override func update(_ currentTime: TimeInterval) {
         inputManager.update()
         checkExits()
+        checkBottomCollection()
     }
     
     // MARK: - Touch Functions
@@ -75,7 +77,29 @@ public class GameScene: SKScene {
             return
         }
         
-        _ = gridManager.handleTouch(touch)
+        if handleCollectionTap(at: location) {
+            print("✨ Coletou item!")
+            return
+        }
+        
+        if gridManager.handleTouch(touch) {
+            return
+        }
+    }
+    
+    func handleCollectionTap(at location: CGPoint) -> Bool {
+        guard let manager = entityManager else { return false }
+        
+        if let entity = manager.entity(at: location) {
+            manager.remove(entity: entity)
+            
+            let imageName = (entity is Bomb) ? "Bomb" : "Bomb"
+            let item = InventoryItem(imageName: imageName)
+            
+            inventoryDelegate?.didCollect(item: item)
+            return true
+        }
+        return false
     }
     
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -122,6 +146,46 @@ public class GameScene: SKScene {
         }
     }
     
+    private func checkBottomCollection() {
+        let entities = entityManager.getEntities()
+        let isInventoryFull = inventoryDelegate?.isInventoryFull()
+        
+        for entity in entities {
+            guard let node = entity.component(ofType: GKSKNodeComponent.self)?.node else { continue }
+            
+            let collectionLineY = frame.minY + 120
+            
+//            print("isInventoryFull \(isInventoryFull)")
+            
+            if node.position.y < collectionLineY && isInventoryFull == false {
+                collect(entity: entity as! GameEntity)
+            }
+        }
+    }
+    
+    private func collect(entity: GameEntity) {
+        entityManager.remove(entity: entity)
+        
+        let itemName: String
+        switch entity {
+        case is Bomb:
+            itemName = "Bomb"
+        case is Ball:
+            itemName = "Ball"
+        case is Poop:
+            itemName = "Poop"
+        default:
+            itemName = "Unknown"
+        }
+        
+        let item = InventoryItem(imageName: itemName)
+        
+        inventoryDelegate?.didCollect(item: item)
+        
+        print("✨ Coletou item arrastado para baixo: \(itemName)")
+        
+    }
+    
     private func exitSide(for node: SKNode, minExitVelocity velocity: CGFloat = 1) -> EdgeSide? {
         guard let body = node.physicsBody else { return nil }
         let accFrame = node.calculateAccumulatedFrame()
@@ -133,12 +197,27 @@ public class GameScene: SKScene {
         return nil
     }
     
-    private func setupBorders() {
+    func setupBorders() {
         self.physicsBody = nil
         var bodies = [SKPhysicsBody]()
         
-        let bottomEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.maxX, y: frame.minY))
-        bodies.append(bottomEdge)
+        //        let bottomEdge = SKPhysicsBody(
+        //            edgeFrom: CGPoint(x: frame.minX, y: frame.minY),
+        //            to: CGPoint(x: frame.maxX, y: frame.minY)
+        //        )
+        //        bodies.append(bottomEdge)
+        let isFull = inventoryDelegate?.isInventoryFull() ?? true
+        
+        if isFull {
+            let bottomEdge = SKPhysicsBody(
+                edgeFrom: CGPoint(x: frame.minX, y: frame.minY),
+                to: CGPoint(x: frame.maxX, y: frame.minY)
+            )
+            bodies.append(bottomEdge)
+            print("🧱 Borda inferior ativada (inventário cheio)")
+        } else {
+            print("📦 Inventário com espaço — borda inferior removida")
+        }
         
         let leftEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.minX, y: frame.maxY))
         bodies.append(leftEdge)
