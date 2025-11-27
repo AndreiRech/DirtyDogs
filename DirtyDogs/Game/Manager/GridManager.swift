@@ -26,7 +26,6 @@ class GridManager {
         self.gridContainer = SKNode()
         self.gridContainer.zPosition = 10
         scene.addChild(gridContainer)
-        
     }
     
     func setupGrid() {
@@ -103,16 +102,17 @@ class GridManager {
             }
         }
         
-        let possibleItems: [Reward] = [.bomb, .poop]
-        let itemCount = Int.random(in: 2...3)
+        let possibleItems: [Reward] = [.bomb, .poop, .seed]
         
-        for _ in 0..<itemCount {
-            if let index = availableIndices.popLast() {
-                let randomItem = possibleItems.randomElement() ?? .poop
-                let randomDepth = Int.random(in: 0...2)
-                
-                newBlocks[index].reward = randomItem
-                newBlocks[index].rewardLayer = randomDepth
+        for item in possibleItems {
+            let itemCount = Int.random(in: 3...6)
+            for _ in 0..<itemCount {
+                if let index = availableIndices.popLast() {
+                    let randomDepth = Int.random(in: 0...2)
+                    
+                    newBlocks[index].reward = item
+                    newBlocks[index].rewardLayer = randomDepth
+                }
             }
         }
         
@@ -162,9 +162,8 @@ class GridManager {
         if block.reward != .none && block.rewardLayer == block.layer - 1 {
             switch block.reward {
             case .bone:
-                print("Osso encontrado")
                 return .bone
-            case .bomb, .poop:
+            case .bomb, .poop, .seed:
                 return block.reward
             default :
                 break
