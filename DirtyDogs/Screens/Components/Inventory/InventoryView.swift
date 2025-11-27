@@ -33,8 +33,10 @@ struct InventoryView: View {
                     .scaledToFit()
                     .offset(y: 65)
                 
-                Image(.itemsLabel)
-                    .offset(y: 12)
+                Text("Items")
+                    .font(.machineGunk(19))
+                    .foregroundStyle(.hardBrown)
+                    .offset(y: 10)
                 
                 HStack{
                     ForEach(availableItems.indices, id: \.self) { index in

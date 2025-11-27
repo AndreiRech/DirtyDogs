@@ -90,15 +90,21 @@ struct BoneBarView: View {
                 }
             }
         }
-        .frame(width: 200, height: 24)
+        .frame(width: 235, height: 33)
     }
 }
 
 #Preview {
     VStack(spacing: 10) {
         BoneBarView(boneBarStatus: .empty)
+        Spacer()
+        
         BoneBarView(boneBarStatus: .firstHalf)
+        Spacer()
+
         BoneBarView(boneBarStatus: .secondHalf)
+        Spacer()
+
         BoneBarView(boneBarStatus: .full)
     }
     .padding()
