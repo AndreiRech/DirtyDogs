@@ -118,6 +118,8 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
         } else {
             print("Inventário cheio! Não foi possível adicionar \(item.imageName)")
         }
+        
+        inventoryDidUpdate()
     }
     
     func didUse(item: InventoryItem) {
@@ -128,13 +130,14 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
         }
 
         spawnItem(type: .ball)
+        inventoryDidUpdate()
     }
     
     func isInventoryFull() -> Bool {
         availableItems.allSatisfy{ $0 != nil }
     }
     
-    func inventoryDidUpdate(items: [InventoryItem?]){
+    func inventoryDidUpdate(){
         gameScene.setupBorders()
     }
 }

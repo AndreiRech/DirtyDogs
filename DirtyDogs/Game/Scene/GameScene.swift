@@ -201,11 +201,11 @@ public class GameScene: SKScene {
         self.physicsBody = nil
         var bodies = [SKPhysicsBody]()
         
-//        let bottomEdge = SKPhysicsBody(
-//            edgeFrom: CGPoint(x: frame.minX, y: frame.minY),
-//            to: CGPoint(x: frame.maxX, y: frame.minY)
-//        )
-//        bodies.append(bottomEdge)
+        //        let bottomEdge = SKPhysicsBody(
+        //            edgeFrom: CGPoint(x: frame.minX, y: frame.minY),
+        //            to: CGPoint(x: frame.maxX, y: frame.minY)
+        //        )
+        //        bodies.append(bottomEdge)
         let isFull = inventoryDelegate?.isInventoryFull() ?? true
         
         if isFull {
@@ -276,15 +276,4 @@ public class GameScene: SKScene {
             print("AVISO: Entidade do tipo \(type(of: entity)) saiu da tela, mas não há lógica de rede para ela.")
         }
     }
-    
-    //    private func handleTap(at location: CGPoint) {
-    //        guard let manager = entityManager else { return }
-    //
-    //        if let entity = manager.entity(at: location) {
-    //            manager.remove(entity: entity)
-    //
-    //            let item = InventoryItem(imageName: "ball_icon")
-    //            inventoryDelegate?.didCollect(item: item)
-    //        }
-    //    }
 }
