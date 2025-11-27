@@ -32,7 +32,7 @@ struct InventoryView: View {
                     .resizable()
                     .frame(width: 303, height: 155)
                     .scaledToFit()
-                    .offset(y: 65)
+                    .offset(y: 70)
                 
                 Text("Items")
                     .font(.machineGunk(19))
@@ -49,14 +49,14 @@ struct InventoryView: View {
                                     .resizable()
                                     .frame(width: 86.44, height: 103.03)
                                     .scaledToFit()
-                                    .offset(y: 80)
+                                    .offset(y: 82)
                             }
                         } else {
                             Image(.button)
                                 .resizable()
                                 .frame(width: 86.44, height: 103.03)
                                 .scaledToFit()
-                                .offset(y: 80)
+                                .offset(y: 82)
                         }
 //                        InventorySlotView(
 //                            item: availableItems[index],
