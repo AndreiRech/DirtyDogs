@@ -15,6 +15,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     var matchManager: MatchManager
     var selectedIndex: Int? = nil
     var bonesFound: Int = 0
+    var showQuitConfirmation: Bool = false
     
     private var speechService: SpeechServiceProtocol
     
@@ -39,14 +40,16 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     }
     
     func onDisappear() {
-        matchManager.endGame(with: .quit)
+        if !matchManager.isGameOver {
+            matchManager.endGame(with: .quit)
+        }
         // speechService.stopListening()
     }
     
     func endGame(with event: PacketType) {
         matchManager.endGame(with: event)
     }
-        
+    
     // MARK: Game functions
     func resetGrid() {
         gameScene.resetGameGrid()
@@ -69,7 +72,6 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
                 gameScene.playSoundEffect(sound: .success)
             case .bomb, .seed, .poop:
                 guard let entityFound = entity.toPhysicsObject else { break }
-                print("entidade: \(entityFound)")
                 spawnItem(type: entityFound)
                 gameScene.playSoundEffect(sound: .itemFound)
             default:
@@ -83,15 +85,15 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     func cancelScratch() {
         self.selectedIndex = nil
     }
-
+    
     func didTapBlock(_ index: Int) {
         let block = gameScene.gridManager.blocks[index]
-
+        
         if block.cleared { return }
-
+        
         Task { @MainActor in
             self.selectedIndex = index
         }
     }
-
+    
 }
