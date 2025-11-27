@@ -18,7 +18,6 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     var bonesFound: Int = 0
     var showQuitConfirmation: Bool = false
     
-    
     // MARK: Init and StateControll functions
     init(matchManager: MatchManager, hapticsService: HapticsServiceProtocol) {
         self.matchManager = matchManager

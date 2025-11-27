@@ -10,4 +10,5 @@ enum SoundEffect {
     case success
     case bombExploded
     case poopSplash
+    case gridTouch
 }

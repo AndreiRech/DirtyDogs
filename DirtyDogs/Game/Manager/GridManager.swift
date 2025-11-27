@@ -11,7 +11,6 @@ import GameplayKit
 class GridManager {
     weak var scene: GameScene?
     weak var uiDelegate: GameSceneDelegate?
-    var hapticsService: HapticsServiceProtocol?
     var fxManager: ScreenFXManager?
     
     var blocks: [GridBlock] = []
@@ -24,9 +23,8 @@ class GridManager {
     private var blockSize: CGSize = .zero
     private var lastDraggedIndex: Int?
     
-    init(scene: GameScene, hapticsService: HapticsServiceProtocol? = nil, fxManager: ScreenFXManager? = nil) {
+    init(scene: GameScene, fxManager: ScreenFXManager? = nil) {
         self.scene = scene
-        self.hapticsService = hapticsService
         self.fxManager = fxManager
         
         self.gridContainer = SKNode()
@@ -146,7 +144,7 @@ class GridManager {
                let index = Int(name.replacingOccurrences(of: "block_", with: "")) {
                 
                 fxManager?.shakeSquare(node: tappedNode)
-                hapticsService?.feedbackGenerator(.medium)
+                fxManager?.playHaptics(with: .gridTouch)
                 uiDelegate?.didTapBlock(index)
                 return true
             }
@@ -222,7 +220,7 @@ class GridManager {
            let index = Int(name.replacingOccurrences(of: "block_", with: "")), index != lastDraggedIndex {
             
             fxManager?.shakeSquare(node: draggedNode)
-            hapticsService?.feedbackGenerator(.medium)
+            fxManager?.playHaptics(with: .gridTouch)
             lastDraggedIndex = index
         }
         
