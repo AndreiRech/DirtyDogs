@@ -16,12 +16,11 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     var selectedIndex: Int? = nil
     var bonesFound: Int = 0
     
-    private var speechService: SpeechServiceProtocol
     
     // MARK: Init and StateControll functions
-    init(matchManager: MatchManager, speechService: SpeechServiceProtocol) {
+    init(matchManager: MatchManager) {
         self.matchManager = matchManager
-        self.speechService = speechService
+        
         
         let scene = GameScene(
             matchManager: matchManager,

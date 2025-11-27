@@ -91,8 +91,7 @@ struct GameView: View {
     GameView(
         viewModel:
             GameViewModel(
-                matchManager: MatchManager(),
-                speechService: SpeechService()
+                matchManager: MatchManager()
             )
     )
 }
