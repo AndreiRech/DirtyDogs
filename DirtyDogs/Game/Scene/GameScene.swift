@@ -33,8 +33,8 @@ public class GameScene: SKScene {
         self.entityManager = EntityManager(scene: self)
         self.fxManager = ScreenFXManager(scene: self, entityManager: entityManager)
         self.inputManager = InputManager(scene: self, entityManager: entityManager, fxManager: fxManager)
-        self.spawnManager = SpawnManager(entityManager: entityManager, fxManager: fxManager)
         self.gridManager = GridManager(scene: self)
+        self.spawnManager = SpawnManager(entityManager: entityManager, fxManager: fxManager, gridManager: gridManager)
     }
     
     public override convenience init(size: CGSize) {
@@ -176,6 +176,8 @@ public class GameScene: SKScene {
             objectType = .bomb
         case is Poop:
             objectType = .poop
+        case is Seed:
+            objectType = .seed
         default:
             objectType = nil
             print("erro: entity type not found")

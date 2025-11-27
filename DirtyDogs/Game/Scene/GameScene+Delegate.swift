@@ -20,6 +20,8 @@ extension GameScene: MatchManagerDelegate {
             spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .bomb)
         case .poop:
             spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .poop)
+        case .seed:
+            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .seed)
         }
     }
 }
