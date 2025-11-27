@@ -8,7 +8,6 @@
 import SwiftUI
 import Speech
 import SpriteKit
-//import SVGKit
 
 struct InventoryView: View {
     var bonesFound: Int
@@ -41,28 +40,11 @@ struct InventoryView: View {
                 
                 HStack(alignment: .center){
                     ForEach(availableItems.indices, id: \.self) { index in
-                        if let item = availableItems[index] {
-                            Button {
-                                onItemTap?(item)
-                            } label: {
-                                Image(item.imageName)
-                                    .resizable()
-                                    .frame(width: 86.44, height: 103.03)
-                                    .scaledToFit()
-                                    .offset(y: 82)
-                            }
-                        } else {
-                            Image(.button)
-                                .resizable()
-                                .frame(width: 86.44, height: 103.03)
-                                .scaledToFit()
-                                .offset(y: 82)
-                        }
-//                        InventorySlotView(
-//                            item: availableItems[index],
-//                            shouldAnimate: slotThatShouldAnimate == index,
-//                            onTap: onItemTap
-//                        )
+                        InventorySlotView(
+                            item: availableItems[index],
+                            shouldAnimate: slotThatShouldAnimate == index,
+                            onTap: onItemTap
+                        )
                     }
                 }
             }
@@ -71,5 +53,5 @@ struct InventoryView: View {
 }
 
 #Preview {
-    InventoryView(bonesFound: 3, availableItems: [InventoryItem(imageName: "seed"), InventoryItem(imageName: "Bomb"), InventoryItem(imageName: "seed")])
+    InventoryView(bonesFound: 3, availableItems: [InventoryItem(imageName: "Tint-Button"), InventoryItem(imageName: "Bomb-Button"), InventoryItem(imageName: "Seed-Button")])
 }
