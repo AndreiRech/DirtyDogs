@@ -17,7 +17,7 @@ struct SpawnManagerTests {
     
     init() {
         let matchManager = MatchManager()
-        let scene = GameScene(matchManager: matchManager, size: CGSize(width: 100, height: 100))
+        let scene = GameScene(matchManager: matchManager, size: CGSize(width: 100, height: 100), hapticService: HapticsService())
         entityManager = EntityManager(scene: scene)
         spawnManager = SpawnManager(entityManager: entityManager, fxManager: nil)
     }
@@ -44,7 +44,7 @@ struct SpawnManagerTests {
     @Test("Spawn Moving Item - Verify force application capability")
     func spawnMovingItem() {
         // Given
-        let scene = GameScene(matchManager: MatchManager(), size: CGSize(width: 500, height: 800))
+        let scene = GameScene(matchManager: MatchManager(), size: CGSize(width: 500, height: 800), hapticService: HapticsService())
         let entityManager = EntityManager(scene: scene)
         let spawnManager = SpawnManager(entityManager: entityManager, fxManager: nil)
         
@@ -61,9 +61,9 @@ struct SpawnManagerTests {
     @Test("Execute Action - Bomb explosion removes entity")
     func executeActionBombExplosion() async throws {
         // Given
-        let scene = GameScene(matchManager: MatchManager(), size: CGSize(width: 500, height: 800))
+        let scene = GameScene(matchManager: MatchManager(), size: CGSize(width: 500, height: 800), hapticService: HapticsService())
         let entityManager = EntityManager(scene: scene)
-        let fxManager = ScreenFXManager(scene: scene, entityManager: entityManager)
+        let fxManager = ScreenFXManager(scene: scene, entityManager: entityManager, hapticsService: HapticsService())
         let spawnManager = SpawnManager(entityManager: entityManager, fxManager: fxManager)
         
         let bomb = Bomb()

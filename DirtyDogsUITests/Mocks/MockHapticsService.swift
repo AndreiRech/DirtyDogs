@@ -6,6 +6,7 @@
 //
 
 @testable import DirtyDogs
+import UIKit
 
 class MockHapticsService: HapticsServiceProtocol {
     var complexSuccessCalled = false
@@ -16,4 +17,5 @@ class MockHapticsService: HapticsServiceProtocol {
     func explosionBomb() {}
     func findItem() {}
     func cleanScreen() {}
+    func feedbackGenerator(_ style: UIImpactFeedbackGenerator.FeedbackStyle) { }
 }
