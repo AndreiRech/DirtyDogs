@@ -22,14 +22,27 @@ struct GameView: View {
                     Button {
                         viewModel.endGame(with: .quit)
                     } label: {
-                        Image("closeButton")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 48, height: 48)
-                            .padding()
+                        HStack{
+                            Button("Bomba") {
+                                viewModel.spawnItem(type: .bomb)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.red)
+                            
+                            Image("closeButton")
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 48, height: 48)
+                                .padding()
+                        }
                     }
                 }
                 Spacer()
+                
+                InventoryView(bonesFound: viewModel.bonesFound, availableItems: viewModel.availableItems, onItemTap: { item in
+                    viewModel.didUse(item: item)
+                })
+                .offset(y: -55)
             }
             
             VStack {
@@ -47,15 +60,15 @@ struct GameView: View {
 //                    .buttonStyle(.borderedProminent)
 //                    .tint(.orange)
 //                    
-                    Button("Bomba") {
-                        viewModel.spawnItem(type: .bomb)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.red)
+//                    Button("Bomba") {
+//                        viewModel.spawnItem(type: .bomb)
+//                    }
+//                    .buttonStyle(.borderedProminent)
+//                    .tint(.red)
 //                }
 //                .padding(.bottom, 20)
                 
-                InventoryView(bonesFound: viewModel.bonesFound, availableItems: viewModel.availableItems)
+
             }
         }
         .sheet(item: Binding(

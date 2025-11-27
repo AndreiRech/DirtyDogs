@@ -14,6 +14,8 @@ struct InventoryView: View {
     var bonesFound: Int
     var availableItems: [InventoryItem?]
     
+    var onItemTap: ((InventoryItem) -> Void)?
+    
     var body: some View {
         ZStack{
             Image(.inventoryBackground)
@@ -37,11 +39,15 @@ struct InventoryView: View {
                 HStack{
                     ForEach(availableItems.indices, id: \.self) { index in
                         if let item = availableItems[index] {
-                            Image(item.imageName)
-                                .resizable()
-                                .frame(width: 86.44, height: 103.03)
-                                .scaledToFit()
-                                .offset(y: 80)
+                            Button {
+                                onItemTap?(item)
+                            } label: {
+                                Image(item.imageName)
+                                    .resizable()
+                                    .frame(width: 86.44, height: 103.03)
+                                    .scaledToFit()
+                                    .offset(y: 80)
+                            }
                         } else {
                             Image(.button)
                                 .resizable()

@@ -155,7 +155,7 @@ public class GameScene: SKScene {
             
             let collectionLineY = frame.minY + 120
             
-            print("isInventoryFull \(isInventoryFull)")
+//            print("isInventoryFull \(isInventoryFull)")
             
             if node.position.y < collectionLineY && isInventoryFull == false {
                 collect(entity: entity as! GameEntity)

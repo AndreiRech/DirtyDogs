@@ -53,7 +53,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     func endGame(with event: PacketType) {
         matchManager.endGame(with: event)
     }
-        
+    
     // MARK: Game functions
     func resetGrid() {
         gameScene.gridManager.resetGrid()
@@ -95,15 +95,15 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     func cancelScratch() {
         self.selectedIndex = nil
     }
-
+    
     func didTapBlock(_ index: Int) {
         let block = gameScene.gridManager.blocks[index]
-
+        
         // Se o bloco já está no positivo (cleared), não abre a raspadinha
         if block.cleared {   // layer == 3
             return
         }
-
+        
         Task { @MainActor in
             self.selectedIndex = index
         }
@@ -125,11 +125,23 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     func didUse(item: InventoryItem) {
         if let index = availableItems.firstIndex(of: item) {
             withAnimation {
-                availableItems.remove(at: index)
+                availableItems[index] = nil
             }
         }
-
-        spawnItem(type: .ball)
+        
+        let type: PhysicsObjectType
+        
+        print("tipo item \(item.imageName)")
+        
+        switch item.imageName {
+        case "Bomb":
+            type = .bomb
+        case "Seed":
+            type = .ball
+        default:
+            type = .ball
+        }
+        spawnItem(type: type)
         inventoryDidUpdate()
     }
     
