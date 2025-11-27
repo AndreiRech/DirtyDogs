@@ -11,7 +11,10 @@ protocol ScratchViewModelProtocol {
     var layer: Int { get }
     var isClear: Bool { get }
     var onComplete: () -> Void { get }
-    var onCancel: () -> Void { get }
+    
+    var reward: Reward { get }
+    var showResult: Bool { get set }
+    
     var clearedCells: Set<Int> { get set }
     var gridPoints: [CGPoint] { get set }
     var cols: Int { get set }
@@ -24,4 +27,5 @@ protocol ScratchViewModelProtocol {
     func setupGrid(in size: CGSize)
     func updateRevealRatio()
     func getImage(nextLayer: Bool) -> String
+    func getRewardImage() -> String
 }

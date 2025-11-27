@@ -12,7 +12,8 @@ class ScratchViewModel: ScratchViewModelProtocol {
     let layer: Int
     let isClear: Bool
     let onComplete: () -> Void
-    let onCancel: () -> Void
+    let reward: Reward
+    var showResult: Bool = false
     
     var clearedCells: Set<Int> = []
     var gridPoints: [CGPoint] = []
@@ -23,11 +24,11 @@ class ScratchViewModel: ScratchViewModelProtocol {
     let targetRevealRatio: CGFloat = 0.7
     var wasCleared: Bool = false
     
-    init(layer: Int, isClear: Bool, onComplete: @escaping () -> Void, onCancel: @escaping () -> Void, clearedCells: Set<Int> = [], gridPoints: [CGPoint] = [], cols: Int = 26, rows: Int = 0, revealRatio: CGFloat = 0) {
+    init(layer: Int, isClear: Bool, reward: Reward, onComplete: @escaping () -> Void, clearedCells: Set<Int> = [], gridPoints: [CGPoint] = [], cols: Int = 26, rows: Int = 0, revealRatio: CGFloat = 0) {
         self.layer = layer
         self.isClear = isClear
+        self.reward = reward
         self.onComplete = onComplete
-        self.onCancel = onCancel
         self.clearedCells = clearedCells
         self.gridPoints = gridPoints
         self.cols = cols
@@ -48,6 +49,21 @@ class ScratchViewModel: ScratchViewModelProtocol {
             return isClear ? "Stone-Dark" : "Stone-Light"
         default:
             return "checkmark.circle.fill"
+        }
+    }
+    
+    func getRewardImage() -> String {
+        switch reward {
+        case .bomb:
+            return "Bomb-Button"
+        case .poop:
+            return "Tint-Button"
+        case .seed:
+            return "Seed-Button"
+        case .bone:
+            return "Bone"
+        default:
+            return ""
         }
     }
     

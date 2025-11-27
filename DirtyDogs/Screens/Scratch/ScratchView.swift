@@ -10,6 +10,7 @@ import SwiftUI
 struct ScratchView: View {
     @Environment(\.dismiss) private var dismiss
     @State var viewModel: ScratchViewModelProtocol
+    @State private var isAnimating = false
     
     var body: some View {
         GeometryReader { geo in
@@ -33,7 +34,7 @@ struct ScratchView: View {
                                 for index in viewModel.clearedCells {
                                     if index < viewModel.gridPoints.count {
                                         let point = viewModel.gridPoints[index]
-
+                                        
                                         let rect = CGRect(
                                             x: point.x - viewModel.brushRadius,
                                             y: point.y - viewModel.brushRadius,
@@ -85,7 +86,7 @@ struct ScratchView: View {
                             let originY = (size.height - rectHeight) / 4
                             
                             let localPoint = CGPoint(x: p.x - originX, y: p.y - originY)
-
+                            
                             let r2 = viewModel.brushRadius * viewModel.brushRadius
                             var changed = false
                             
@@ -103,6 +104,74 @@ struct ScratchView: View {
                             if changed { viewModel.updateRevealRatio() }
                         }
                 )
+                
+                if viewModel.showResult {
+                    ZStack {
+                        if viewModel.reward == .none {
+                            ZStack{
+                                Image("NoneBackground")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 180, height: 64)
+                                
+                                Text("YOU DON'T FIND\nANY ITEMS, TRY AGAIN!")
+                                    .font(.machineGunk(20))
+                                    .foregroundStyle(Color.brown)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                            }
+                        } else {
+                            VStack {
+                                Image(viewModel.getRewardImage())
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 100)
+                                    .background(
+                                        ZStack {
+                                            Circle()
+                                                .fill(
+                                                    RadialGradient(
+                                                        colors: [
+                                                            Color.white,
+                                                            Color.white.opacity(0.0)
+                                                        ],
+                                                        center: .center,
+                                                        startRadius: 0,
+                                                        endRadius: 55
+                                                    )
+                                                )
+                                                .frame(width: 120, height: 120)
+                                                .blur(radius: 5)
+                                            
+                                            Circle()
+                                                .fill(
+                                                    RadialGradient(
+                                                        colors: [
+                                                            Color.white.opacity(0.6),
+                                                            Color.white.opacity(0.0)
+                                                        ],
+                                                        center: .center,
+                                                        startRadius: 30,
+                                                        endRadius: 80
+                                                    )
+                                                )
+                                                .frame(width: 160, height: 160)
+                                                .blur(radius: 20)
+                                        }
+                                            .scaleEffect(isAnimating ? 1.15 : 0.85)
+                                            .opacity(isAnimating ? 1.0 : 0.6)
+                                            .onAppear {
+                                                withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
+                                                    isAnimating = true
+                                                }
+                                            }
+                                    )
+                            }
+                        }
+                    }
+                    .transition(.scale.combined(with: .opacity))
+                    .zIndex(100)
+                }
             }
             .onAppear {
                 let scratchAreaSize = CGSize(width: size.width * 0.8, height: size.height * 0.5)
@@ -111,8 +180,13 @@ struct ScratchView: View {
             .onChange(of: viewModel.clearedCells) {
                 if viewModel.wasCleared == false && viewModel.revealRatio >= viewModel.targetRevealRatio {
                     viewModel.wasCleared = true
+                    
+                    withAnimation(.spring()) {
+                        viewModel.showResult = true
+                    }
+                    
                     Task { @MainActor in
-                        try? await Task.sleep(for: .seconds(0.25))
+                        try? await Task.sleep(for: .seconds(1.2))
                         viewModel.onComplete()
                         dismiss()
                     }
@@ -123,5 +197,5 @@ struct ScratchView: View {
 }
 
 #Preview {
-    ScratchView(viewModel: ScratchViewModel(layer: 0, isClear: true, onComplete: { print("") }, onCancel: { print("") }))
+    ScratchView(viewModel: ScratchViewModel(layer: 0, isClear: true, reward: .bomb, onComplete: { print("") }))
 }
