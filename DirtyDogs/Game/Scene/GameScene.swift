@@ -163,6 +163,10 @@ public class GameScene: SKScene {
     }
     
     private func collect(entity: GameEntity) {
+        let generator = UIImpactFeedbackGenerator(style: .heavy)
+        generator.prepare()
+        generator.impactOccurred()
+        
         entityManager.remove(entity: entity)
         
         let itemName: String
