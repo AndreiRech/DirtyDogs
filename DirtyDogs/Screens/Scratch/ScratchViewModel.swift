@@ -52,7 +52,7 @@ class ScratchViewModel: ScratchViewModelProtocol {
         case 2:
             return isClear ? "Stone-Dark" : "Stone-Light"
         default:
-            return "checkmark.circle.fill"
+            return isClear ? "Obsidiam-Dark" : "Obsidiam-Light"
         }
     }
     
