@@ -117,12 +117,8 @@ class HapticsService: HapticsServiceProtocol {
     }
     
     func feedbackGenerator(_ style : UIImpactFeedbackGenerator.FeedbackStyle) {
-        print("Feedbackaqui")
         let generator = UIImpactFeedbackGenerator(style: style)
         generator.prepare()
         generator.impactOccurred()
     }
-    
-    
-
 }
