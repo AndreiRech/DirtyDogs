@@ -11,6 +11,7 @@ protocol GameViewModelProtocol {
     var gameScene: GameScene { get }
     var matchManager: MatchManager { get }
     var bonesFound: Int { get set }
+    var slotThatShouldAnimate: Int? { get }
     
     var selectedIndex: Int? { get set }
     var availableItems: [InventoryItem?] { get }

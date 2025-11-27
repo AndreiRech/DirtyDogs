@@ -39,7 +39,7 @@ struct GameView: View {
                 }
                 Spacer()
                 
-                InventoryView(bonesFound: viewModel.bonesFound, availableItems: viewModel.availableItems, onItemTap: { item in
+                InventoryView(bonesFound: viewModel.bonesFound, availableItems: viewModel.availableItems, slotThatShouldAnimate: viewModel.slotThatShouldAnimate, onItemTap: { item in
                     viewModel.didUse(item: item)
                 })
                 .offset(y: -55)

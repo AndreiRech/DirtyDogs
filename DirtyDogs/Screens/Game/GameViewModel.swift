@@ -15,6 +15,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     var matchManager: MatchManager
     var selectedIndex: Int? = nil
     var bonesFound: Int = 0
+    var slotThatShouldAnimate: Int? = nil
     
     var availableItems: [InventoryItem?] = [
         nil,
@@ -126,6 +127,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
         if let index = availableItems.firstIndex(of: item) {
             withAnimation {
                 availableItems[index] = nil
+                slotThatShouldAnimate = index
             }
         }
         
@@ -136,13 +138,17 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
         switch item.imageName {
         case "Bomb":
             type = .bomb
-        case "Seed":
+        case "seed":
             type = .ball
         default:
             type = .ball
         }
         spawnItem(type: type)
         inventoryDidUpdate()
+        
+        DispatchQueue.main.async {
+                self.slotThatShouldAnimate = nil
+            }
     }
     
     func isInventoryFull() -> Bool {

@@ -13,6 +13,7 @@ import SpriteKit
 struct InventoryView: View {
     var bonesFound: Int
     var availableItems: [InventoryItem?]
+    var slotThatShouldAnimate: Int?
     
     var onItemTap: ((InventoryItem) -> Void)?
     
@@ -29,7 +30,7 @@ struct InventoryView: View {
             ZStack{
                 Image("Chon")
                     .resizable()
-                    .frame(width: 303, height: 145)
+                    .frame(width: 303, height: 155)
                     .scaledToFit()
                     .offset(y: 65)
                 
@@ -38,7 +39,7 @@ struct InventoryView: View {
                     .foregroundStyle(.hardBrown)
                     .offset(y: 10)
                 
-                HStack{
+                HStack(alignment: .center){
                     ForEach(availableItems.indices, id: \.self) { index in
                         if let item = availableItems[index] {
                             Button {
@@ -57,6 +58,11 @@ struct InventoryView: View {
                                 .scaledToFit()
                                 .offset(y: 80)
                         }
+//                        InventorySlotView(
+//                            item: availableItems[index],
+//                            shouldAnimate: slotThatShouldAnimate == index,
+//                            onTap: onItemTap
+//                        )
                     }
                 }
             }
@@ -65,5 +71,5 @@ struct InventoryView: View {
 }
 
 #Preview {
-    InventoryView(bonesFound: 3, availableItems: [InventoryItem(imageName: "seed")])
+    InventoryView(bonesFound: 3, availableItems: [InventoryItem(imageName: "seed"), InventoryItem(imageName: "Bomb"), InventoryItem(imageName: "seed")])
 }
