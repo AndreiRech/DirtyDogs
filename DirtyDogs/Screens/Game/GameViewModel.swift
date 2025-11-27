@@ -15,6 +15,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     var matchManager: MatchManager
     var selectedIndex: Int? = nil
     var bonesFound: Int = 0
+    var showQuitConfirmation: Bool = false
     
     
     // MARK: Init and StateControll functions
@@ -38,29 +39,31 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     }
     
     func onDisappear() {
-        matchManager.endGame(with: .quit)
+        if !matchManager.isGameOver {
+            matchManager.endGame(with: .quit)
+        }
         // speechService.stopListening()
     }
     
     func endGame(with event: PacketType) {
         matchManager.endGame(with: event)
     }
-        
+    
     // MARK: Game functions
     func resetGrid() {
-        gameScene.gridManager.resetGrid()
+        gameScene.resetGameGrid()
     }
     
     func spawnItem(type: PhysicsObjectType) {
-        let spawnPoint = CGPoint(
-            x: gameScene.frame.midX,
-            y: gameScene.frame.maxY - 100
-        )
-        gameScene.spawnManager.spawnItem(at: spawnPoint, entity: type)
+        gameScene.spawnItem(type: type)
+    }
+    
+    func playHaptics(sound: SoundEffect) {
+        gameScene.playSoundEffect(sound: sound)
     }
     
     func completeScratch(at index: Int) {
-        let entity = gameScene.gridManager.completeScratch(at: index)
+        let entity = gameScene.revealItem(at: index)
         
         if let entity = entity {
             switch entity {
@@ -69,13 +72,9 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
                 if bonesFound == 3 {
                     endGame(with: .victory)
                 }
-                gameScene.fxManager.playComplex()
             case .bomb, .seed, .poop:
                 guard let entityFound = entity.toPhysicsObject else { break }
-                
-                print("entidade encontrada: \(entityFound)")
                 spawnItem(type: entityFound)
-                gameScene.fxManager.playItemFind()
             default:
                 break
             }
@@ -87,18 +86,15 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     func cancelScratch() {
         self.selectedIndex = nil
     }
-
+    
     func didTapBlock(_ index: Int) {
         let block = gameScene.gridManager.blocks[index]
-
-        // Se o bloco já está no positivo (cleared), não abre a raspadinha
-        if block.cleared {   // layer == 3
-            return
-        }
-
+        
+        if block.cleared { return }
+        
         Task { @MainActor in
             self.selectedIndex = index
         }
     }
-
+    
 }

@@ -15,4 +15,5 @@ class MockHapticsService: HapticsServiceProtocol {
     func complexSuccess() { complexSuccessCalled = true }
     func explosionBomb() {}
     func findItem() {}
+    func cleanScreen() {}
 }
