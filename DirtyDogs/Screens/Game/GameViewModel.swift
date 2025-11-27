@@ -10,14 +10,20 @@ import SpriteKit
 import SwiftUI
 
 @Observable
-class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
+class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate {
     var gameScene: GameScene
     var matchManager: MatchManager
     var hapticsService: HapticsServiceProtocol
     var selectedIndex: Int? = nil
     var bonesFound: Int = 0
     var showQuitConfirmation: Bool = false
+    var slotThatShouldAnimate: Int? = nil
     
+    var availableItems: [InventoryItem?] = [
+        nil,
+        nil,
+        nil
+    ]
     
     // MARK: Init and StateControll functions
     init(matchManager: MatchManager, hapticsService: HapticsServiceProtocol) {
@@ -34,6 +40,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
         
         self.matchManager.delegate = scene
         self.gameScene.uiDelegate = self
+        self.gameScene.inventoryDelegate = self
     }
     
     func onAppear() {
@@ -97,4 +104,49 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
         }
     }
     
+    func didCollect(item: InventoryItem) {
+        if let index = availableItems.firstIndex(where: { $0 == nil }){
+            withAnimation {
+                availableItems[index] = item
+            }
+        }
+        
+        inventoryDidUpdate()
+    }
+    
+    func didUse(item: InventoryItem) {
+        if let index = availableItems.firstIndex(of: item) {
+            withAnimation {
+                availableItems[index] = nil
+                slotThatShouldAnimate = index
+            }
+        }
+        
+        let type: PhysicsObjectType
+                
+        switch item.imageName {
+        case "Bomb-Button":
+            type = .bomb
+        case "Seed-Button":
+            type = .seed
+        case "Tint-Button":
+            type = .poop
+        default:
+            type = .poop
+        }
+        spawnItem(type: type)
+        inventoryDidUpdate()
+        
+        DispatchQueue.main.async {
+                self.slotThatShouldAnimate = nil
+            }
+    }
+    
+    func isInventoryFull() -> Bool {
+        availableItems.allSatisfy{ $0 != nil }
+    }
+    
+    func inventoryDidUpdate(){
+        gameScene.setupBorders()
+    }
 }

@@ -22,7 +22,7 @@ class PoopTestScene: GameScene {
     init() {
         let screenSize = UIScreen.main.bounds.size
         let matchManager = MatchManager()
-        super.init(matchManager: matchManager, size: screenSize)
+        super.init(matchManager: matchManager, size: screenSize, hapticService: HapticsService())
         matchManager.delegate = self
     }
 

@@ -11,7 +11,6 @@ import GameplayKit
 class GridManager {
     weak var scene: GameScene?
     weak var uiDelegate: GameSceneDelegate?
-    var hapticsService: HapticsServiceProtocol?
     var fxManager: ScreenFXManager?
     
     var blocks: [GridBlock] = []
@@ -24,9 +23,8 @@ class GridManager {
     private var blockSize: CGSize = .zero
     private var lastDraggedIndex: Int?
     
-    init(scene: GameScene, hapticsService: HapticsServiceProtocol? = nil, fxManager: ScreenFXManager? = nil) {
+    init(scene: GameScene, fxManager: ScreenFXManager? = nil) {
         self.scene = scene
-        self.hapticsService = hapticsService
         self.fxManager = fxManager
         
         self.gridContainer = SKNode()
@@ -54,13 +52,13 @@ class GridManager {
             width: CGFloat(cols) * blockSize.width + CGFloat(cols - 1) * spacing + 20,
             height: CGFloat(rows) * blockSize.height + CGFloat(rows - 1) * spacing + 20
         )
-        background.position = CGPoint(x: scene.frame.midX, y: scene.frame.maxY - 190 - background.size.height / 2)
+        background.position = CGPoint(x: scene.frame.midX, y: scene.frame.maxY - 150 - background.size.height / 2)
         background.zPosition = -1
         gridContainer.addChild(background)
         
         let totalWidth = CGFloat(cols) * blockSize.width + CGFloat(cols - 1) * spacing
         let startX = scene.frame.midX - totalWidth / 2 + blockSize.width / 2
-        let startY = scene.frame.maxY - 200 - blockSize.height / 2
+        let startY = scene.frame.maxY - 160 - blockSize.height / 2
         
         for row in 0..<rows {
             for col in 0..<cols {
@@ -103,7 +101,7 @@ class GridManager {
             }
         }
         
-        let possibleItems: [Reward] = [.bomb, .poop, .seed]
+        let possibleItems: [Reward] = [.poop, .bomb, .seed]
         
         for item in possibleItems {
             let itemCount = Int.random(in: 3...6)
@@ -146,7 +144,7 @@ class GridManager {
                let index = Int(name.replacingOccurrences(of: "block_", with: "")) {
                 
                 fxManager?.shakeSquare(node: tappedNode)
-                hapticsService?.feedbackGenerator(.medium)
+                fxManager?.playHaptics(with: .gridTouch)
                 uiDelegate?.didTapBlock(index)
                 return true
             }
@@ -222,7 +220,7 @@ class GridManager {
            let index = Int(name.replacingOccurrences(of: "block_", with: "")), index != lastDraggedIndex {
             
             fxManager?.shakeSquare(node: draggedNode)
-            hapticsService?.feedbackGenerator(.medium)
+            fxManager?.playHaptics(with: .gridTouch)
             lastDraggedIndex = index
         }
         

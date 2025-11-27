@@ -11,14 +11,15 @@ import GameplayKit
 class ScreenFXManager {
     weak var scene: SKScene?
     weak var entityManager: EntityManager?
-    private let haptics = HapticsService()
+    private let haptics: HapticsServiceProtocol
     
     private var stunOverlay: SKShapeNode?
     var isStunned: Bool = false
     
-    init(scene: SKScene, entityManager: EntityManager?) {
+    init(scene: SKScene, entityManager: EntityManager?, hapticsService: HapticsServiceProtocol) {
         self.scene = scene
         self.entityManager = entityManager
+        self.haptics = hapticsService
         haptics.prepareHaptics()
     }
     
@@ -32,6 +33,8 @@ class ScreenFXManager {
             haptics.explosionBomb()
         case .poopSplash:
             haptics.cleanScreen() // TODO: Alterar para o do coco
+        case .gridTouch:
+            haptics.feedbackGenerator(.medium)
         }
     }
     

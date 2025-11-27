@@ -16,7 +16,7 @@ struct GridManagerTests {
     
     init() {
         let matchManager = MatchManager()
-        scene = GameScene(matchManager: matchManager, size: CGSize(width: 300, height: 400))
+        scene = GameScene(matchManager: matchManager, size: CGSize(width: 300, height: 400), hapticService: HapticsService())
         gridManager = scene.gridManager
     }
     

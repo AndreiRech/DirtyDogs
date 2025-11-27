@@ -15,7 +15,7 @@ struct ScreenFXManagerTests {
     func applyStunState() async throws {
         // Given
         let scene = SKScene()
-        let fxManager = ScreenFXManager(scene: scene, entityManager: nil)
+        let fxManager = ScreenFXManager(scene: scene, entityManager: nil, hapticsService: HapticsService())
         
         // When
         fxManager.applyStun(duration: 0.1)
@@ -33,9 +33,9 @@ struct ScreenFXManagerTests {
     @Test("Explode - Verify entity removal from manager")
     func explodeRemovesEntity() {
         // Given
-        let scene = GameScene(matchManager: MatchManager(), size: CGSize(width: 500, height: 800))
+        let scene = GameScene(matchManager: MatchManager(), size: CGSize(width: 500, height: 800), hapticService: HapticsService())
         let entityManager = EntityManager(scene: scene)
-        let fxManager = ScreenFXManager(scene: scene, entityManager: entityManager)
+        let fxManager = ScreenFXManager(scene: scene, entityManager: entityManager, hapticsService: HapticsService())
         
         let ball = Ball()
         let node = SKShapeNode(circleOfRadius: 10)

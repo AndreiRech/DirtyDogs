@@ -17,23 +17,11 @@ struct GameView: View {
                 .ignoresSafeArea()
             
             VStack {
-                HStack {
-                    Spacer()
-                    Button {
-                        if let _ = viewModel.selectedIndex {
-                            viewModel.cancelScratch()
-                        } else {
-                            viewModel.showQuitConfirmation = true
-                        }
-                    } label: {
-                        Image("closeButton")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 48, height: 48)
-                            .padding()
-                    }
-                }
                 Spacer()
+                InventoryView(bonesFound: viewModel.bonesFound, availableItems: viewModel.availableItems, slotThatShouldAnimate: viewModel.slotThatShouldAnimate, onItemTap: { item in
+                    viewModel.didUse(item: item)
+                })
+                .offset(y: -55)
             }
             .zIndex(1)
             
@@ -62,10 +50,30 @@ struct GameView: View {
                     )
                 )
                 .id("\(index)-\(block.layer)")
-                .zIndex(0)
+                .zIndex(2)
                 .transition(.opacity)
             }
             
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        if let _ = viewModel.selectedIndex {
+                            viewModel.cancelScratch()
+                        } else {
+                            viewModel.showQuitConfirmation = true
+                        }
+                    } label: {
+                        Image("closeButton")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 48, height: 48)
+                            .padding()
+                    }
+                }
+                Spacer()
+            }
+            .zIndex(3)
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.selectedIndex)
         .onAppear {
