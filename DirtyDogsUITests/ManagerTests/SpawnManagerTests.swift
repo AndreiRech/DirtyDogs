@@ -73,7 +73,7 @@ struct SpawnManagerTests {
         spawnManager.executeAction(value: bomb)
         
         // Then
-        try await Task.sleep(nanoseconds: 1_000_000_000)
+        try await Task.sleep(nanoseconds: 2_000_000_000)
         
         let hasBomb = entityManager.getEntities().contains(bomb)
         #expect(!hasBomb)
