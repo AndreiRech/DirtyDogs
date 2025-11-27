@@ -59,6 +59,10 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
         gameScene.spawnItem(type: type)
     }
     
+    func playHaptics(sound: SoundEffect) {
+        gameScene.playSoundEffect(sound: sound)
+    }
+    
     func completeScratch(at index: Int) {
         let entity = gameScene.revealItem(at: index)
         
@@ -69,11 +73,9 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
                 if bonesFound == 3 {
                     endGame(with: .victory)
                 }
-                gameScene.playSoundEffect(sound: .success)
             case .bomb, .seed, .poop:
                 guard let entityFound = entity.toPhysicsObject else { break }
                 spawnItem(type: entityFound)
-                gameScene.playSoundEffect(sound: .itemFound)
             default:
                 break
             }

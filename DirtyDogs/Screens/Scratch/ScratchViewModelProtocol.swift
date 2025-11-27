@@ -10,10 +10,13 @@ import SwiftUI
 protocol ScratchViewModelProtocol {
     var layer: Int { get }
     var isClear: Bool { get }
+    
+    var playHaptics: () -> Void { get }
     var onComplete: () -> Void { get }
     
     var reward: Reward { get }
     var showResult: Bool { get set }
+    var isAnimating: Bool { get set }
     
     var clearedCells: Set<Int> { get set }
     var gridPoints: [CGPoint] { get set }

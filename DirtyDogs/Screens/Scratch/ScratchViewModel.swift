@@ -12,8 +12,11 @@ class ScratchViewModel: ScratchViewModelProtocol {
     let layer: Int
     let isClear: Bool
     let onComplete: () -> Void
+    let playHaptics: () -> Void
+    
     let reward: Reward
     var showResult: Bool = false
+    var isAnimating: Bool = false
     
     var clearedCells: Set<Int> = []
     var gridPoints: [CGPoint] = []
@@ -24,7 +27,7 @@ class ScratchViewModel: ScratchViewModelProtocol {
     let targetRevealRatio: CGFloat = 0.7
     var wasCleared: Bool = false
     
-    init(layer: Int, isClear: Bool, reward: Reward, onComplete: @escaping () -> Void, clearedCells: Set<Int> = [], gridPoints: [CGPoint] = [], cols: Int = 26, rows: Int = 0, revealRatio: CGFloat = 0) {
+    init(layer: Int, isClear: Bool, reward: Reward, onComplete: @escaping () -> Void, playHaptics: @escaping () -> Void, clearedCells: Set<Int> = [], gridPoints: [CGPoint] = [], cols: Int = 26, rows: Int = 0, revealRatio: CGFloat = 0) {
         self.layer = layer
         self.isClear = isClear
         self.reward = reward
@@ -34,6 +37,7 @@ class ScratchViewModel: ScratchViewModelProtocol {
         self.cols = cols
         self.rows = rows
         self.revealRatio = revealRatio
+        self.playHaptics = playHaptics
     }
     
     func getImage(nextLayer: Bool = false) -> String {

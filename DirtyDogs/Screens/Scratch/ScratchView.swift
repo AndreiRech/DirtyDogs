@@ -10,7 +10,6 @@ import SwiftUI
 struct ScratchView: View {
     @Environment(\.dismiss) private var dismiss
     @State var viewModel: ScratchViewModelProtocol
-    @State private var isAnimating = false
     
     var body: some View {
         GeometryReader { geo in
@@ -66,7 +65,7 @@ struct ScratchView: View {
                         .zIndex(-2)
                     
                     VStack {
-                        Text("CLEANING: \(Int(viewModel.revealRatio * 108))%")
+                        Text("CLEANING: \(Int(viewModel.revealRatio * 110))%")
                             .font(.machineGunk(24))
                             .foregroundStyle(.hardBrown)
                             .offset(y: 10)
@@ -114,7 +113,7 @@ struct ScratchView: View {
                                     .scaledToFit()
                                     .frame(width: 180, height: 64)
                                 
-                                Text("YOU DON'T FIND\nANY ITEMS, TRY AGAIN!")
+                                Text("YOU DIDN'T FIND\nANY ITEMS, TRY AGAIN!")
                                     .font(.machineGunk(20))
                                     .foregroundStyle(Color.brown)
                                     .multilineTextAlignment(.center)
@@ -158,11 +157,11 @@ struct ScratchView: View {
                                                 .frame(width: 160, height: 160)
                                                 .blur(radius: 20)
                                         }
-                                            .scaleEffect(isAnimating ? 1.15 : 0.85)
-                                            .opacity(isAnimating ? 1.0 : 0.6)
+                                            .scaleEffect(viewModel.isAnimating ? 1.15 : 0.85)
+                                            .opacity(viewModel.isAnimating ? 1.0 : 0.6)
                                             .onAppear {
                                                 withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
-                                                    isAnimating = true
+                                                    viewModel.isAnimating = true
                                                 }
                                             }
                                     )
@@ -183,6 +182,7 @@ struct ScratchView: View {
                     
                     withAnimation(.spring()) {
                         viewModel.showResult = true
+                        viewModel.playHaptics()
                     }
                     
                     Task { @MainActor in
@@ -194,8 +194,4 @@ struct ScratchView: View {
             }
         }
     }
-}
-
-#Preview {
-    ScratchView(viewModel: ScratchViewModel(layer: 0, isClear: true, reward: .bomb, onComplete: { print("") }))
 }

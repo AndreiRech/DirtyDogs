@@ -48,6 +48,16 @@ struct GameView: View {
                         reward: rewardForThisLayer,
                         onComplete: {
                             viewModel.completeScratch(at: index)
+                        },
+                        playHaptics: {
+                            switch rewardForThisLayer {
+                            case .bomb, .poop, .seed:
+                                viewModel.playHaptics(sound: .itemFound)
+                            case .bone:
+                                viewModel.playHaptics(sound: .success)
+                            default:
+                                break
+                            }
                         }
                     )
                 )
