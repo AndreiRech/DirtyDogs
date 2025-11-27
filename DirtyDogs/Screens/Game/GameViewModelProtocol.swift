@@ -24,6 +24,7 @@ protocol GameViewModelProtocol {
     
     func didUse(item: InventoryItem)
     func isInventoryFull() -> Bool
+    func inventoryDidUpdate(items: [InventoryItem?])
     
     func completeScratch(at index: Int)
     func cancelScratch()

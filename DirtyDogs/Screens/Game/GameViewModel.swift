@@ -17,11 +17,9 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     var bonesFound: Int = 0
     
     var availableItems: [InventoryItem?] = [
-        InventoryItem(imageName: "Seed"),
-//        nil,
-        InventoryItem(imageName: "Seed"),
-//        nil
-        InventoryItem(imageName: "Seed")
+        nil,
+        nil,
+        nil
     ]
     
     private var speechService: SpeechServiceProtocol
@@ -134,5 +132,9 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     
     func isInventoryFull() -> Bool {
         availableItems.allSatisfy{ $0 != nil }
+    }
+    
+    func inventoryDidUpdate(items: [InventoryItem?]){
+        gameScene.setupBorders()
     }
 }

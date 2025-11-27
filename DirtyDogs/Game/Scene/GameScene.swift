@@ -148,13 +148,16 @@ public class GameScene: SKScene {
     
     private func checkBottomCollection() {
         let entities = entityManager.getEntities()
+        let isInventoryFull = inventoryDelegate?.isInventoryFull()
         
         for entity in entities {
             guard let node = entity.component(ofType: GKSKNodeComponent.self)?.node else { continue }
             
             let collectionLineY = frame.minY + 120
             
-            if node.position.y < collectionLineY {
+            print("isInventoryFull \(isInventoryFull)")
+            
+            if node.position.y < collectionLineY && isInventoryFull == false {
                 collect(entity: entity as! GameEntity)
             }
         }
@@ -194,7 +197,7 @@ public class GameScene: SKScene {
         return nil
     }
     
-    private func setupBorders() {
+    func setupBorders() {
         self.physicsBody = nil
         var bodies = [SKPhysicsBody]()
         
@@ -203,6 +206,18 @@ public class GameScene: SKScene {
 //            to: CGPoint(x: frame.maxX, y: frame.minY)
 //        )
 //        bodies.append(bottomEdge)
+        let isFull = inventoryDelegate?.isInventoryFull() ?? true
+        
+        if isFull {
+            let bottomEdge = SKPhysicsBody(
+                edgeFrom: CGPoint(x: frame.minX, y: frame.minY),
+                to: CGPoint(x: frame.maxX, y: frame.minY)
+            )
+            bodies.append(bottomEdge)
+            print("🧱 Borda inferior ativada (inventário cheio)")
+        } else {
+            print("📦 Inventário com espaço — borda inferior removida")
+        }
         
         let leftEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.minX, y: frame.maxY))
         bodies.append(leftEdge)
