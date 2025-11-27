@@ -26,7 +26,6 @@ class GridManager {
         self.gridContainer = SKNode()
         self.gridContainer.zPosition = 10
         scene.addChild(gridContainer)
-        
     }
     
     func setupGrid() {
@@ -72,11 +71,6 @@ class GridManager {
                 node.name = "block_\(index)"
                 node.zPosition = 1
                 
-                
-                if blocks[index].cleared {
-                    addCheckmark(to: node)
-                }
-                
                 gridContainer.addChild(node)
                 blockNodes.append(node)
             }
@@ -103,16 +97,17 @@ class GridManager {
             }
         }
         
-        let possibleItems: [Reward] = [.bomb, .poop]
-        let itemCount = Int.random(in: 2...3)
+        let possibleItems: [Reward] = [.bomb, .poop, .seed]
         
-        for _ in 0..<itemCount {
-            if let index = availableIndices.popLast() {
-                let randomItem = possibleItems.randomElement() ?? .poop
-                let randomDepth = Int.random(in: 0...2)
-                
-                newBlocks[index].reward = randomItem
-                newBlocks[index].rewardLayer = randomDepth
+        for item in possibleItems {
+            let itemCount = Int.random(in: 3...6)
+            for _ in 0..<itemCount {
+                if let index = availableIndices.popLast() {
+                    let randomDepth = Int.random(in: 0...2)
+                    
+                    newBlocks[index].reward = item
+                    newBlocks[index].rewardLayer = randomDepth
+                }
             }
         }
         
@@ -131,7 +126,7 @@ class GridManager {
         case 2:
             return SKTexture(imageNamed: isEven ? "pedra1" : "pedra2")
         default:
-            return SKTexture()
+            return SKTexture(imageNamed: isEven ? "obsidiam1" : "obsidiam2")
         }
     }
     
@@ -162,9 +157,8 @@ class GridManager {
         if block.reward != .none && block.rewardLayer == block.layer - 1 {
             switch block.reward {
             case .bone:
-                print("Osso encontrado")
                 return .bone
-            case .bomb, .poop:
+            case .bomb, .poop, .seed:
                 return block.reward
             default :
                 break
@@ -181,47 +175,24 @@ class GridManager {
         
         let node = blockNodes[index]
         
-        if blocks[index].cleared {
-            node.texture = nil
-            node.color = .black.withAlphaComponent(0.3)
-            addCheckmark(to: node)
-        } else {
-            // remove checkmark se existir
-            node.children.forEach { child in
-                if let label = child as? SKLabelNode, label.text == "✓" {
-                    label.removeFromParent()
-                }
-            }
-            
-            node.color = .clear
-            // Natural growth animation for the new layer
-            let newTexture = textureForLayer(layer: newLayer, index: index)
-            
-            let growNode = SKSpriteNode(texture: newTexture)
-            growNode.size = node.size
-            growNode.position = .zero
-            growNode.zPosition = node.zPosition + 1
-            growNode.anchorPoint = CGPoint(x: 0.5, y: 0.0)
-            growNode.yScale = 0.0
-            node.addChild(growNode)
-
-            let growAction = SKAction.scaleY(to: 1.0, duration: 0.25)
-            growNode.run(growAction) {
-                node.texture = newTexture
-                growNode.removeFromParent()
-            }
-        }
-    }
-    
-    private func addCheckmark(to node: SKNode) {
-        if node.children.contains(where: { $0 is SKLabelNode }) { return }
+        node.color = .clear
+        // Natural growth animation for the new layer
+        let newTexture = textureForLayer(layer: newLayer, index: index)
         
-        let check = SKLabelNode(text: "✓")
-        check.fontName = "Arial-BoldMT"
-        check.fontSize = 38
-        check.zPosition = 10
-        check.position = CGPoint(x: 0, y: -10)
-        node.addChild(check)
+        let growNode = SKSpriteNode(texture: newTexture)
+        growNode.size = node.size
+        growNode.position = .zero
+        growNode.zPosition = node.zPosition + 1
+        growNode.anchorPoint = CGPoint(x: 0.5, y: 0.0)
+        growNode.yScale = 0.0
+        node.addChild(growNode)
+        
+        let growAction = SKAction.scaleY(to: 1.0, duration: 0.25)
+        growNode.run(growAction) {
+            node.texture = newTexture
+            growNode.removeFromParent()
+        }
+        
     }
     
     func resetGrid() {

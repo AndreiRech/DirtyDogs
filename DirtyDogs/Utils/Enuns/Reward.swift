@@ -16,7 +16,7 @@ enum Reward: String, Codable {
         switch self {
         case .bomb: return .bomb
         case .poop: return .poop
-//        case .seed: return .seed
+        case .seed: return .seed
         default: return nil
         }
     }

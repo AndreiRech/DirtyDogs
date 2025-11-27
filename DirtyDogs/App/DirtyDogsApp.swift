@@ -13,8 +13,8 @@ struct DirtyDogsApp: App {
     
     var body: some Scene {
         WindowGroup {
-            InventoryView()
-//            ControllerView(matchManager: matchManager)
+//            InventoryView()
+            ControllerView(matchManager: matchManager)
             //BombTestView()
             //PoopTestView()
         }

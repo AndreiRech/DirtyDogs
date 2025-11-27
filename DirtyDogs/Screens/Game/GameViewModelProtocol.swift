@@ -9,6 +9,7 @@ protocol GameViewModelProtocol {
     var gameScene: GameScene { get }
     var matchManager: MatchManager { get }
     var bonesFound: Int { get set }
+    var showQuitConfirmation: Bool { get set }
     
     var selectedIndex: Int? { get set }
     
@@ -21,4 +22,5 @@ protocol GameViewModelProtocol {
     
     func completeScratch(at index: Int)
     func cancelScratch()
+    func playHaptics(sound: SoundEffect)
 }
