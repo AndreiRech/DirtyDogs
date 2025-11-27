@@ -200,14 +200,14 @@ class ScreenFXManager {
         }
         scene.run(.sequence(actions))
     }
-  
-   func cleanPoopOverlayOnShake() {
+    
+    func cleanPoopOverlayOnShake() {
         guard let scene = scene else { return }
 
         playHaptics(with: .poopSplash)
         
         let overlays = scene.children.filter { $0.name == "poopOverlay" }
-
+        
         for overlay in overlays {
             overlay.run(.sequence([
                 .fadeOut(withDuration: 1.9),
@@ -217,127 +217,136 @@ class ScreenFXManager {
     }
     
     func explodeSeed(node: SKNode, entity: GKEntity?, gridManager: GridManager?) {
-            guard let parent = node.parent else { return }
-            let origin = node.position
-            
-            // Emitter de partículas rosa/verde (semente)
-            let seedEmitter = SKEmitterNode()
-            seedEmitter.particleTexture = nil
-            seedEmitter.particleColor = .systemPink
-            seedEmitter.particleColorBlendFactor = 1.0
-            seedEmitter.numParticlesToEmit = 150
-            seedEmitter.particleBirthRate = 800
-            seedEmitter.particleLifetime = 0.6
-            seedEmitter.particleSpeed = 400
-            seedEmitter.particleAlpha = 0.9
-            seedEmitter.particleScale = 0.35
-            seedEmitter.position = origin
-            seedEmitter.zPosition = 998
-            parent.addChild(seedEmitter)
-            
-            seedEmitter.run(.sequence([.wait(forDuration: 0.8), .removeFromParent()]))
-            
-            // Flash rosa
-            let seedFlash = SKShapeNode(circleOfRadius: 100)
-            seedFlash.fillColor = .systemPink
-            seedFlash.strokeColor = .systemGreen
-            seedFlash.lineWidth = 18
-            seedFlash.alpha = 0.8
-            seedFlash.position = origin
-            seedFlash.zPosition = 999
-            parent.addChild(seedFlash)
-            
-            seedFlash.run(.sequence([
-                .group([.scale(to: 3.5, duration: 0.28), .fadeOut(withDuration: 0.25)]),
-                .removeFromParent()
-            ]))
-            
-            // Animação de "plantio" - bolinhas nos blocos do grid
-            if let gridManager = gridManager {
-                animatePlanting(gridManager: gridManager)
-            }
-            
-            shake(intensity: 15, duration: 0.3)
-            haptics.explosionBomb()
-            haptics.complexSuccess()
-            applyStun(duration: 0.8)
-            
-            if let entity = entity {
-                entityManager?.remove(entity: entity)
-            } else {
-                node.removeFromParent()
-            }
+        guard let parent = node.parent else { return }
+        let origin = node.position
+        
+        // Emitter de partículas rosa/verde (semente)
+        let seedEmitter = SKEmitterNode()
+        seedEmitter.particleTexture = nil
+        seedEmitter.particleColor = .systemPink
+        seedEmitter.particleColorBlendFactor = 1.0
+        seedEmitter.numParticlesToEmit = 150
+        seedEmitter.particleBirthRate = 800
+        seedEmitter.particleLifetime = 0.6
+        seedEmitter.particleSpeed = 400
+        seedEmitter.particleAlpha = 0.9
+        seedEmitter.particleScale = 0.35
+        seedEmitter.position = origin
+        seedEmitter.zPosition = 998
+        parent.addChild(seedEmitter)
+        
+        seedEmitter.run(.sequence([.wait(forDuration: 0.8), .removeFromParent()]))
+        
+        // Flash rosa
+        let seedFlash = SKShapeNode(circleOfRadius: 100)
+        seedFlash.fillColor = .systemPink
+        seedFlash.strokeColor = .systemGreen
+        seedFlash.lineWidth = 18
+        seedFlash.alpha = 0.8
+        seedFlash.position = origin
+        seedFlash.zPosition = 999
+        parent.addChild(seedFlash)
+        
+        seedFlash.run(.sequence([
+            .group([.scale(to: 3.5, duration: 0.28), .fadeOut(withDuration: 0.25)]),
+            .removeFromParent()
+        ]))
+        
+        // Animação de "plantio" - bolinhas nos blocos do grid
+        if let gridManager = gridManager {
+            animatePlanting(gridManager: gridManager)
         }
         
-        private func animatePlanting(gridManager: GridManager) {
-            guard let scene = scene else { return }
+        shake(intensity: 15, duration: 0.3)
+        haptics.explosionBomb()
+        haptics.complexSuccess()
+        applyStun(duration: 0.8)
+        
+        if let entity = entity {
+            entityManager?.remove(entity: entity)
+        } else {
+            node.removeFromParent()
+        }
+    }
+    
+    private func animatePlanting(gridManager: GridManager) {
+        guard let scene = scene else { return }
+        
+        let totalBlocks = gridManager.blocks.count
+        
+        for i in 0..<totalBlocks {
+            let block = gridManager.blocks[i]
             
-            let totalBlocks = gridManager.blocks.count
+            // Se já está no nível mínimo (grama = layer 0), não faz nada
+            if block.layer < 0 { continue }
             
-            for i in 0..<totalBlocks {
-                let block = gridManager.blocks[i]
+            // Pega a posição do bloco
+            if let blockNode = gridManager.blockNodes.first(where: { $0.name == "block_\(i)" }) {
+                let blockPosition = scene.convert(blockNode.position, from: gridManager.gridContainer)
                 
-                // Se já está no nível mínimo (grama = layer 0), não faz nada
-                if block.layer < 0 { continue }
+                // Cria a bolinha de "plantio"
+                let seedBall = SKShapeNode(circleOfRadius: 20)
+                seedBall.fillColor = .systemPink
+                seedBall.strokeColor = .systemGreen
+                seedBall.lineWidth = 3
+                seedBall.alpha = 0
+                seedBall.position = blockPosition
+                seedBall.zPosition = 2000 // Bem acima de tudo
+                scene.addChild(seedBall)
                 
-                // Pega a posição do bloco
-                if let blockNode = gridManager.blockNodes.first(where: { $0.name == "block_\(i)" }) {
-                    let blockPosition = scene.convert(blockNode.position, from: gridManager.gridContainer)
+                // Animação: aparece, pulsa e desaparece
+                let delay = Double(i) * 0.08 
+                
+                seedBall.run(.sequence([
+                    .wait(forDuration: delay),
+                    .group([
+                        .fadeIn(withDuration: 0.15),
+                        .scale(to: 1.2, duration: 0.15)
+                    ]),
+                    .wait(forDuration: 0.1),
+                    .group([
+                        .fadeOut(withDuration: 0.15),
+                        .scale(to: 0.8, duration: 0.15)
+                    ]),
+                    .removeFromParent()
+                ]))
+                
+                // Animaçao pra mexer os quadradinhos
+                let wiggleLeft = SKAction.rotate(byAngle: .pi / 32, duration: 0.05)
+                let wiggleRight = SKAction.rotate(byAngle: -.pi / 32, duration: 0.05)
+                let wiggleSequence = SKAction.sequence([wiggleLeft, wiggleRight, wiggleRight, wiggleLeft])
+                let wiggleRepeat = SKAction.repeat(wiggleSequence, count: 2)
+                
+                blockNode.run(.sequence([
+                    .wait(forDuration: delay),
+                    wiggleRepeat
+                ]))
+                
+                // Atualiza o layer do bloco após a animação
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.3) {
+                    let newLayer: Int
                     
-                    // Cria a bolinha de "plantio"
-                    let seedBall = SKShapeNode(circleOfRadius: 20)
-                    seedBall.fillColor = .systemPink
-                    seedBall.strokeColor = .systemGreen
-                    seedBall.lineWidth = 3
-                    seedBall.alpha = 0
-                    seedBall.position = blockPosition
-                    seedBall.zPosition = 2000 // Bem acima de tudo
-                    scene.addChild(seedBall)
-                    
-                    // Animação: aparece, pulsa e desaparece
-                    let delay = Double(i) * 0.08 
-                    
-                    seedBall.run(.sequence([
-                        .wait(forDuration: delay),
-                        .group([
-                            .fadeIn(withDuration: 0.15),
-                            .scale(to: 1.2, duration: 0.15)
-                        ]),
-                        .wait(forDuration: 0.1),
-                        .group([
-                            .fadeOut(withDuration: 0.15),
-                            .scale(to: 0.8, duration: 0.15)
-                        ]),
-                        .removeFromParent()
-                    ]))
-                    
-                    // Animaçao pra mexer os quadradinhos
-                    let wiggleLeft = SKAction.rotate(byAngle: .pi / 32, duration: 0.05)
-                    let wiggleRight = SKAction.rotate(byAngle: -.pi / 32, duration: 0.05)
-                    let wiggleSequence = SKAction.sequence([wiggleLeft, wiggleRight, wiggleRight, wiggleLeft])
-                    let wiggleRepeat = SKAction.repeat(wiggleSequence, count: 2)
-
-                    blockNode.run(.sequence([
-                        .wait(forDuration: delay),
-                        wiggleRepeat
-                    ]))
-                    
-                    // Atualiza o layer do bloco após a animação
-                    DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.3) {
-                        let newLayer: Int
-
-                        // Se finalizado (camada 3), volta para pedra (2)
-                        if block.layer == 3 {
-                            newLayer = 2
-                        }
-                        // Caso normal: diminui a camada (inclui a camada 0 também, se quiser)
-                        else {
-                            newLayer = max(block.layer - 1, 0)
-                        }
-
-                        gridManager.updateBlockLayer(at: i, to: newLayer)
+                    // Se finalizado (camada 3), volta para pedra (2)
+                    if block.layer == 3 {
+                        newLayer = 2
                     }
+                    // Caso normal: diminui a camada (inclui a camada 0 também, se quiser)
+                    else {
+                        newLayer = max(block.layer - 1, 0)
+                    }
+                    
+                    gridManager.updateBlockLayer(at: i, to: newLayer)
                 }
             }
         }
+    }
+    
+    func shakeSquare(node: SKNode) {
+        let moveLeft = SKAction.moveBy(x: -4, y: 0, duration: 0.04)
+        let moveRight = SKAction.moveBy(x: 8, y: 0, duration: 0.04)
+        let moveCenter = SKAction.moveBy(x: -4, y: 0, duration: 0.04)
+
+        let sequence = SKAction.sequence([moveLeft, moveRight, moveCenter])
+        node.run(sequence)
+    }
 }

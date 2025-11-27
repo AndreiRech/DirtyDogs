@@ -11,6 +11,7 @@ import GameKit
 
 public class GameScene: SKScene {
     private var matchManager: MatchManager
+    var hapticsService: HapticsServiceProtocol?
     
     var entityManager: EntityManager!
     var fxManager: ScreenFXManager!
@@ -25,15 +26,15 @@ public class GameScene: SKScene {
         }
     }
     
-    // MARK: Init functions
-    init(matchManager: MatchManager, size: CGSize) {
+    init(matchManager: MatchManager, size: CGSize, hapticService: HapticsServiceProtocol? = nil) {
         self.matchManager = matchManager
+        self.hapticsService = hapticService
         super.init(size: size)
         
         self.entityManager = EntityManager(scene: self)
         self.fxManager = ScreenFXManager(scene: self, entityManager: entityManager)
         self.inputManager = InputManager(scene: self, entityManager: entityManager, fxManager: fxManager)
-        self.gridManager = GridManager(scene: self)
+        self.gridManager = GridManager(scene: self, hapticsService: hapticService, fxManager: fxManager)
         self.spawnManager = SpawnManager(entityManager: entityManager, fxManager: fxManager, gridManager: gridManager)
     }
     
@@ -78,7 +79,9 @@ public class GameScene: SKScene {
     }
     
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        inputManager.handleTouchesMoved(touches)
+        guard let touch = touches.first else { return }
+        let location = touch.location(in: self)
+        gridManager.handleDrag(at: location)
     }
     
     override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {

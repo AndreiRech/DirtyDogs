@@ -85,7 +85,8 @@ struct GameView: View {
     GameView(
         viewModel:
             GameViewModel(
-                matchManager: MatchManager()
+                matchManager: MatchManager(),
+                hapticsService: HapticsService()
             )
     )
 }

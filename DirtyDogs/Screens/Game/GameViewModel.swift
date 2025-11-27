@@ -13,19 +13,21 @@ import SwiftUI
 class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     var gameScene: GameScene
     var matchManager: MatchManager
+    var hapticsService: HapticsServiceProtocol
     var selectedIndex: Int? = nil
     var bonesFound: Int = 0
     var showQuitConfirmation: Bool = false
     
     
     // MARK: Init and StateControll functions
-    init(matchManager: MatchManager) {
+    init(matchManager: MatchManager, hapticsService: HapticsServiceProtocol) {
         self.matchManager = matchManager
-        
+        self.hapticsService = hapticsService
         
         let scene = GameScene(
             matchManager: matchManager,
-            size: .zero
+            size: .zero,
+            hapticService: hapticsService
         )
         scene.scaleMode = .resizeFill
         self.gameScene = scene
@@ -35,14 +37,12 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate {
     }
     
     func onAppear() {
-        // speechService.startListening(matchManager: matchManager)
     }
     
     func onDisappear() {
         if !matchManager.isGameOver {
             matchManager.endGame(with: .quit)
         }
-        // speechService.stopListening()
     }
     
     func endGame(with event: PacketType) {

@@ -11,6 +11,8 @@ import GameplayKit
 class GridManager {
     weak var scene: GameScene?
     weak var uiDelegate: GameSceneDelegate?
+    var hapticsService: HapticsServiceProtocol?
+    var fxManager: ScreenFXManager?
     
     var blocks: [GridBlock] = []
     var blockNodes: [SKSpriteNode] = []
@@ -20,9 +22,13 @@ class GridManager {
     private let cols = 3
     private let spacing: CGFloat = -4
     private var blockSize: CGSize = .zero
+    private var lastDraggedIndex: Int?
     
-    init(scene: GameScene) {
+    init(scene: GameScene, hapticsService: HapticsServiceProtocol? = nil, fxManager: ScreenFXManager? = nil) {
         self.scene = scene
+        self.hapticsService = hapticsService
+        self.fxManager = fxManager
+        
         self.gridContainer = SKNode()
         self.gridContainer.zPosition = 10
         scene.addChild(gridContainer)
@@ -139,9 +145,12 @@ class GridManager {
             if let name = tappedNode.name,
                let index = Int(name.replacingOccurrences(of: "block_", with: "")) {
                 
+                fxManager?.shakeSquare(node: tappedNode)
+                hapticsService?.feedbackGenerator(.medium)
                 uiDelegate?.didTapBlock(index)
                 return true
             }
+            
         }
         return false
     }
@@ -203,5 +212,19 @@ class GridManager {
     func updateData(blocks: [GridBlock]) {
         self.blocks = blocks
         setupGrid()
+    }
+    
+    func handleDrag(at position: CGPoint) {
+        let locationInGrid = scene?.convert(position, to: gridContainer) ?? .zero
+        
+        if let draggedNode = gridContainer.nodes(at: locationInGrid).first(where: { $0.name?.contains("block_") == true }),
+           let name = draggedNode.name,
+           let index = Int(name.replacingOccurrences(of: "block_", with: "")), index != lastDraggedIndex {
+            
+            fxManager?.shakeSquare(node: draggedNode)
+            hapticsService?.feedbackGenerator(.medium)
+            lastDraggedIndex = index
+        }
+        
     }
 }

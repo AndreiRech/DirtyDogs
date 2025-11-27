@@ -115,5 +115,10 @@ class HapticsService: HapticsServiceProtocol {
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
     }
-
+    
+    func feedbackGenerator(_ style : UIImpactFeedbackGenerator.FeedbackStyle) {
+        let generator = UIImpactFeedbackGenerator(style: style)
+        generator.prepare()
+        generator.impactOccurred()
+    }
 }
