@@ -18,8 +18,7 @@ struct GameViewModelTests {
     
     init() {
         let matchManager = MatchManager()
-        let mockSpeech = MockSpeechService()
-        viewModel = GameViewModel(matchManager: matchManager, speechService: mockSpeech)
+        viewModel = GameViewModel(matchManager: matchManager, hapticsService: HapticsService())
         scene = viewModel.gameScene
         gridManager = scene.gridManager
         entityManager = scene.entityManager

@@ -11,8 +11,8 @@ import GameKit
 
 public class GameScene: SKScene {
     private var matchManager: MatchManager
-    var hapticsService: HapticsServiceProtocol?
     
+    var hapticsService: HapticsServiceProtocol
     var entityManager: EntityManager!
     var fxManager: ScreenFXManager!
     var inputManager: InputManager!
@@ -26,15 +26,17 @@ public class GameScene: SKScene {
         }
     }
     
-    init(matchManager: MatchManager, size: CGSize, hapticService: HapticsServiceProtocol? = nil) {
+    weak var inventoryDelegate: InventoryDelegate?
+    
+    init(matchManager: MatchManager, size: CGSize, hapticService: HapticsServiceProtocol) {
         self.matchManager = matchManager
         self.hapticsService = hapticService
         super.init(size: size)
         
         self.entityManager = EntityManager(scene: self)
-        self.fxManager = ScreenFXManager(scene: self, entityManager: entityManager)
+        self.fxManager = ScreenFXManager(scene: self, entityManager: entityManager, hapticsService: hapticsService)
         self.inputManager = InputManager(scene: self, entityManager: entityManager, fxManager: fxManager)
-        self.gridManager = GridManager(scene: self, hapticsService: hapticService, fxManager: fxManager)
+        self.gridManager = GridManager(scene: self, fxManager: fxManager)
         self.spawnManager = SpawnManager(entityManager: entityManager, fxManager: fxManager, gridManager: gridManager)
     }
     
@@ -65,23 +67,47 @@ public class GameScene: SKScene {
     public override func update(_ currentTime: TimeInterval) {
         inputManager.update()
         checkExits()
+        checkBottomCollection()
     }
     
     // MARK: - Touch Functions
     override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
+        let location = touch.location(in: self)
         
         if inputManager.handleTouchesBegan(touches) {
             return
         }
         
-        _ = gridManager.handleTouch(touch)
+        if handleCollectionTap(at: location) {
+            return
+        }
+        
+        if gridManager.handleTouch(touch) {
+            return
+        }
+    }
+    
+    func handleCollectionTap(at location: CGPoint) -> Bool {
+        guard let manager = entityManager else { return false }
+        
+        if let entity = manager.entity(at: location) {
+            manager.remove(entity: entity)
+            
+            let imageName = (entity is Bomb) ? "Bomb" : "Bomb"
+            let item = InventoryItem(imageName: imageName)
+            
+            inventoryDelegate?.didCollect(item: item)
+            return true
+        }
+        return false
     }
     
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let touch = touches.first else { return }
-        let location = touch.location(in: self)
-        gridManager.handleDrag(at: location)
+        inputManager.handleTouchesMoved(touches)
+//        guard let touch = touches.first else { return }
+//        let location = touch.location(in: self)
+//        gridManager.handleDrag(at: location)
     }
     
     override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -121,6 +147,45 @@ public class GameScene: SKScene {
         }
     }
     
+    private func checkBottomCollection() {
+        let entities = entityManager.getEntities()
+        let isInventoryFull = inventoryDelegate?.isInventoryFull()
+        
+        for entity in entities {
+            guard let node = entity.component(ofType: GKSKNodeComponent.self)?.node else { continue }
+            
+            let collectionLineY = frame.minY + 120
+                        
+            if node.position.y < collectionLineY && isInventoryFull == false {
+                collect(entity: entity as! GameEntity)
+            }
+        }
+    }
+    
+    private func collect(entity: GameEntity) {
+        let generator = UIImpactFeedbackGenerator(style: .heavy)
+        generator.prepare()
+        generator.impactOccurred()
+        
+        entityManager.remove(entity: entity)
+        
+        let itemName: String
+        switch entity {
+        case is Bomb:
+            itemName = "Bomb-Button"
+        case is Seed:
+            itemName = "Seed-Button"
+        case is Poop:
+            itemName = "Tint-Button"
+        default:
+            itemName = "Unknown"
+        }
+        
+        let item = InventoryItem(imageName: itemName)
+        
+        inventoryDelegate?.didCollect(item: item)
+    }
+    
     private func exitSide(for node: SKNode, minExitVelocity velocity: CGFloat = 1) -> EdgeSide? {
         guard let body = node.physicsBody else { return nil }
         let accFrame = node.calculateAccumulatedFrame()
@@ -132,12 +197,20 @@ public class GameScene: SKScene {
         return nil
     }
     
-    private func setupBorders() {
+    func setupBorders() {
         self.physicsBody = nil
         var bodies = [SKPhysicsBody]()
         
-        let bottomEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.maxX, y: frame.minY))
-        bodies.append(bottomEdge)
+        let isFull = inventoryDelegate?.isInventoryFull() ?? true
+        
+        if isFull {
+            let bottomEdge = SKPhysicsBody(
+                edgeFrom: CGPoint(x: frame.minX, y: frame.minY),
+                to: CGPoint(x: frame.maxX, y: frame.minY)
+            )
+            bodies.append(bottomEdge)
+        } else {
+        }
         
         let leftEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.minX, y: frame.maxY))
         bodies.append(leftEdge)

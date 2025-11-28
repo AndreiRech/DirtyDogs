@@ -8,37 +8,43 @@
 import SwiftUI
 import Speech
 import SpriteKit
-//import SVGKit
 
 struct InventoryView: View {
-
+    var bonesFound: Int
+    var availableItems: [InventoryItem?]
+    var slotThatShouldAnimate: Int?
+    
+    var onItemTap: ((InventoryItem) -> Void)?
+    
     var body: some View {
         ZStack{
-            Image("inventoryBackground")
+            Image(.inventoryBackground)
                 .resizable()
                 .frame(width: 295, height: 115)
                 .scaledToFit()
             
-            BoneBarView(boneBarStatus: .secondHalf)
+            BoneBarView(boneBarStatus: BoneStatusEnum(rawValue: bonesFound) ?? .empty)
                 .offset(y: -30)
             
             ZStack{
                 Image("Chon")
                     .resizable()
-                    .frame(width: 303, height: 145)
+                    .frame(width: 303, height: 155)
                     .scaledToFit()
-                    .offset(y: 65)
+                    .offset(y: 70)
                 
-                Image(.itemsLabel)
-                    .offset(y: 12)
+                Text("Items")
+                    .font(.machineGunk(19))
+                    .foregroundStyle(.hardBrown)
+                    .offset(y: 10)
                 
-                HStack{
-                    ForEach(0..<3){_ in
-                        Image("Button")
-                            .resizable()
-                            .frame(width: 86.44, height: 103.03)
-                            .scaledToFit()
-                            .offset(y: 80)
+                HStack(alignment: .center){
+                    ForEach(availableItems.indices, id: \.self) { index in
+                        InventorySlotView(
+                            item: availableItems[index],
+                            shouldAnimate: slotThatShouldAnimate == index,
+                            onTap: onItemTap
+                        )
                     }
                 }
             }
@@ -47,5 +53,5 @@ struct InventoryView: View {
 }
 
 #Preview {
-    InventoryView()
+    InventoryView(bonesFound: 3, availableItems: [InventoryItem(imageName: "Tint-Button"), InventoryItem(imageName: "Bomb-Button"), InventoryItem(imageName: "Seed-Button")])
 }
