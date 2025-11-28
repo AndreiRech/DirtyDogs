@@ -19,16 +19,29 @@ class GameOverViewModel: GameOverViewModelProtocol {
         self.matchManager = matchManager
     }
     
-    var screenTextLines: [String] {
+    var screenTextLines: String {
         switch gameResult {
         case .victory:
-            return ["You", "Won!"]
+            return "won"
         case .defeat:
-            return ["You", "Lost!"]
+            return "lost"
         case .quit:
-            return ["Your", "Enemy", "Left"]
+            return "left"
         default:
-            return ["\(gameResult)"]
+            return "left"
+        }
+    }
+    
+    var boneImage: String? {
+        switch gameResult {
+        case .victory:
+            return "boneFull"
+        case .defeat:
+            return "boneBroken"
+        case .quit:
+            return nil
+        default:
+            return nil
         }
     }
     

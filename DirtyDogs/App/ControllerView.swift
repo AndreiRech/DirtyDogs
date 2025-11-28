@@ -17,7 +17,7 @@ struct ControllerView: View {
             if matchManager.isGameOver {
                 GameOverView(viewModel: GameOverViewModel(matchManager: matchManager))
             } else if matchManager.gameState == .inGame {
-                GameView(viewModel: GameViewModel(matchManager: matchManager, speechService: speechService, hapticsService: hapticsService))
+                GameView(viewModel: GameViewModel(matchManager: matchManager,  hapticsService: hapticsService))
             } else {
                 MenuView(viewModel: MenuViewModel(matchManager: matchManager, hapticsService: hapticsService))
             }

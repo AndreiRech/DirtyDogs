@@ -12,68 +12,37 @@ struct GameOverView: View {
     
     var body: some View {
         ZStack {
-            Color(.green)
-                .ignoresSafeArea()
+            MovingBackground()
             
-            VStack() {
-                Spacer()
+            VStack(spacing: 48) {
                 
-                ForEach(Array(viewModel.screenTextLines.enumerated()), id: \.offset) { index, text in
-                    Text(text)
-                        .font(.machineGunk(120))
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(index % 2 == 0 ? .softRed : .softBlue)
-                }
-                .padding(-26)
+                Image(viewModel.screenTextLines)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
+                    .padding(.horizontal, 55)
                 
-                Spacer()
-                
-                ZStack {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(.softGray.opacity(0.5))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(.wine, lineWidth: 4)
-                        )
-                    
-                    Image(.bone)
+                if let boneImage = viewModel.boneImage {
+                    Image(boneImage)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .padding(40)
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
+                        .frame(maxHeight: 180)
+                        .padding()
                 }
-                .frame(height: 200)
                 
-                Spacer()
                 
-                Button {
+                
+                GameButton (title: "return to menu") {
                     viewModel.returnToMenu()
-                } label: {
-                    VStack(spacing: 0) {
-                        VStack(spacing: 0) {
-                            Text("PLAY")
-                                .font(.system(size: 44, weight: .heavy, design: .rounded))
-                                .foregroundStyle(.wine)
-                                .frame(maxWidth: .infinity)
-                                .background(.white)
-                            
-                            Text("AGAIN")
-                                .font(.system(size: 44, weight: .heavy, design: .rounded))
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .background(.wine)
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(.wine, lineWidth: 3))
-                    }
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 16).fill(Color.white))
-                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(.wine, lineWidth: 3))
                 }
-                .padding(.horizontal, 50)
+                .padding()
+                .previewLayout(.sizeThatFits)
                 
                 Spacer()
+                
             }
-            .padding(16)
+            .padding(.top, 20)
         }
     }
 }
