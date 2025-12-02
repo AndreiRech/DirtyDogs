@@ -9,9 +9,9 @@ import Foundation
 import SpriteKit
 import GameplayKit
 
-public class Ball: GKEntity {
-    
+public class Ball: GKEntity, GameEntity {
     private var ballSize: CGFloat = 40
+    private var wasReceived: Bool = false
     
     public var node: SKNode? {
         component(ofType: GKSKNodeComponent.self)?.node
@@ -29,14 +29,18 @@ public class Ball: GKEntity {
         node.name = "ball"
         node.fillColor = .systemBlue
         node.strokeColor = .white
+        node.zPosition = 100 
 
         node.physicsBody = SKPhysicsBody(circleOfRadius: ballSize)
         node.physicsBody?.affectedByGravity = false
         node.physicsBody?.categoryBitMask = PhysicsCategory.parcel
-        node.physicsBody?.collisionBitMask = PhysicsCategory.parcel
+        node.physicsBody?.collisionBitMask = PhysicsCategory.parcel | PhysicsCategory.edge
         node.physicsBody?.contactTestBitMask = 0
-        node.physicsBody?.linearDamping = 7
-        node.physicsBody?.angularDamping = 7
+        node.physicsBody?.linearDamping = 5
+        node.physicsBody?.angularDamping = 5
+        node.physicsBody?.restitution = 0.9
+        node.physicsBody?.friction = 0.0
+        node.physicsBody?.usesPreciseCollisionDetection = true
         
         addComponent(GKSKNodeComponent(node: node))
         
@@ -51,4 +55,7 @@ public class Ball: GKEntity {
     public func setPosition(to point: CGPoint) {
         component(ofType: GKSKNodeComponent.self)?.node.position = point
     }
+    
+    func setReceived(value: Bool) { wasReceived = value }
+    func getReceived() -> Bool { wasReceived }
 }

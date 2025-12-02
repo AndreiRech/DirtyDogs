@@ -10,26 +10,15 @@ import SwiftUI
 struct ControllerView: View {
     @State var matchManager: MatchManager
     @State var hapticsService: HapticsServiceProtocol = HapticsService()
-    @State var speechService: SpeechServiceProtocol = SpeechService()
-    
+   
     var body: some View {
         ZStack {
             if matchManager.isGameOver {
-                let viewModel = GameOverViewModel(matchManager: matchManager)
-                GameOverView(viewModel: viewModel)
-                
-            } else if matchManager.inGame {
-                GameView(
-                    matchManager: matchManager,
-                    speechService: speechService
-                )
-                
+                GameOverView(viewModel: GameOverViewModel(matchManager: matchManager))
+            } else if matchManager.gameState == .inGame {
+                GameView(viewModel: GameViewModel(matchManager: matchManager, hapticsService: hapticsService))
             } else {
-                let viewModel = MenuViewModel(
-                    matchManager: matchManager,
-                    hapticsService: hapticsService
-                )
-                MenuView(viewModel: viewModel)
+                MenuView(viewModel: MenuViewModel(matchManager: matchManager, hapticsService: hapticsService))
             }
         }
         .onAppear {

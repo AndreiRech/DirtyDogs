@@ -6,5 +6,8 @@
 //
 
 protocol GameOverViewModelProtocol {
+    var gameResult: GameState { get }
+    var screenTextLines: String { get }
+    var boneImage: String? { get }
     func returnToMenu()
 }

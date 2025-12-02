@@ -12,33 +12,37 @@ struct GameOverView: View {
     
     var body: some View {
         ZStack {
-            Color(.secondarySystemBackground)
-                .ignoresSafeArea()
+            MovingBackground()
             
-            VStack {
-                Spacer()
+            VStack(spacing: 48) {
                 
-                VStack(spacing: -32) {
-                    Text("Game ended")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundStyle(Color(.label))
+                Image(viewModel.screenTextLines)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
+                    .padding(.horizontal, 55)
+                
+                if let boneImage = viewModel.boneImage {
+                    Image(boneImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
+                        .frame(maxHeight: 180)
+                        .padding()
                 }
-                .padding(.bottom, 50)
                 
-                Button {
+                
+                
+                GameButton (title: "return to menu") {
                     viewModel.returnToMenu()
-                } label: {
-                    Text("Return")
-                        .foregroundStyle(Color(.secondarySystemBackground))
-                        .font(.title3)
-                        .fontWeight(.semibold)
                 }
                 .padding()
-                .background(Capsule().fill(.green))
+                .previewLayout(.sizeThatFits)
                 
                 Spacer()
+                
             }
+            .padding(.top, 20)
         }
     }
 }
