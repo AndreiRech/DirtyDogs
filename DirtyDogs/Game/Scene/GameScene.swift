@@ -79,28 +79,9 @@ public class GameScene: SKScene {
             return
         }
         
-        if handleCollectionTap(at: location) {
-            return
-        }
-        
         if gridManager.handleTouch(touch) {
             return
         }
-    }
-    
-    func handleCollectionTap(at location: CGPoint) -> Bool {
-        guard let manager = entityManager else { return false }
-        
-        if let entity = manager.entity(at: location) {
-            manager.remove(entity: entity)
-            
-            let imageName = (entity is Bomb) ? "Bomb" : "Bomb"
-            let item = InventoryItem(imageName: imageName)
-            
-            inventoryDelegate?.didCollect(item: item)
-            return true
-        }
-        return false
     }
     
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -153,11 +134,12 @@ public class GameScene: SKScene {
         
         for entity in entities {
             guard let node = entity.component(ofType: GKSKNodeComponent.self)?.node else { continue }
+            guard let item = entity as? GameEntity else { return }
             
             let collectionLineY = frame.minY + 120
                         
-            if node.position.y < collectionLineY && isInventoryFull == false {
-                collect(entity: entity as! GameEntity)
+            if node.position.y < collectionLineY && isInventoryFull == false && item.getReceived() == false {
+                collect(entity: item)
             }
         }
     }
@@ -209,7 +191,6 @@ public class GameScene: SKScene {
                 to: CGPoint(x: frame.maxX, y: frame.minY)
             )
             bodies.append(bottomEdge)
-        } else {
         }
         
         let leftEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.minX, y: frame.maxY))
@@ -229,9 +210,8 @@ public class GameScene: SKScene {
     }
     
     private func sendParcel(side: EdgeSide, node: SKNode, entity: GameEntity) {
-        if entity.getReceived() {
+        if entity.getReceived() && !(entity is Seed) {
             spawnManager.executeAction(value: entity)
-            entityManager.remove(entity: entity)
             return
         }
         
