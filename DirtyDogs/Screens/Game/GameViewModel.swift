@@ -79,7 +79,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
                 if bonesFound == 3 {
                     endGame(with: .victory)
                 }
-            case .bomb, .seed, .poop:
+            case .bomb, .seed, .tint:
                 guard let entityFound = entity.toPhysicsObject else { break }
                 spawnItem(type: entityFound)
             default:
@@ -130,9 +130,9 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
         case "Seed-Button":
             type = .seed
         case "Tint-Button":
-            type = .poop
+            type = .tint
         default:
-            type = .poop
+            type = .tint
         }
         spawnItem(type: type)
         inventoryDidUpdate()

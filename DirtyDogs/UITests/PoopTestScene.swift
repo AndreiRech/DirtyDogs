@@ -38,7 +38,7 @@ class PoopTestScene: GameScene {
    func spawnAndExplodeTestPoop() {
        let center = CGPoint(x: frame.midX, y: frame.midY)
        if let spawn = spawnManager {
-           let entity = Poop()
+           let entity = Tint()
            entity.setPosition(to: center)
            entityManager.add(entity: entity)
            spawn.executeAction(value: entity)   //força a explosão
@@ -48,7 +48,7 @@ class PoopTestScene: GameScene {
 
     func spawnPoopOnly() {
         let center = CGPoint(x: frame.midX, y: frame.midY)
-        spawnManager.spawnItem(at: center, entity: .poop)
+        spawnManager.spawnItem(at: center, entity: .tint)
     }
 
     func explodePoopAlone() {

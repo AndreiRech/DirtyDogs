@@ -108,7 +108,7 @@ class GridManager {
             }
         }
         
-        let possibleItems: [Reward] = [.poop, .bomb, .seed]
+        let possibleItems: [Reward] = [.tint, .bomb, .seed]
         
         for item in possibleItems {
             let itemCount = Int.random(in: 3...5)

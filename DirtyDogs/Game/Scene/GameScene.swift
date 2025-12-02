@@ -154,7 +154,7 @@ public class GameScene: SKScene {
         for entity in entities {
             guard let node = entity.component(ofType: GKSKNodeComponent.self)?.node else { continue }
             
-            let collectionLineY = frame.minY + 120
+            let collectionLineY = frame.minY + 250
                         
             if node.position.y < collectionLineY && isInventoryFull == false {
                 collect(entity: entity as! GameEntity)
@@ -175,7 +175,7 @@ public class GameScene: SKScene {
             itemName = "Bomb-Button"
         case is Seed:
             itemName = "Seed-Button"
-        case is Poop:
+        case is Tint:
             itemName = "Tint-Button"
         default:
             itemName = "Unknown"
@@ -199,14 +199,15 @@ public class GameScene: SKScene {
     
     func setupBorders() {
         self.physicsBody = nil
+        let barrierY = frame.minY + 220
         var bodies = [SKPhysicsBody]()
         
         let isFull = inventoryDelegate?.isInventoryFull() ?? true
         
         if isFull {
             let bottomEdge = SKPhysicsBody(
-                edgeFrom: CGPoint(x: frame.minX, y: frame.minY),
-                to: CGPoint(x: frame.maxX, y: frame.minY)
+                edgeFrom: CGPoint(x: frame.minX, y: barrierY),
+                to: CGPoint(x: frame.maxX, y: barrierY)
             )
             bodies.append(bottomEdge)
         } else {
@@ -246,8 +247,8 @@ public class GameScene: SKScene {
             objectType = .ball
         case is Bomb:
             objectType = .bomb
-        case is Poop:
-            objectType = .poop
+        case is Tint:
+            objectType = .tint
         case is Seed:
             objectType = .seed
         default:
