@@ -154,7 +154,7 @@ public class GameScene: SKScene {
         for entity in entities {
             guard let node = entity.component(ofType: GKSKNodeComponent.self)?.node else { continue }
             
-            let collectionLineY = frame.minY + 280
+            let collectionLineY = frame.minY + 250
                         
             if node.position.y < collectionLineY && isInventoryFull == false {
                 collect(entity: entity as! GameEntity)
