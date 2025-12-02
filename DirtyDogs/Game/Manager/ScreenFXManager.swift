@@ -110,6 +110,8 @@ class ScreenFXManager {
         }
     }
     
+    // MARK: Poop
+    
     func explodePoop(node: SKNode, entity: GKEntity?) {
         guard let scene = scene, let parent = node.parent else { return }
         let origin = node.position
@@ -219,6 +221,8 @@ class ScreenFXManager {
         }
     }
     
+    // MARK: Seeds
+    
     func explodeSeed(node: SKNode, entity: GKEntity?, gridManager: GridManager?) {
         guard let parent = node.parent else { return }
         let origin = node.position
@@ -228,34 +232,57 @@ class ScreenFXManager {
         seedEmitter.particleTexture = nil
         seedEmitter.particleColor = .systemPink
         seedEmitter.particleColorBlendFactor = 1.0
-        seedEmitter.numParticlesToEmit = 150
-        seedEmitter.particleBirthRate = 800
-        seedEmitter.particleLifetime = 0.6
-        seedEmitter.particleSpeed = 400
-        seedEmitter.particleAlpha = 0.9
-        seedEmitter.particleScale = 0.35
+        seedEmitter.particleColorSequence = nil
+        seedEmitter.particleColorBlendFactorSequence = nil
+        
+        // Gradiente de cores para mais vida
+        let colorSequence = SKKeyframeSequence(keyframeValues: [
+            UIColor.systemPink,
+            UIColor.systemGreen,
+            UIColor.systemPink.withAlphaComponent(0.3)
+        ], times: [0, 0.5, 1])
+        seedEmitter.particleColorSequence = colorSequence
+        
+        seedEmitter.numParticlesToEmit = 200
+        seedEmitter.particleBirthRate = 1000
+        seedEmitter.particleLifetime = 0.8
+        seedEmitter.particleLifetimeRange = 0.3
+        seedEmitter.particleSpeed = 450
+        seedEmitter.particleSpeedRange = 150
+        seedEmitter.emissionAngleRange = .pi * 2
+        seedEmitter.particleAlpha = 1.0
+        seedEmitter.particleAlphaSpeed = -1.2
+        seedEmitter.particleScale = 0.4
+        seedEmitter.particleScaleRange = 0.2
+        seedEmitter.particleScaleSpeed = -0.3
         seedEmitter.position = origin
         seedEmitter.zPosition = 998
         parent.addChild(seedEmitter)
         
-        seedEmitter.run(.sequence([.wait(forDuration: 0.8), .removeFromParent()]))
+        seedEmitter.run(.sequence([.wait(forDuration: 1.0), .removeFromParent()]))
         
-        // Flash rosa
-        let seedFlash = SKShapeNode(circleOfRadius: 100)
-        seedFlash.fillColor = .systemPink
+        // Flash rosa com efeito de ondas
+        createImpactWaves(at: origin, in: parent)
+        
+        let seedFlash = SKShapeNode(circleOfRadius: 80)
+        seedFlash.fillColor = .systemPink.withAlphaComponent(0.6)
         seedFlash.strokeColor = .systemGreen
-        seedFlash.lineWidth = 18
-        seedFlash.alpha = 0.8
+        seedFlash.lineWidth = 20
+        seedFlash.glowWidth = 8
+        seedFlash.alpha = 1.0
         seedFlash.position = origin
         seedFlash.zPosition = 999
         parent.addChild(seedFlash)
         
         seedFlash.run(.sequence([
-            .group([.scale(to: 3.5, duration: 0.28), .fadeOut(withDuration: 0.25)]),
+            .group([
+                .scale(to: 4.0, duration: 0.35),
+                .fadeOut(withDuration: 0.3)
+            ]),
             .removeFromParent()
         ]))
         
-        // Animação de "plantio" - bolinhas nos blocos do grid
+        // Animação de "plantio" - sementes nos blocos do grid
         if let gridManager = gridManager {
             animatePlanting(gridManager: gridManager)
         }
@@ -271,77 +298,236 @@ class ScreenFXManager {
             node.removeFromParent()
         }
     }
-    
+
+    // Ondas de impacto
+    private func createImpactWaves(at position: CGPoint, in parent: SKNode) {
+        for i in 0..<3 {
+            let wave = SKShapeNode(circleOfRadius: 60)
+            wave.strokeColor = i % 2 == 0 ? .systemPink : .systemGreen
+            wave.lineWidth = 12 - CGFloat(i * 3)
+            wave.fillColor = .clear
+            wave.alpha = 0.8
+            wave.position = position
+            wave.zPosition = 997
+            parent.addChild(wave)
+            
+            let delay = Double(i) * 0.1
+            wave.run(.sequence([
+                .wait(forDuration: delay),
+                .group([
+                    .scale(to: 3.5, duration: 0.5),
+                    .fadeOut(withDuration: 0.5)
+                ]),
+                .removeFromParent()
+            ]))
+        }
+    }
+
     private func animatePlanting(gridManager: GridManager) {
         guard let scene = scene else { return }
         
         let totalBlocks = gridManager.blocks.count
         
+        // Criar um padrão de ondas radiais do centro
+        let centerIndex = totalBlocks / 2
+        var blockDistances: [(index: Int, distance: CGFloat)] = []
+        
         for i in 0..<totalBlocks {
             let block = gridManager.blocks[i]
-            
-            // Se já está no nível mínimo (grama = layer 0), não faz nada
             if block.layer < 0 { continue }
             
-            // Pega a posição do bloco
+            if let blockNode = gridManager.blockNodes.first(where: { $0.name == "block_\(i)" }) {
+                // Calcula distância do centro para efeito de onda
+                let row = i / Int(sqrt(Double(totalBlocks)))
+                let col = i % Int(sqrt(Double(totalBlocks)))
+                let centerRow = centerIndex / Int(sqrt(Double(totalBlocks)))
+                let centerCol = centerIndex % Int(sqrt(Double(totalBlocks)))
+                let distance = sqrt(pow(CGFloat(row - centerRow), 2) + pow(CGFloat(col - centerCol), 2))
+                
+                blockDistances.append((i, distance))
+            }
+        }
+        
+        // Ordena por distância para criar efeito de onda
+        blockDistances.sort { $0.distance < $1.distance }
+        
+        for (index, item) in blockDistances.enumerated() {
+            let i = item.index
+            let block = gridManager.blocks[i]
+            
             if let blockNode = gridManager.blockNodes.first(where: { $0.name == "block_\(i)" }) {
                 let blockPosition = scene.convert(blockNode.position, from: gridManager.gridContainer)
+               
+                let texture = SKTexture(imageNamed: "Seed")
+                let seedItem = SKSpriteNode(texture: texture)
+                seedItem.size = CGSize(width: 70, height: 70)
+                seedItem.alpha = 0
+                seedItem.position = CGPoint(x: blockPosition.x, y: blockPosition.y + 100)
+                seedItem.zPosition = 2000
+                scene.addChild(seedItem)
                 
-                // Cria a bolinha de "plantio"
-                let seedBall = SKShapeNode(circleOfRadius: 20)
-                seedBall.fillColor = .systemPink
-                seedBall.strokeColor = .systemGreen
-                seedBall.lineWidth = 3
-                seedBall.alpha = 0
-                seedBall.position = blockPosition
-                seedBall.zPosition = 2000 // Bem acima de tudo
-                scene.addChild(seedBall)
+                // Trail de partículas para a semente caindo
+                let trail = SKEmitterNode()
+                trail.particleTexture = nil
+                trail.particleColor = .systemGreen
+                trail.particleColorBlendFactor = 1.0
+                trail.numParticlesToEmit = 0
+                trail.particleBirthRate = 80
+                trail.particleLifetime = 0.3
+                trail.particleSpeed = 0
+                trail.particleAlpha = 0.6
+                trail.particleScale = 0.2
+                trail.particleScaleSpeed = -0.4
+                trail.zPosition = 1999
+                seedItem.addChild(trail)
                 
-                // Animação: aparece, pulsa e desaparece
-                let delay = Double(i) * 0.08 
+                // Delay baseado na distância para efeito de onda
+                let delay = Double(index) * 0.04
                 
-                seedBall.run(.sequence([
-                    .wait(forDuration: delay),
-                    .group([
-                        .fadeIn(withDuration: 0.15),
-                        .scale(to: 1.2, duration: 0.15)
-                    ]),
-                    .wait(forDuration: 0.1),
-                    .group([
-                        .fadeOut(withDuration: 0.15),
-                        .scale(to: 0.8, duration: 0.15)
-                    ]),
-                    .removeFromParent()
+                let moveDown = SKAction.moveTo(y: blockPosition.y, duration: 0.35)
+                moveDown.timingMode = .easeIn
+                let fadeIn = SKAction.fadeIn(withDuration: 0.1)
+                let fallGroup = SKAction.group([fadeIn, moveDown])
+                
+                let bounceUp = SKAction.moveTo(y: blockPosition.y + 15, duration: 0.08)
+                let bounceDown = SKAction.moveTo(y: blockPosition.y, duration: 0.08)
+                let bounce = SKAction.sequence([bounceUp, bounceDown])
+                
+                let scaleUp = SKAction.scale(to: 1.4, duration: 0.12)
+                let scaleDown = SKAction.scale(to: 1.0, duration: 0.12)
+                let pulse = SKAction.sequence([scaleUp, scaleDown])
+                
+                let colorize = SKAction.sequence([
+                    SKAction.colorize(with: .white, colorBlendFactor: 0.6, duration: 0.12),
+                    SKAction.colorize(withColorBlendFactor: 0, duration: 0.12)
+                ])
+                let pulseGroup = SKAction.group([pulse, colorize])
+                
+                let disappear = SKAction.group([
+                    SKAction.fadeOut(withDuration: 0.2),
+                    SKAction.scale(to: 0.3, duration: 0.2),
+                    SKAction.moveTo(y: blockPosition.y - 10, duration: 0.2)
+                ])
+                
+                seedItem.run(SKAction.sequence([
+                    SKAction.wait(forDuration: delay),
+                    fallGroup,
+                    bounce,
+                    pulseGroup,
+                    SKAction.wait(forDuration: 0.15),
+                    disappear,
+                    SKAction.run { trail.particleBirthRate = 0 },
+                    SKAction.removeFromParent()
                 ]))
                 
-                // Animaçao pra mexer os quadradinhos
-                let wiggleLeft = SKAction.rotate(byAngle: .pi / 32, duration: 0.05)
-                let wiggleRight = SKAction.rotate(byAngle: -.pi / 32, duration: 0.05)
-                let wiggleSequence = SKAction.sequence([wiggleLeft, wiggleRight, wiggleRight, wiggleLeft])
-                let wiggleRepeat = SKAction.repeat(wiggleSequence, count: 2)
+                // PARTÍCULAS DE IMPACTO no chão
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.35) {
+                    self.createGroundImpact(at: blockPosition, in: scene)
+                }
+                
+                // Animação do bloco
+                let elasticWiggle = SKAction.customAction(withDuration: 0.5) { node, elapsedTime in
+                    let progress = elapsedTime / 0.5
+                    let angle = sin(progress * .pi * 4) * 0.08 * (1 - progress) // Dampening
+                    node.zRotation = angle
+                }
+                
+                // Squeeze effect
+                let squashStretch = SKAction.sequence([
+                    .group([
+                        .scaleX(to: 1.15, duration: 0.08),
+                        .scaleY(to: 0.85, duration: 0.08)
+                    ]),
+                    .group([
+                        .scaleX(to: 0.95, duration: 0.12),
+                        .scaleY(to: 1.05, duration: 0.12)
+                    ]),
+                    .group([
+                        .scaleX(to: 1.0, duration: 0.1),
+                        .scaleY(to: 1.0, duration: 0.1)
+                    ])
+                ])
                 
                 blockNode.run(.sequence([
-                    .wait(forDuration: delay),
-                    wiggleRepeat
+                    .wait(forDuration: delay + 0.35),
+                    .group([elasticWiggle, squashStretch])
                 ]))
                 
                 // Atualiza o layer do bloco após a animação
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.3) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.8) {
                     let newLayer: Int
                     
-                    // Se finalizado (camada 3), volta para pedra (2)
                     if block.layer == 3 {
                         newLayer = 2
-                    }
-                    // Caso normal: diminui a camada (inclui a camada 0 também, se quiser)
-                    else {
+                    } else {
                         newLayer = max(block.layer - 1, 0)
                     }
                     
                     gridManager.updateBlockLayer(at: i, to: newLayer)
+                    
+                    // Efeito de brilho no bloco após mudança
+                    self.createBlockShine(on: blockNode)
                 }
             }
         }
+    }
+
+    // Impacto no chão
+    private func createGroundImpact(at position: CGPoint, in parent: SKNode) {
+        // Pequena explosão de partículas
+        let impact = SKEmitterNode()
+        impact.particleTexture = nil
+        impact.particleColor = .systemGreen
+        impact.particleColorBlendFactor = 1.0
+        impact.numParticlesToEmit = 15
+        impact.particleBirthRate = 300
+        impact.particleLifetime = 0.3
+        impact.particleSpeed = 80
+        impact.particleSpeedRange = 40
+        impact.emissionAngle = -.pi / 2
+        impact.emissionAngleRange = .pi / 3
+        impact.particleAlpha = 0.7
+        impact.particleScale = 0.25
+        impact.particleScaleSpeed = -0.5
+        impact.position = position
+        impact.zPosition = 1998
+        parent.addChild(impact)
+        
+        impact.run(.sequence([.wait(forDuration: 0.5), .removeFromParent()]))
+        
+        // Ondinha no chão
+        let groundWave = SKShapeNode(circleOfRadius: 20)
+        groundWave.strokeColor = .systemGreen.withAlphaComponent(0.6)
+        groundWave.lineWidth = 4
+        groundWave.fillColor = .clear
+        groundWave.position = position
+        groundWave.zPosition = 1997
+        parent.addChild(groundWave)
+        
+        groundWave.run(.sequence([
+            .group([
+                .scale(to: 2.0, duration: 0.25),
+                .fadeOut(withDuration: 0.25)
+            ]),
+            .removeFromParent()
+        ]))
+    }
+
+    // Brilho no bloco
+    private func createBlockShine(on blockNode: SKNode) {
+        let shine = SKShapeNode(rectOf: CGSize(width: 40, height: 40), cornerRadius: 5)
+        shine.fillColor = .clear
+        shine.strokeColor = .clear
+        shine.alpha = 0
+        shine.position = .zero
+        shine.zPosition = 10
+        blockNode.addChild(shine)
+        
+        shine.run(.sequence([
+            .fadeAlpha(to: 0.5, duration: 0.1),
+            .fadeOut(withDuration: 0.2),
+            .removeFromParent()
+        ]))
     }
     
     func shakeSquare(node: SKNode) {
@@ -353,3 +539,4 @@ class ScreenFXManager {
         node.run(sequence)
     }
 }
+
