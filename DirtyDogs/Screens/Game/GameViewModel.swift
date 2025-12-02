@@ -61,8 +61,8 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
         gameScene.resetGameGrid()
     }
     
-    func spawnItem(type: PhysicsObjectType) {
-        gameScene.spawnItem(type: type)
+    func spawnItem(type: PhysicsObjectType, spawnPoint: CGPoint? = nil) {
+        gameScene.spawnItem(type: type, spawnPoint: spawnPoint)
     }
     
     func playHaptics(sound: SoundEffect) {
@@ -81,7 +81,9 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
                 }
             case .bomb, .seed, .poop:
                 guard let entityFound = entity.toPhysicsObject else { break }
-                spawnItem(type: entityFound)
+                
+                let blockPos = gameScene.getBlockPosition(at: index)
+                spawnItem(type: entityFound, spawnPoint: blockPos)
             default:
                 break
             }
