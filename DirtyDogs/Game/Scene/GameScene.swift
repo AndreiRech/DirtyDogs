@@ -199,14 +199,15 @@ public class GameScene: SKScene {
     
     func setupBorders() {
         self.physicsBody = nil
+        let barrierY = frame.minY + 220
         var bodies = [SKPhysicsBody]()
         
         let isFull = inventoryDelegate?.isInventoryFull() ?? true
         
         if isFull {
             let bottomEdge = SKPhysicsBody(
-                edgeFrom: CGPoint(x: frame.minX, y: frame.minY),
-                to: CGPoint(x: frame.maxX, y: frame.minY)
+                edgeFrom: CGPoint(x: frame.minX, y: barrierY),
+                to: CGPoint(x: frame.maxX, y: barrierY)
             )
             bodies.append(bottomEdge)
         } else {
