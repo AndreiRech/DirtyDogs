@@ -240,6 +240,14 @@ class GridManager {
         setupGrid()
     }
     
+    func getPositionForBlock(at index: Int) -> CGPoint? {
+        guard index >= 0 && index < blockNodes.count else { return nil }
+        
+        let blockNode = blockNodes[index]
+        
+        return blockNode.position
+    }
+    
     func handleDrag(at position: CGPoint) {
         let locationInGrid = scene?.convert(position, to: gridContainer) ?? .zero
         

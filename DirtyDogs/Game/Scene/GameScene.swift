@@ -278,12 +278,14 @@ public class GameScene: SKScene {
         gridManager.resetGrid()
     }
     
-    func spawnItem(type: PhysicsObjectType) {
-        let spawnPoint = CGPoint(
-            x: frame.midX,
-            y: frame.maxY - 100
-        )
-        spawnManager.spawnItem(at: spawnPoint, entity: type)
+    func spawnItem(type: PhysicsObjectType, spawnPoint: CGPoint? = nil) {
+        var position: CGPoint
+        if let p = spawnPoint {
+            position = p
+        } else {
+            position = CGPoint(x: frame.midX, y: frame.midY)
+        }
+        spawnManager.spawnItem(at: position, entity: type)
     }
     
     func revealItem(at index: Int) -> Reward? {
@@ -292,5 +294,9 @@ public class GameScene: SKScene {
     
     func playSoundEffect(sound: SoundEffect) {
         fxManager.playHaptics(with: sound)
+    }
+    
+    func getBlockPosition(at index: Int) -> CGPoint? {
+        gridManager.getPositionForBlock(at: index)
     }
 }
