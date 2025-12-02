@@ -35,7 +35,7 @@ class SpawnManager {
         value.setReceived(value: true)
         entityManager?.add(entity: value)
         
-        value.body?.applyForce(.init(dx: 0, dy: -25000))
+        value.body?.applyForce(.init(dx: 0, dy: -30000))
         
         executeAction(value: value)
     }

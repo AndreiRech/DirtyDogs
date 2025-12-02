@@ -100,7 +100,7 @@ class InputManager {
         
         let maxSpeed: CGFloat = 1000
         var velocity = body.velocity
-        let speed = hypot(velocity.dx, velocity.dy)
+        let speed = hypot(velocity.dx, velocity.dy) * 2
         if speed > maxSpeed {
             velocity.dx = velocity.dx / speed * maxSpeed
             velocity.dy = velocity.dy / speed * maxSpeed
