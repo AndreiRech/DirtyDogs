@@ -42,13 +42,13 @@ struct GridManagerTests {
         let blocks = gridManager.createMap(horizontal: 3, vertical: 4)
         
         // Then
-        #expect(blocks.count == 12)
+        #expect(blocks.count == 36)
         
         let bones = blocks.filter { $0.reward == .bone }
         #expect(bones.count == 3, "Should have exactly 3 bones")
         
-        let items = blocks.filter { $0.reward == .bomb || $0.reward == .poop }
-        #expect(items.count >= 6 && items.count <= 12, "Should have between 2 and 3 items forEach item")
+        let items = blocks.filter { $0.reward == .bomb || $0.reward == .poop || $0.reward == .seed }
+        #expect(items.count >= 9 && items.count <= 15, "Should have between 3 and 5 items forEach item")
     }
     
     @Test("Complete scratch logic reveals item correctly")
@@ -82,6 +82,6 @@ struct GridManagerTests {
         
         // Then
         #expect(gridManager.blocks[0].layer == 0)
-        #expect(gridManager.blocks.count == 12)
+        #expect(gridManager.blocks.count == 36)
     }
 }
