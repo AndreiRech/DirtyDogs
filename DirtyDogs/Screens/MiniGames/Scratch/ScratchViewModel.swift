@@ -60,7 +60,7 @@ class ScratchViewModel: ScratchViewModelProtocol {
         switch reward {
         case .bomb:
             return "Bomb-Button"
-        case .poop:
+        case .tint:
             return "Tint-Button"
         case .seed:
             return "Seed-Button"

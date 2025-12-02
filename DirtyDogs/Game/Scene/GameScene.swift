@@ -175,7 +175,7 @@ public class GameScene: SKScene {
             itemName = "Bomb-Button"
         case is Seed:
             itemName = "Seed-Button"
-        case is Poop:
+        case is Tint:
             itemName = "Tint-Button"
         default:
             itemName = "Unknown"
@@ -247,8 +247,8 @@ public class GameScene: SKScene {
             objectType = .ball
         case is Bomb:
             objectType = .bomb
-        case is Poop:
-            objectType = .poop
+        case is Tint:
+            objectType = .tint
         case is Seed:
             objectType = .seed
         default:
