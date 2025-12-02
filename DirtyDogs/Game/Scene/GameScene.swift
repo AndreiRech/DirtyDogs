@@ -105,9 +105,9 @@ public class GameScene: SKScene {
     
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         inputManager.handleTouchesMoved(touches)
-//        guard let touch = touches.first else { return }
-//        let location = touch.location(in: self)
-//        gridManager.handleDrag(at: location)
+        //        guard let touch = touches.first else { return }
+        //        let location = touch.location(in: self)
+        //        gridManager.handleDrag(at: location)
     }
     
     override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -210,7 +210,6 @@ public class GameScene: SKScene {
                 to: CGPoint(x: frame.maxX, y: barrierY)
             )
             bodies.append(bottomEdge)
-        } else {
         }
         
         let leftEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.minX, y: frame.maxY))
@@ -300,3 +299,4 @@ public class GameScene: SKScene {
         gridManager.getPositionForBlock(at: index)
     }
 }
+
