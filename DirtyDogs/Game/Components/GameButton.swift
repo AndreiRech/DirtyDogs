@@ -10,6 +10,7 @@ import SwiftUI
 
 struct GameButton: View {
     var title: String = "PLAY"
+    var disabled: Bool = false
     var action: () -> Void
 
     var body: some View {
@@ -46,6 +47,7 @@ struct GameButton: View {
                 .contentShape(RoundedRectangle(cornerRadius: 26))
         }
         .buttonStyle(.plain)
+        .disabled(disabled)
     }
 }
 

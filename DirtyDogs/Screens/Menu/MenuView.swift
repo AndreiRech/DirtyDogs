@@ -12,48 +12,38 @@ struct MenuView: View {
     @State var viewModel: MenuViewModelProtocol
     
     var body: some View {
-        VStack {
-            Spacer()
+        
+        ZStack {
+            MovingBackground()
             
-            Image(systemName: "globe")
-                .resizable()
-                .scaledToFit()
-                .padding(30)
-                .foregroundStyle(Color.green)
-            
-            Spacer()
-            
-            Button {
-                viewModel.playButtonTapped()
-            } label: {
-                Text("Play")
-                    .foregroundStyle(Color(.secondarySystemBackground))
-                    .font(.machineGunk(32))
-                    .bold()
+            VStack(spacing: 86) {
+                
+                Image("logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
+                    .padding(.horizontal, 55)
+                    .padding(.top, 40)
+                
+                
+                VStack (spacing: 40){
+                    GameButton (
+                        title: "play",
+                        disabled: viewModel.isPlayButtonDisabled
+                    ){
+                        viewModel.playButtonTapped()
+                    }
+                    
+                    GameButton (title: "settings") {
+                        // add open settings func
+                    }
+                }
+                
+                Spacer()
+                
             }
-            .disabled(viewModel.isPlayButtonDisabled)
-            .padding(.vertical, 20)
-            .padding(.horizontal, 100)
-            .background(
-                Capsule()
-                    .fill(
-                        viewModel.isPlayButtonDisabled
-                        ? .gray : .green
-                    )
-            )
-            
-            Text(viewModel.authenticatingState.rawValue)
-                .foregroundStyle(Color(.label))
-                .font(.headline)
-                .fontWeight(.semibold)
-                .padding()
-            
-            Spacer()
+            .padding(.top, 20)
         }
-        .background(
-            Color(.secondarySystemBackground)
-        )
-        .ignoresSafeArea()
         .onAppear {
             viewModel.prepareHaptics()
         }
