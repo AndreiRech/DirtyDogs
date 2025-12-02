@@ -10,12 +10,12 @@ enum Reward: String, Codable {
     case bone
     case bomb
     case seed
-    case poop
+    case tint
     
     var toPhysicsObject: PhysicsObjectType? {
         switch self {
         case .bomb: return .bomb
-        case .poop: return .poop
+        case .tint: return .tint
         case .seed: return .seed
         default: return nil
         }

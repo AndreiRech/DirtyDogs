@@ -101,7 +101,7 @@ class GridManager {
             }
         }
         
-        let possibleItems: [Reward] = [.poop, .bomb, .seed]
+        let possibleItems: [Reward] = [.tint, .bomb, .seed]
         
         for item in possibleItems {
             let itemCount = Int.random(in: 3...6)
@@ -165,7 +165,7 @@ class GridManager {
             switch block.reward {
             case .bone:
                 return .bone
-            case .bomb, .poop, .seed:
+            case .bomb, .tint, .seed:
                 return block.reward
             default :
                 break

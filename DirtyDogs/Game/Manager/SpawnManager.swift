@@ -46,8 +46,8 @@ class SpawnManager {
             return Ball()
         case .bomb:
             return Bomb()
-        case .poop:
-            return Poop()
+        case .tint:
+            return Tint()
         case .seed:
             return Seed()
         }
@@ -66,7 +66,7 @@ class SpawnManager {
             }
         }
         
-        if let poop = value as? Poop {
+        if let poop = value as? Tint {
             Task { @MainActor [weak self] in
                 try? await Task.sleep(for: .seconds(0.4))
                 guard let self = self, let fx = self.fxManager else { return }
