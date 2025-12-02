@@ -86,10 +86,10 @@ class GridManager {
         //  - 0 na camada 0 (grama)
         //  - 1 na camada 1 (terra)
         //  - 2 na camada 2 (pedra)
-        // Para os itens, deve existir entre 2 até 3 de cada e devem ser espalhados pelas 3 camadas
+        // Para os itens, deve existir entre 3 até 5 de cada e devem ser espalhados pelas 3 camadas
         // Para o restante, deve ser .none
         
-        let totalBlocks = cols * rows
+        let totalBlocks = cols * rows * 3
         var newBlocks = Array(repeating: GridBlock(reward: .none, rewardLayer: 0), count: totalBlocks)
         var availableIndices = Array(0..<totalBlocks).shuffled()
         
@@ -104,7 +104,7 @@ class GridManager {
         let possibleItems: [Reward] = [.poop, .bomb, .seed]
         
         for item in possibleItems {
-            let itemCount = Int.random(in: 3...6)
+            let itemCount = Int.random(in: 3...5)
             for _ in 0..<itemCount {
                 if let index = availableIndices.popLast() {
                     let randomDepth = Int.random(in: 0...2)
