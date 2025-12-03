@@ -9,10 +9,10 @@
 import SwiftUI
 
 struct GameButton: View {
-    var title: String = "PLAY"
+    var title: String = "settings"
     var disabled: Bool = false
     var action: () -> Void
-
+    
     var body: some View {
         Button(action: action) {
             Text(title)
@@ -21,30 +21,27 @@ struct GameButton: View {
                 .padding()
                 .background(
                     ZStack {
-                        // Fundo principal
-                        RoundedRectangle(cornerRadius: 26)
-                            .fill(.caramelo)
+                        RoundedRectangle(cornerRadius: 18)
+                            .stroke(Color.darkCoffee, lineWidth: 5.11)
+                            .frame(width: 202,height: 96)
+                            .offset(y: 2.3)
                         
-                        // Borda mais escura
-                        RoundedRectangle(cornerRadius: 26)
-                            .stroke(.darkCoffee, lineWidth: 8)
+                        Image("buttonBG")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 200, height: 87.11)
+                            .fixedSize()
+                            .shadow(color: .black.opacity(0.25), radius: 1.61932, x: 0, y: 3.40)
+                            .offset(y: 5.88)
                         
-                        // Sombra interna simulando profundidade
-                        RoundedRectangle(cornerRadius: 26)
-                            .stroke(.raspaCafe, lineWidth: 14)
-                            .blur(radius: 6)
-                            .offset(y: 4)
-                            .mask(
-                                RoundedRectangle(cornerRadius: 26)
-                                    .fill(LinearGradient(
-                                        colors: [.black, .clear],
-                                        startPoint: .bottom,
-                                        endPoint: .top
-                                    ))
-                            )
+                        Image("buttonNoiseBG")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 200, height: 87.11)
+                            .fixedSize()
+                        
                     }
                 )
-                .contentShape(RoundedRectangle(cornerRadius: 26))
         }
         .buttonStyle(.plain)
         .disabled(disabled)
@@ -52,7 +49,7 @@ struct GameButton: View {
 }
 
 #Preview {
-    GameButton(title: "Play", action: {
+    GameButton(title: "play", action: {
         
     })
 }
