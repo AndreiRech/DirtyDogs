@@ -12,9 +12,11 @@ struct MovingBackground: View {
     let columns = 8
     let spacing: CGFloat = 24
     let pawSize: CGFloat = 62
-    let numberOfRows = 20
+    let numberOfRows = 24
     let animationDuration: Double = 10
-    let scrollDistance: CGFloat = 100
+    var scrollDistance: CGFloat {
+        self.pawSize + self.spacing
+    }
 
     @State private var offsets: [CGFloat] = Array(repeating: 0, count: 8)
 
@@ -49,7 +51,7 @@ struct MovingBackground: View {
                 .fixedSize(horizontal: true, vertical: false)
                 .ignoresSafeArea()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .offset(x: -(CGFloat(columns) * (pawSize + spacing)) / 4.0, y: -50)
+                .offset(x: -(CGFloat(columns) * (pawSize + spacing)) / 4.0, y: -200)
             }
         }
         .onAppear {
@@ -67,7 +69,7 @@ struct MovingBackground: View {
             withAnimation(
                 Animation
                     .linear(duration: animationDuration)
-                    .repeatForever(autoreverses: true)
+                    .repeatForever(autoreverses: false)
                     .delay(Double(column) * 0.1)
             ) {
                 offsets[column] = direction * scrollDistance
