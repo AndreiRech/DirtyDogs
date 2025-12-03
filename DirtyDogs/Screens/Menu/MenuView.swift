@@ -12,48 +12,35 @@ struct MenuView: View {
     @State var viewModel: MenuViewModelProtocol
     
     var body: some View {
-        VStack {
-            Spacer()
+        
+        VStack(spacing: 86) {
             
-            Image(systemName: "globe")
+            Image("logo")
                 .resizable()
                 .scaledToFit()
-                .padding(30)
-                .foregroundStyle(Color.green)
+                .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
+                .padding(.horizontal, 55)
+                .padding(.top, 40)
             
-            Spacer()
             
-            Button {
-                viewModel.playButtonTapped()
-            } label: {
-                Text("Play")
-                    .foregroundStyle(Color(.secondarySystemBackground))
-                    .font(.machineGunk(32))
-                    .bold()
+            VStack (spacing: 40){
+                GameButton (
+                    title: "play",
+                    disabled: viewModel.isPlayButtonDisabled
+                ){
+                    viewModel.playButtonTapped()
+                }
+                
+                GameButton (title: "settings") {
+                    // add open settings func
+                }
             }
-            .disabled(viewModel.isPlayButtonDisabled)
-            .padding(.vertical, 20)
-            .padding(.horizontal, 100)
-            .background(
-                Capsule()
-                    .fill(
-                        viewModel.isPlayButtonDisabled
-                        ? .gray : .green
-                    )
-            )
-            
-            Text(viewModel.authenticatingState.rawValue)
-                .foregroundStyle(Color(.label))
-                .font(.headline)
-                .fontWeight(.semibold)
-                .padding()
             
             Spacer()
+            
         }
-        .background(
-            Color(.secondarySystemBackground)
-        )
-        .ignoresSafeArea()
+        .background( MovingBackground())
+        .padding(.top, 20)
         .onAppear {
             viewModel.prepareHaptics()
         }
