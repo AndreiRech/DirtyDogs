@@ -13,37 +13,34 @@ struct MenuView: View {
     
     var body: some View {
         
-        ZStack {
-            MovingBackground()
+        VStack(spacing: 86) {
             
-            VStack(spacing: 86) {
-                
-                Image("logo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
-                    .padding(.horizontal, 55)
-                    .padding(.top, 40)
-                
-                
-                VStack (spacing: 40){
-                    GameButton (
-                        title: "play",
-                        disabled: viewModel.isPlayButtonDisabled
-                    ){
-                        viewModel.playButtonTapped()
-                    }
-                    
-                    GameButton (title: "settings") {
-                        // add open settings func
-                    }
+            Image("logo")
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
+                .padding(.horizontal, 55)
+                .padding(.top, 40)
+            
+            
+            VStack (spacing: 40){
+                GameButton (
+                    title: "play",
+                    disabled: viewModel.isPlayButtonDisabled
+                ){
+                    viewModel.playButtonTapped()
                 }
                 
-                Spacer()
-                
+                GameButton (title: "settings") {
+                    // add open settings func
+                }
             }
-            .padding(.top, 20)
+            
+            Spacer()
+            
         }
+        .background( MovingBackground())
+        .padding(.top, 20)
         .onAppear {
             viewModel.prepareHaptics()
         }
