@@ -12,6 +12,7 @@ class ScreenFXManager {
     weak var scene: SKScene?
     weak var entityManager: EntityManager?
     private let haptics: HapticsServiceProtocol
+    private var motionService: MotionServiceProtocol
     
     private var stunOverlay: SKShapeNode?
     var isStunned: Bool = false
@@ -21,6 +22,7 @@ class ScreenFXManager {
         self.entityManager = entityManager
         self.haptics = hapticsService
         haptics.prepareHaptics()
+        motionService = MotionService()
     }
     
     func playHaptics(with sound: SoundEffect) {
@@ -151,9 +153,9 @@ class ScreenFXManager {
         
         poopOverlay.run(.sequence([
             .fadeAlpha(to: 0.95, duration: 0.25),
-            .wait(forDuration: 5.0),
-            .fadeOut(withDuration: 0.7),
-            .removeFromParent()
+//            .wait(forDuration: 5.0),
+//            .fadeOut(withDuration: 0.7),
+//            .removeFromParent()
         ]))
         
         shake(intensity: 25, duration: 0.45)
@@ -165,6 +167,15 @@ class ScreenFXManager {
             entityManager?.remove(entity: entity)
         } else {
             node.removeFromParent()
+        }
+        
+        var shakeCountIntensity = 0.0
+        motionService.startMonitoring { [weak self] intensity in
+            shakeCountIntensity += intensity
+            if shakeCountIntensity >= 20.0 {
+                self?.motionService.stopMonitoring()
+                self?.cleanPoopOverlayOnShake()
+            }
         }
     }
     
