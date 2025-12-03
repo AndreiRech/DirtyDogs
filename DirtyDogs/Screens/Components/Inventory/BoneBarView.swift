@@ -35,7 +35,7 @@ struct BoneBarView: View {
                         .frame(width: geo.size.width / 3)
                         .position(x: geo.size.width / 6, y: geo.size.height / 2)
                     
-                    Image("BoneFull")
+                    Image("BoneFullInventory")
                         .position(x: geo.size.width * 1/3, y: geo.size.height / 2)
                     Image("BoneEmpty")
                         .position(x: geo.size.width * 2/3, y: geo.size.height / 2)
@@ -55,9 +55,9 @@ struct BoneBarView: View {
                         .frame(width: geo.size.width / 3)
                         .position(x: geo.size.width / 2, y: geo.size.height / 2)
                     
-                    Image("BoneFull")
+                    Image("BoneFullInventory")
                         .position(x: geo.size.width * 1/3, y: geo.size.height / 2)
-                    Image("BoneFull")
+                    Image("BoneFullInventory")
                         .position(x: geo.size.width * 2/3, y: geo.size.height / 2)
                     Image("BoneEmpty")
                         .position(x: geo.size.width * 3/3, y: geo.size.height / 2)
@@ -81,11 +81,11 @@ struct BoneBarView: View {
                         .frame(width: geo.size.width / 3)
                         .position(x: geo.size.width * (5.0 / 6.0), y: geo.size.height / 2)
                     
-                    Image("BoneFull")
+                    Image("BoneFullInventory")
                         .position(x: geo.size.width * 1/3, y: geo.size.height / 2)
-                    Image("BoneFull")
+                    Image("BoneFullInventory")
                         .position(x: geo.size.width * 2/3, y: geo.size.height / 2)
-                    Image("BoneFull")
+                    Image("BoneFullInventory")
                         .position(x: geo.size.width * 3/3, y: geo.size.height / 2)
                 }
             }

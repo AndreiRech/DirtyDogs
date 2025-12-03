@@ -336,8 +336,7 @@ class ScreenFXManager {
             let block = gridManager.blocks[i]
             if block.layer < 0 { continue }
             
-            if let blockNode = gridManager.blockNodes.first(where: { $0.name == "block_\(i)" }) {
-                // Calcula distância do centro para efeito de onda
+            if let _ = gridManager.blockNodes.first(where: { $0.name == "block_\(i)" }) {
                 let row = i / Int(sqrt(Double(totalBlocks)))
                 let col = i % Int(sqrt(Double(totalBlocks)))
                 let centerRow = centerIndex / Int(sqrt(Double(totalBlocks)))
