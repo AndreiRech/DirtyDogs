@@ -45,7 +45,7 @@ struct GameViewModelTests {
         
         #expect(initialCount == 0)
         
-        viewModel.spawnItem(type: .bomb)
+        viewModel.spawnItem(type: .bomb, spawnPoint: nil)
         
         let newCount = entityManager.getEntities().count
         #expect(newCount == initialCount + 1)

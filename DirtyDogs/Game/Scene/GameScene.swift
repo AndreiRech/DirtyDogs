@@ -75,7 +75,6 @@ public class GameScene: SKScene {
     // MARK: - Touch Functions
     override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-        let location = touch.location(in: self)
         
         if inputManager.handleTouchesBegan(touches) {
             return
@@ -213,7 +212,12 @@ public class GameScene: SKScene {
     }
     
     private func sendParcel(side: EdgeSide, node: SKNode, entity: GameEntity) {
-        if entity.getReceived() && !(entity is Seed) {
+        if entity.getReceived() {
+            if entity is Seed {
+                entityManager.remove(entity: entity)
+                return
+            }
+            
             spawnManager.executeAction(value: entity)
             return
         }
