@@ -47,7 +47,7 @@ struct GridManagerTests {
         let bones = blocks.filter { $0.reward == .bone }
         #expect(bones.count == 3, "Should have exactly 3 bones")
         
-        let items = blocks.filter { $0.reward == .bomb || $0.reward == .poop }
+        let items = blocks.filter { $0.reward == .bomb || $0.reward == .tint }
         #expect(items.count >= 6 && items.count <= 12, "Should have between 2 and 3 items forEach item")
     }
     

@@ -39,7 +39,7 @@ struct GameView: View {
                         },
                         playHaptics: {
                             switch rewardForThisLayer {
-                            case .bomb, .poop, .seed:
+                            case .bomb, .tint, .seed:
                                 viewModel.playHaptics(sound: .itemFound)
                             case .bone:
                                 viewModel.playHaptics(sound: .success)

@@ -25,10 +25,11 @@ public class Seed: GKEntity, GameEntity {
     override public init() {
         super.init()
         
-        let node = SKShapeNode(circleOfRadius: seedSize)
+        let texture = SKTexture(imageNamed: "Seed")
+        let node = SKSpriteNode(texture: texture)
+        node.size = CGSize(width: seedSize * 2, height: seedSize * 2)
         
-        node.name = "ball"
-        node.fillColor = .systemPink
+        node.name = "seed"
         node.zPosition = 100
         
         node.physicsBody = SKPhysicsBody(circleOfRadius: seedSize)

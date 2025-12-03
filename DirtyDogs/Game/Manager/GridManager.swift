@@ -101,7 +101,7 @@ class GridManager {
             }
         }
         
-        let possibleItems: [Reward] = [.poop, .bomb, .seed]
+        let possibleItems: [Reward] = [.tint, .bomb, .seed]
         
         for item in possibleItems {
             let itemCount = Int.random(in: 3...6)
@@ -165,7 +165,7 @@ class GridManager {
             switch block.reward {
             case .bone:
                 return .bone
-            case .bomb, .poop, .seed:
+            case .bomb, .tint, .seed:
                 return block.reward
             default :
                 break
@@ -173,6 +173,34 @@ class GridManager {
         }
         
         return nil
+    }
+    
+    private func xMarkForBlock(at index: Int, shouldShow: Bool) {
+        guard index < blockNodes.count else { return }
+        
+        let blockNode = blockNodes[index]
+        let xMarkName = "xMarkOverlay"
+        
+        if shouldShow {
+            if blockNode.childNode(withName: xMarkName) == nil {
+                let xNode = SKLabelNode(text: "X")
+                xNode.fontName = "MachineGunk"
+                xNode.fontSize = blockSize.height * 0.4
+                xNode.fontColor = .black
+                xNode.verticalAlignmentMode = .center
+                xNode.horizontalAlignmentMode = .center
+                
+                xNode.name = xMarkName
+                xNode.alpha = 0.23
+                xNode.zPosition = 5
+                
+                blockNode.addChild(xNode)
+            }
+        } else {
+            if let existingMark = blockNode.childNode(withName: xMarkName) {
+                existingMark.removeFromParent()
+            }
+        }
     }
     
     func updateBlockLayer(at index: Int, to newLayer: Int) {
@@ -183,8 +211,9 @@ class GridManager {
         let node = blockNodes[index]
         
         node.color = .clear
-        // Natural growth animation for the new layer
         let newTexture = textureForLayer(layer: newLayer, index: index)
+        
+        xMarkForBlock(at: index, shouldShow: newLayer == 3 ? true : false)
         
         let growNode = SKSpriteNode(texture: newTexture)
         growNode.size = node.size
@@ -199,7 +228,6 @@ class GridManager {
             node.texture = newTexture
             growNode.removeFromParent()
         }
-        
     }
     
     func resetGrid() {
@@ -210,6 +238,14 @@ class GridManager {
     func updateData(blocks: [GridBlock]) {
         self.blocks = blocks
         setupGrid()
+    }
+    
+    func getPositionForBlock(at index: Int) -> CGPoint? {
+        guard index >= 0 && index < blockNodes.count else { return nil }
+        
+        let blockNode = blockNodes[index]
+        
+        return blockNode.position
     }
     
     func handleDrag(at position: CGPoint) {

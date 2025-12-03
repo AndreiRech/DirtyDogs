@@ -62,6 +62,8 @@ public class GameScene: SKScene {
         setupBorders()
         
         _ = gridManager.createMap(horizontal: 3, vertical: 4)
+        
+
     }
     
     public override func update(_ currentTime: TimeInterval) {
@@ -79,35 +81,16 @@ public class GameScene: SKScene {
             return
         }
         
-        if handleCollectionTap(at: location) {
-            return
-        }
-        
         if gridManager.handleTouch(touch) {
             return
         }
     }
     
-    func handleCollectionTap(at location: CGPoint) -> Bool {
-        guard let manager = entityManager else { return false }
-        
-        if let entity = manager.entity(at: location) {
-            manager.remove(entity: entity)
-            
-            let imageName = (entity is Bomb) ? "Bomb" : "Bomb"
-            let item = InventoryItem(imageName: imageName)
-            
-            inventoryDelegate?.didCollect(item: item)
-            return true
-        }
-        return false
-    }
-    
     override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         inputManager.handleTouchesMoved(touches)
-//        guard let touch = touches.first else { return }
-//        let location = touch.location(in: self)
-//        gridManager.handleDrag(at: location)
+        //        guard let touch = touches.first else { return }
+        //        let location = touch.location(in: self)
+        //        gridManager.handleDrag(at: location)
     }
     
     override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -153,11 +136,12 @@ public class GameScene: SKScene {
         
         for entity in entities {
             guard let node = entity.component(ofType: GKSKNodeComponent.self)?.node else { continue }
+            guard let item = entity as? GameEntity else { return }
             
             let collectionLineY = frame.minY + 250
                         
-            if node.position.y < collectionLineY && isInventoryFull == false {
-                collect(entity: entity as! GameEntity)
+            if node.position.y < collectionLineY && isInventoryFull == false && item.getReceived() == false {
+                collect(entity: item)
             }
         }
     }
@@ -175,7 +159,7 @@ public class GameScene: SKScene {
             itemName = "Bomb-Button"
         case is Seed:
             itemName = "Seed-Button"
-        case is Poop:
+        case is Tint:
             itemName = "Tint-Button"
         default:
             itemName = "Unknown"
@@ -210,7 +194,6 @@ public class GameScene: SKScene {
                 to: CGPoint(x: frame.maxX, y: barrierY)
             )
             bodies.append(bottomEdge)
-        } else {
         }
         
         let leftEdge = SKPhysicsBody(edgeFrom: CGPoint(x: frame.minX, y: frame.minY), to: CGPoint(x: frame.minX, y: frame.maxY))
@@ -230,9 +213,8 @@ public class GameScene: SKScene {
     }
     
     private func sendParcel(side: EdgeSide, node: SKNode, entity: GameEntity) {
-        if entity.getReceived() {
+        if entity.getReceived() && !(entity is Seed) {
             spawnManager.executeAction(value: entity)
-            entityManager.remove(entity: entity)
             return
         }
         
@@ -247,8 +229,8 @@ public class GameScene: SKScene {
             objectType = .ball
         case is Bomb:
             objectType = .bomb
-        case is Poop:
-            objectType = .poop
+        case is Tint:
+            objectType = .tint
         case is Seed:
             objectType = .seed
         default:
@@ -278,12 +260,14 @@ public class GameScene: SKScene {
         gridManager.resetGrid()
     }
     
-    func spawnItem(type: PhysicsObjectType) {
-        let spawnPoint = CGPoint(
-            x: frame.midX,
-            y: frame.maxY - 100
-        )
-        spawnManager.spawnItem(at: spawnPoint, entity: type)
+    func spawnItem(type: PhysicsObjectType, spawnPoint: CGPoint? = nil) {
+        var position: CGPoint
+        if let p = spawnPoint {
+            position = p
+        } else {
+            position = CGPoint(x: frame.midX, y: frame.midY)
+        }
+        spawnManager.spawnItem(at: position, entity: type)
     }
     
     func revealItem(at index: Int) -> Reward? {
@@ -293,4 +277,9 @@ public class GameScene: SKScene {
     func playSoundEffect(sound: SoundEffect) {
         fxManager.playHaptics(with: sound)
     }
+    
+    func getBlockPosition(at index: Int) -> CGPoint? {
+        gridManager.getPositionForBlock(at: index)
+    }
 }
+

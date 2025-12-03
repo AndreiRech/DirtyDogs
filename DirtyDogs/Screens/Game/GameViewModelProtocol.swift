@@ -23,7 +23,7 @@ protocol GameViewModelProtocol {
     
     func endGame(with event: PacketType)
     func resetGrid()
-    func spawnItem(type: PhysicsObjectType)
+    func spawnItem(type: PhysicsObjectType, spawnPoint: CGPoint?)
     
     func didUse(item: InventoryItem)
     func isInventoryFull() -> Bool

@@ -38,7 +38,7 @@ struct ScratchViewModelTests {
     func rewardImageLogic() {
         // Given
         let vmBomb = ScratchViewModel(layer: 0, isClear: true, reward: .bomb, onComplete: {}, playHaptics: {})
-        let vmPoop = ScratchViewModel(layer: 0, isClear: true, reward: .poop, onComplete: {}, playHaptics: {})
+        let vmPoop = ScratchViewModel(layer: 0, isClear: true, reward: .tint, onComplete: {}, playHaptics: {})
         let vmSeed = ScratchViewModel(layer: 0, isClear: true, reward: .seed, onComplete: {}, playHaptics: {})
         let vmBone = ScratchViewModel(layer: 0, isClear: true, reward: .bone, onComplete: {}, playHaptics: {})
         let vmNone = ScratchViewModel(layer: 0, isClear: true, reward: .none, onComplete: {}, playHaptics: {})
