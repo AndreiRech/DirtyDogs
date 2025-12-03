@@ -86,31 +86,35 @@ class GridManager {
         //  - 0 na camada 0 (grama)
         //  - 1 na camada 1 (terra)
         //  - 2 na camada 2 (pedra)
-        // Para os itens, deve existir entre 2 até 3 de cada e devem ser espalhados pelas 3 camadas
+        // Para os itens, deve existir entre 3 até 5 de cada e devem ser espalhados pelas 3 camadas
         // Para o restante, deve ser .none
         
         let totalBlocks = cols * rows
-        var newBlocks = Array(repeating: GridBlock(reward: .none, rewardLayer: 0), count: totalBlocks)
-        var availableIndices = Array(0..<totalBlocks).shuffled()
+        var newBlocks = Array(repeating: GridBlock(), count: totalBlocks)
+        var availableSlots: [(blockIndex: Int, layer: Int)] = []
+        
+        for i in 0..<totalBlocks {
+            for layer in 0..<3 {
+                availableSlots.append((blockIndex: i, layer: layer))
+            }
+        }
+        availableSlots.shuffle()
         
         let boneDepths = [1, 2, 2]
         for depth in boneDepths {
-            if let index = availableIndices.popLast() {
-                newBlocks[index].reward = .bone
-                newBlocks[index].rewardLayer = depth
+            if let slotIndex = availableSlots.firstIndex(where: { $0.layer == depth }) {
+                let slot = availableSlots.remove(at: slotIndex)
+                newBlocks[slot.blockIndex].rewards[depth] = .bone
             }
         }
         
         let possibleItems: [Reward] = [.tint, .bomb, .seed]
         
         for item in possibleItems {
-            let itemCount = Int.random(in: 3...6)
+            let itemCount = Int.random(in: 3...5)
             for _ in 0..<itemCount {
-                if let index = availableIndices.popLast() {
-                    let randomDepth = Int.random(in: 0...2)
-                    
-                    newBlocks[index].reward = item
-                    newBlocks[index].rewardLayer = randomDepth
+                if let slot = availableSlots.popLast() {
+                    newBlocks[slot.blockIndex].rewards[slot.layer] = item
                 }
             }
         }
@@ -156,20 +160,15 @@ class GridManager {
     func completeScratch(at index: Int) -> Reward? {
         guard index < blocks.count else { return nil }
         
+        let scratchedLayer = blocks[index].layer
+        
         blocks[index].layer += 1
         let block = blocks[index]
         
         updateBlockLayer(at: index, to: block.layer)
         
-        if block.reward != .none && block.rewardLayer == block.layer - 1 {
-            switch block.reward {
-            case .bone:
-                return .bone
-            case .bomb, .tint, .seed:
-                return block.reward
-            default :
-                break
-            }
+        if let reward = block.rewards[scratchedLayer] {
+            return reward
         }
         
         return nil

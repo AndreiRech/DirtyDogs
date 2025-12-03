@@ -66,12 +66,12 @@ class SpawnManager {
             }
         }
         
-        if let poop = value as? Tint {
+        if let tint = value as? Tint {
             Task { @MainActor [weak self] in
                 try? await Task.sleep(for: .seconds(0.4))
                 guard let self = self, let fx = self.fxManager else { return }
-                if let node = poop.node {
-                    fx.explodePoop(node: node, entity: poop)
+                if let node = tint.node {
+                    fx.explodePoop(node: node, entity: tint)
                 }
             }
         }

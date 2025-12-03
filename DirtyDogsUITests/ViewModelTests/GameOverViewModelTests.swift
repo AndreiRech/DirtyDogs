@@ -10,11 +10,11 @@ import Testing
 
 struct GameOverViewModelTests {
     @Test("Screen text matches game state", arguments: [
-        (GameState.victory, ["You", "Won!"]),
-        (GameState.defeat, ["You", "Lost!"]),
-        (GameState.quit, ["Your", "Enemy", "Left"])
+        (GameState.victory, "won"),
+        (GameState.defeat, "lost"),
+        (GameState.quit, "left")
     ])
-    func screenTextCheck(state: GameState, expectedLines: [String]) {
+    func screenTextCheck(state: GameState, expectedLines: String) {
         // Given
         let matchManager = MatchManager()
         let viewModel = GameOverViewModel(matchManager: matchManager)
