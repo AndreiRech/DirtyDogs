@@ -30,7 +30,9 @@ struct GameViewModelTests {
         
         #expect(viewModel.bonesFound == 0)
         
-        gridManager.blocks[0] = GridBlock(layer: 0, reward: .bone, rewardLayer: 0)
+        var block = GridBlock(layer: 0)
+        block.rewards[0] = .bone
+        gridManager.blocks[0] = block
         
         viewModel.completeScratch(at: 0)
         

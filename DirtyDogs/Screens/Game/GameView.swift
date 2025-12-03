@@ -27,7 +27,7 @@ struct GameView: View {
             
             if let index = viewModel.selectedIndex {
                 let block = viewModel.gameScene.gridManager.blocks[index]
-                let rewardForThisLayer: Reward = (block.rewardLayer == block.layer) ? block.reward : .none
+                let rewardForThisLayer: Reward = block.rewards[block.layer] ?? .none
                 
                 ScratchView(
                     viewModel: ScratchViewModel(
