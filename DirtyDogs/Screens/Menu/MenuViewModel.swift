@@ -9,12 +9,26 @@ import Foundation
 
 @Observable
 class MenuViewModel: MenuViewModelProtocol {
+    
     private var matchManager: MatchManager
     private var hapticsService: HapticsServiceProtocol
+    private var settingsService: SettingsServiceProtocol
     
-    init(matchManager: MatchManager, hapticsService: HapticsServiceProtocol) {
+    var soundEnabled: Bool = true
+    var hapticsEnabled: Bool = true
+    var showTutorial: Bool = false
+    
+    init(
+        matchManager: MatchManager,
+        hapticsService: HapticsServiceProtocol,
+        settingsService: SettingsServiceProtocol
+    ) {
         self.matchManager = matchManager
         self.hapticsService = hapticsService
+        self.settingsService = settingsService
+        
+        self.soundEnabled = settingsService.soundEnabled
+        self.hapticsEnabled = settingsService.hapticsEnabled
     }
     
     var authenticatingState: PlayerAuthStateEnum {
@@ -32,5 +46,15 @@ class MenuViewModel: MenuViewModelProtocol {
     func playButtonTapped() {
         matchManager.startMatchmaking()
         hapticsService.complexSuccess()
+    }
+    
+    func toggleSound() {
+        soundEnabled.toggle()
+        settingsService.soundEnabled = soundEnabled
+    }
+    
+    func toggleHaptics() {
+        hapticsEnabled.toggle()
+        settingsService.hapticsEnabled = hapticsEnabled
     }
 }

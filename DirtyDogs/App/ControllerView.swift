@@ -10,6 +10,7 @@ import SwiftUI
 struct ControllerView: View {
     @State var matchManager: MatchManager
     @State var hapticsService: HapticsServiceProtocol = HapticsService()
+    @State var settingsService: SettingsServiceProtocol = SettingsService()
    
     var body: some View {
         ZStack {
@@ -18,7 +19,13 @@ struct ControllerView: View {
             } else if matchManager.gameState == .inGame {
                 GameView(viewModel: GameViewModel(matchManager: matchManager, hapticsService: hapticsService))
             } else {
-                MenuView(viewModel: MenuViewModel(matchManager: matchManager, hapticsService: hapticsService))
+                MenuView(
+                    viewModel: MenuViewModel(
+                        matchManager: matchManager,
+                        hapticsService: hapticsService,
+                        settingsService: settingsService
+                    )
+                )
             }
         }
         .onAppear {
