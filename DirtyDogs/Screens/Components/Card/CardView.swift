@@ -9,25 +9,36 @@ import SwiftUI
 
 struct CardView: View {
     let imageName: String
+    let totalPages: Int
+    var atualPage: Int
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             Image(imageName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 304, height: 386)
+                .frame(width: 304, height: 521)
                 .zIndex(2)
             
-            Image("CleaningBackground")
+            Image("OnboardingBackground")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 344, height: 460)
-                .offset(y: -10)
+                .frame(width: 350, height: 511)
                 .zIndex(1)
+            
+            HStack {
+                ForEach(1...totalPages, id: \.self) { page in
+                    Circle()
+                        .frame(width: 10, height: 10)
+                        .foregroundStyle(page == atualPage ? .darkCoffee : .raspaCafe)
+                }
+            }
+            .zIndex(3)
+            .padding(.bottom, 24)
         }
     }
 }
 
 #Preview {
-    CardView(imageName: "Grass-Light")
+    CardView(imageName: "Grass-Light", totalPages: 3, atualPage: 2)
 }
