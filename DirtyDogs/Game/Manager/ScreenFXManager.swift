@@ -9,7 +9,7 @@ import SpriteKit
 import GameplayKit
 
 class ScreenFXManager {
-    weak var scene: SKScene?
+    weak var scene: GameScene?
     weak var entityManager: EntityManager?
     private let haptics: HapticsServiceProtocol
     private var motionService: MotionServiceProtocol
@@ -17,7 +17,7 @@ class ScreenFXManager {
     private var stunOverlay: SKShapeNode?
     var isStunned: Bool = false
     
-    init(scene: SKScene, entityManager: EntityManager?, hapticsService: HapticsServiceProtocol) {
+    init(scene: GameScene, entityManager: EntityManager?, hapticsService: HapticsServiceProtocol) {
         self.scene = scene
         self.entityManager = entityManager
         self.haptics = hapticsService
@@ -112,10 +112,13 @@ class ScreenFXManager {
         }
     }
     
-    // MARK: Poop
+    // MARK: Tint
     
-    func explodePoop(node: SKNode, entity: GKEntity?) {
+    func explodeTint(node: SKNode, entity: GKEntity?) {
         guard let scene = scene, let parent = node.parent else { return }
+        
+        scene.uiDelegate?.isOverAll(true)
+        
         let origin = node.position
         
         let poopEmitter = SKEmitterNode()
@@ -152,10 +155,7 @@ class ScreenFXManager {
         scene.addChild(poopOverlay)
         
         poopOverlay.run(.sequence([
-            .fadeAlpha(to: 0.95, duration: 0.25),
-//            .wait(forDuration: 5.0),
-//            .fadeOut(withDuration: 0.7),
-//            .removeFromParent()
+            .fadeAlpha(to: 1.00, duration: 0.25),
         ]))
         
         shake(intensity: 25, duration: 0.45)
@@ -174,6 +174,7 @@ class ScreenFXManager {
             shakeCountIntensity += intensity
             if shakeCountIntensity >= 20.0 {
                 self?.motionService.stopMonitoring()
+                self?.scene?.uiDelegate?.isOverAll(false)
                 self?.cleanPoopOverlayOnShake()
             }
         }
