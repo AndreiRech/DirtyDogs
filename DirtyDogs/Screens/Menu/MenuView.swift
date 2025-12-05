@@ -12,37 +12,63 @@ struct MenuView: View {
     @State var viewModel: MenuViewModelProtocol
     
     var body: some View {
-        
-        VStack(spacing: 86) {
+        NavigationStack {
             
-            Image("logo")
-                .resizable()
-                .scaledToFit()
-                .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
-                .padding(.horizontal, 55)
-                .padding(.top, 40)
-            
-            
-            VStack (spacing: 40){
-                GameButton (
-                    title: "play",
-                    disabled: viewModel.isPlayButtonDisabled
-                ){
-                    viewModel.playButtonTapped()
+            VStack(spacing: 64) {
+                
+                Image("logo")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: 256, alignment: .init(horizontal: .center, vertical: .center))
+                    .frame(maxHeight: 243)
+                    .padding(.horizontal, 55)
+                    .padding(.top, 40)
+                    .fixedSize()
+                
+                
+                VStack (spacing: 32){
+                    GameButton (
+                        title: "play",
+                        disabled: viewModel.isPlayButtonDisabled
+                    ){
+                        viewModel.playButtonTapped()
+                    }
+                    
+                    GameButton(title: "tutorial") {
+                        viewModel.showTutorial = true
+                    }
+                    
                 }
                 
-                GameButton (title: "settings") {
-                    // add open settings func
+                HStack (spacing: 55) {
+                    ConfigButton(
+                        isActive: $viewModel.soundEnabled,
+                        images: ["SoundButton", "SoundButtonDisabled"],
+                        onTap: {
+                            viewModel.toggleSound()
+                        }
+                    )
+                    
+                    ConfigButton(
+                        isActive: $viewModel.hapticsEnabled,
+                        images: ["HapticsButton", "HapticsButtonDisabled"],
+                        onTap: {
+                            viewModel.toggleHaptics()
+                        }
+                    )
                 }
+                
+                Spacer()
+                
             }
-            
-            Spacer()
-            
-        }
-        .background( MovingBackground())
-        .padding(.top, 20)
-        .onAppear {
-            viewModel.prepareHaptics()
+            .background( MovingBackground())
+            .padding(.top, 20)
+            .onAppear {
+                viewModel.prepareHaptics()
+            }
+            .navigationDestination(isPresented: $viewModel.showTutorial) {
+                TutorialView()
+            }
         }
     }
 }
@@ -51,7 +77,8 @@ struct MenuView: View {
     MenuView(
         viewModel: MenuViewModel(
             matchManager: MatchManager(),
-            hapticsService: HapticsService()
+            hapticsService: HapticsService(),
+            settingsService: SettingsService()
         )
     )
 }

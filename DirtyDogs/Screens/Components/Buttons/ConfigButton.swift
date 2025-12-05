@@ -15,9 +15,6 @@ struct ConfigButton: View {
     var body: some View {
         Button {
             onTap()
-            withAnimation(.easeInOut(duration: 0.3)) {
-                isActive.toggle()
-            }
         } label: {
             Image(isActive ? images[0] : images[1])
                 .frame(width: 76, height: 56)

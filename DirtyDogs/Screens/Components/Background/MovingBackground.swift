@@ -15,7 +15,7 @@ struct MovingBackground: View {
     let rows = 24
     let spacing: CGFloat = 24
     let pawSize: CGFloat = 62
-    let velocity: CGFloat = 0.5 /// ajuste a velocidade
+    let velocity: CGFloat = 0.5 
 
     var itemHeight: CGFloat { pawSize + spacing }
     var loopLength: CGFloat { itemHeight * CGFloat(rows) }

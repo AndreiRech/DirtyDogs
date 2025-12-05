@@ -18,6 +18,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     var bonesFound: Int = 0
     var showQuitConfirmation: Bool = false
     var slotThatShouldAnimate: Int? = nil
+    var isOverAll: Bool = false
     
     var availableItems: [InventoryItem?] = [
         nil,
@@ -150,5 +151,9 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     
     func inventoryDidUpdate(){
         gameScene.setupBorders()
+    }
+    
+    func isOverAll(_ isOver: Bool) {
+        isOverAll = isOver
     }
 }

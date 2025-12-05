@@ -8,7 +8,12 @@
 protocol MenuViewModelProtocol {
     var authenticatingState: PlayerAuthStateEnum { get }
     var isPlayButtonDisabled: Bool { get }
+    var soundEnabled: Bool { get set }
+    var hapticsEnabled: Bool { get set }
+    var showTutorial: Bool { get set }
     
     func prepareHaptics()
     func playButtonTapped()
+    func toggleSound()
+    func toggleHaptics()
 }

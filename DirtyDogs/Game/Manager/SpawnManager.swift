@@ -71,7 +71,7 @@ class SpawnManager {
                 try? await Task.sleep(for: .seconds(0.4))
                 guard let self = self, let fx = self.fxManager else { return }
                 if let node = tint.node {
-                    fx.explodePoop(node: node, entity: tint)
+                    fx.explodeTint(node: node, entity: tint)
                 }
             }
         }
