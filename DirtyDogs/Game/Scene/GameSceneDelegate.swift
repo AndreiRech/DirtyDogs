@@ -7,6 +7,7 @@
 
 protocol GameSceneDelegate: AnyObject {
     func didTapBlock(_ index: Int)
+    func isOverAll(_ isOver: Bool)
 }
 
 protocol InventoryDelegate: AnyObject {
