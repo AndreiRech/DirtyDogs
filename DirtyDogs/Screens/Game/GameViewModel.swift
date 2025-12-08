@@ -11,6 +11,7 @@ import SwiftUI
 
 @Observable
 class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate {
+    
     var gameScene: GameScene
     var matchManager: MatchManager
     var hapticsService: HapticsServiceProtocol
