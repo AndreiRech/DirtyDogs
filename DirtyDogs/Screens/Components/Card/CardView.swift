@@ -17,7 +17,7 @@ struct CardView: View {
             Image(imageName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 304, height: 521)
+                .frame(width: 304, height: 556)
                 .zIndex(2)
             
             Image("OnboardingBackground")
