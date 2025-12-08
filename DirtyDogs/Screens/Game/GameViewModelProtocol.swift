@@ -18,7 +18,6 @@ protocol GameViewModelProtocol {
     var selectedIndex: Int? { get set }
     var availableItems: [InventoryItem?] { get }
     
-    func onAppear()
     func onDisappear()
     
     func endGame(with event: PacketType)

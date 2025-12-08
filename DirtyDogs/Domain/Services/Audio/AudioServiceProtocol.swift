@@ -17,4 +17,7 @@ protocol AudioServiceProtocol {
     
     func stop(sound: String)
     func stopAll()
+    
+    func playLoopSimple(sound: String, volume: Float)
+    func stopSimpleLoop(sound: String)
 }
