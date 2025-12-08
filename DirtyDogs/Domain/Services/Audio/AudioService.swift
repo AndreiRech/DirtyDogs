@@ -17,6 +17,7 @@ class AudioService: AudioServiceProtocol {
     private var loopPlayersB: [String: AVAudioPlayer] = [:]
     
     private var loopTimers: [String: Timer] = [:]
+    private var simpleLoopPlayers: [String: AVAudioPlayer] = [:]
     
     private init() {}
     
@@ -155,4 +156,37 @@ class AudioService: AudioServiceProtocol {
         
         return player
     }
+
+    func playLoopSimple(sound: String, volume: Float = 1.0) {
+       
+        if let existing = simpleLoopPlayers[sound], existing.isPlaying {
+            existing.volume = volume
+            return
+        }
+
+        guard let url = Bundle.main.url(forResource: sound, withExtension: nil) else {
+            print("AudioService: sound not found -> \(sound)")
+            return
+        }
+
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.numberOfLoops = -1
+            player.volume = volume
+            player.prepareToPlay()
+            player.play()
+
+            simpleLoopPlayers[sound] = player
+
+        } catch {
+            print("❌ Error loading loop audio:", error)
+        }
+    }
+    
+    func stopSimpleLoop(sound: String) {
+        simpleLoopPlayers[sound]?.stop()
+        simpleLoopPlayers.removeValue(forKey: sound)
+    }
+
+
 }
