@@ -65,7 +65,9 @@ public class GameScene: SKScene {
         
         spawnItem(type: .bomb)
         spawnItem(type: .seed)
-        spawnItem(type: .tint)
+        spawnItem(type: .tint)   
+        
+
     }
     
     public override func update(_ currentTime: TimeInterval) {

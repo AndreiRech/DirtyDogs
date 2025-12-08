@@ -183,6 +183,10 @@ class ScreenFXManager {
     func explodeTint(node: SKNode, entity: GKEntity?) {
         guard let scene = scene, let parent = node.parent else { return }
         
+        AudioService.shared.play(sound: "Spray.wav", volume: -0.5)
+        
+        scene.uiDelegate?.isOverAll(true)
+        
         let origin = node.position
         
         let poopEmitter = SKEmitterNode()
