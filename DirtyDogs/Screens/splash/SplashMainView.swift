@@ -12,6 +12,18 @@ import Lottie
 struct SplashToPawsView: View {
     @State private var showHome = false
     @State private var showBackground = false
+    
+    let matchManager: MatchManager
+    let hapticsService: HapticsServiceProtocol
+    let settingsService: SettingsServiceProtocol
+    
+    init(matchManager: MatchManager, hapticsService: HapticsServiceProtocol, settingsService: SettingsServiceProtocol) {
+        self.matchManager = matchManager
+        self.hapticsService = hapticsService
+        self.settingsService = settingsService
+    }
+    
+    
         
     var body: some View {
         ZStack {
@@ -42,9 +54,9 @@ struct SplashToPawsView: View {
             if showHome {
                 MenuView(
                     viewModel: MenuViewModel(
-                        matchManager: MatchManager(),
-                        hapticsService: HapticsService(),
-                        settingsService: SettingsService()
+                        matchManager: matchManager,
+                        hapticsService: hapticsService,
+                        settingsService: settingsService
                     )
                 )
             }
@@ -55,5 +67,5 @@ struct SplashToPawsView: View {
 
 
 #Preview {
-    SplashToPawsView()
+    SplashToPawsView(matchManager: MatchManager(), hapticsService: HapticsService(), settingsService: SettingsService())
 }
