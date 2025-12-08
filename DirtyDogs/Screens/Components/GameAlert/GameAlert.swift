@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct GameAlert: View {
-    @Environment(\.dismiss) var dismiss
+    var onCancel: () -> Void
     var onConfirm: () -> Void
     
     var body: some View {
@@ -17,35 +17,35 @@ struct GameAlert: View {
                 .zIndex(-1)
             
             VStack(spacing: 14) {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("LEAVING THE GAME?")
-                        .font(.machineGunk(19))
+                VStack(alignment: .center, spacing: 0) {
+                    Text("LEAVE THE MATCH?")
+                        .font(.machineGunk(32))
                         .foregroundStyle(.sombraCamarelo)
                     
-                    Text("Are you sure that you want to leave?")
-                        .font(.machineGunk(14))
+                    Text("Are you sure you want to exit?")
+                        .font(.machineGunk(16))
                         .foregroundStyle(.sombraCamarelo)
                 }
-                .offset(x: -10)
                 
-                HStack(spacing: 21) {
+                HStack(spacing: 32) {
                     Button {
-                        dismiss()
+                        onCancel()
                     } label: {
-                        Image(.cancelAlertButton)
+                        Image(.leaveAlertButton)
                     }
                     
                     Button {
                         onConfirm()
                     } label: {
-                        Image(.leaveAlertButton)
+                        Image(.cancelAlertButton)
                     }
                 }
             }
+            .padding()
         }
     }
 }
 
 #Preview {
-    GameAlert(onConfirm: {})
+    GameAlert(onCancel: {}, onConfirm: {})
 }
