@@ -315,6 +315,7 @@ class ScreenFXManager {
 
     // Ondas de impacto
     private func createImpactWaves(at position: CGPoint, in parent: SKNode) {
+        AudioService.shared.play(sound: "Plantation.wav", volume: -0.5)
         for i in 0..<3 {
             let wave = SKShapeNode(circleOfRadius: 60)
             wave.strokeColor = i % 2 == 0 ? .systemPink : .systemGreen
