@@ -63,7 +63,9 @@ public class GameScene: SKScene {
         
         _ = gridManager.createMap(horizontal: 3, vertical: 4)
         
-
+        spawnItem(type: .bomb)
+        spawnItem(type: .seed)
+        spawnItem(type: .tint)
     }
     
     public override func update(_ currentTime: TimeInterval) {

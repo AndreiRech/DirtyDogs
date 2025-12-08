@@ -14,7 +14,7 @@ class ScreenFXManager {
     private let haptics: HapticsServiceProtocol
     private var motionService: MotionServiceProtocol
     
-    private var stunOverlay: SKShapeNode?
+    private var stunOverlay: SKNode?
     var isStunned: Bool = false
     
     init(scene: GameScene, entityManager: EntityManager?, hapticsService: HapticsServiceProtocol) {
@@ -34,26 +34,74 @@ class ScreenFXManager {
         case .bombExploded:
             haptics.explosionBomb()
         case .poopSplash:
-            haptics.cleanScreen() // TODO: Alterar para o do coco
+            haptics.cleanScreen()
         case .gridTouch:
             haptics.feedbackGenerator(.medium)
         }
     }
     
-    func applyStun(duration: TimeInterval) {
+    func applyStun(duration: TimeInterval, showOverlay: Bool = false) {
         guard let scene = scene, !isStunned else { return }
         isStunned = true
         
-        let overlay = SKShapeNode(rectOf: CGSize(width: scene.size.width * 1.3, height: scene.size.height * 1.3), cornerRadius: 0)
-        overlay.fillColor = UIColor.black.withAlphaComponent(0.35)
-        overlay.strokeColor = .clear
-        overlay.position = CGPoint(x: scene.frame.midX, y: scene.frame.midY)
-        overlay.zPosition = 1000
-        overlay.name = "stunOverlay"
+        // Bloqueia a UI
+        scene.uiDelegate?.isOverAll(true)
         
-        scene.addChild(overlay)
-        self.stunOverlay = overlay
+        // Desabilita interações na scene
+        scene.isUserInteractionEnabled = false
         
+        if showOverlay {
+            // Container para o efeito de blur
+            let blurContainer = SKNode()
+            blurContainer.name = "stunOverlay"
+            blurContainer.zPosition = 1500
+            
+            // Cria múltiplas camadas para simular blur
+            let overlaySize = CGSize(width: scene.size.width * 1.5, height: scene.size.height * 1.5)
+            let overlayPosition = CGPoint(x: scene.frame.midX, y: scene.frame.midY)
+            
+            // Camada base (mais opaca)
+            let baseOverlay = SKSpriteNode(color: UIColor.white.withAlphaComponent(0.5),
+                                           size: overlaySize)
+            baseOverlay.position = overlayPosition
+            baseOverlay.alpha = 0
+            blurContainer.addChild(baseOverlay)
+            
+            // Camadas adicionais deslocadas para criar efeito de blur
+            let blurLayers = 8
+            for i in 1...blurLayers {
+                let offset = CGFloat(i) * 2.5
+                let alpha = 0.15 / CGFloat(i)
+                
+                // Cria 4 camadas por "anel" (cima, baixo, esquerda, direita)
+                let positions = [
+                    CGPoint(x: overlayPosition.x + offset, y: overlayPosition.y),
+                    CGPoint(x: overlayPosition.x - offset, y: overlayPosition.y),
+                    CGPoint(x: overlayPosition.x, y: overlayPosition.y + offset),
+                    CGPoint(x: overlayPosition.x, y: overlayPosition.y - offset)
+                ]
+                
+                for pos in positions {
+                    let layer = SKSpriteNode(color: UIColor.white.withAlphaComponent(alpha),
+                                            size: overlaySize)
+                    layer.position = pos
+                    layer.alpha = 0
+                    blurContainer.addChild(layer)
+                }
+            }
+            
+            scene.addChild(blurContainer)
+            
+            // Anima todas as camadas
+            blurContainer.children.forEach { child in
+                child.run(.fadeAlpha(to: 1.0, duration: 0.2))
+            }
+            
+            self.stunOverlay = blurContainer
+        } else {
+            self.stunOverlay = nil
+        }
+
         Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(duration))
             self?.removeStun()
@@ -61,15 +109,27 @@ class ScreenFXManager {
     }
     
     func removeStun() {
-        stunOverlay?.removeFromParent()
+        guard let scene = scene else { return }
+        
+        stunOverlay?.run(.sequence([
+            .fadeOut(withDuration: 0.3),
+            .removeFromParent()
+        ]))
         stunOverlay = nil
         isStunned = false
+        
+        // Reabilita interações na scene
+        scene.isUserInteractionEnabled = true
+        
+        // Desbloqueia a UI
+        scene.uiDelegate?.isOverAll(false)
     }
     
     func explode(node: SKNode, entity: GKEntity?) {
-        guard let parent = node.parent else { return }
+        guard let scene = scene, let parent = node.parent else { return }
+
         let origin = node.position
-        
+
         let emitter = SKEmitterNode()
         emitter.particleTexture = nil
         emitter.particleColor = .orange
@@ -83,9 +143,9 @@ class ScreenFXManager {
         emitter.position = origin
         emitter.zPosition = 998
         parent.addChild(emitter)
-        
+
         emitter.run(.sequence([.wait(forDuration: 0.5), .removeFromParent()]))
-        
+
         let explosionCircle = SKShapeNode(circleOfRadius: 120)
         explosionCircle.fillColor = .orange
         explosionCircle.strokeColor = .yellow
@@ -94,21 +154,27 @@ class ScreenFXManager {
         explosionCircle.position = origin
         explosionCircle.zPosition = 999
         parent.addChild(explosionCircle)
-        
+
         explosionCircle.run(.sequence([
             .group([.scale(to: 4.0, duration: 0.30), .fadeOut(withDuration: 0.25)]),
             .removeFromParent()
         ]))
-        
+
         shake(intensity: 18, duration: 0.35)
         applyBlast(from: origin, radius: 260, strength: 2200)
-        applyStun(duration: 1.0)
         playHaptics(with: .bombExploded)
         
-        if let entity = entity {
-            entityManager?.remove(entity: entity)
-        } else {
-            node.removeFromParent()
+        // Aplica o stun ANTES de remover a entidade
+        applyStun(duration: 1.0, showOverlay: true)
+        
+        // Agenda a remoção da entidade após o stun
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(1.0))
+            if let entity = entity {
+                self?.entityManager?.remove(entity: entity)
+            } else {
+                node.removeFromParent()
+            }
         }
     }
     
@@ -116,8 +182,6 @@ class ScreenFXManager {
     
     func explodeTint(node: SKNode, entity: GKEntity?) {
         guard let scene = scene, let parent = node.parent else { return }
-        
-        scene.uiDelegate?.isOverAll(true)
         
         let origin = node.position
         
@@ -161,12 +225,16 @@ class ScreenFXManager {
         shake(intensity: 25, duration: 0.45)
         playHaptics(with: .poopSplash)
         applyBlast(from: origin, radius: 350, strength: 5000)
-        applyStun(duration: 1.5)
+        applyStun(duration: 1.5, showOverlay: false)
         
-        if let entity = entity {
-            entityManager?.remove(entity: entity)
-        } else {
-            node.removeFromParent()
+        // Agenda a remoção da entidade após o stun
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(1.5))
+            if let entity = entity {
+                self?.entityManager?.remove(entity: entity)
+            } else {
+                node.removeFromParent()
+            }
         }
         
         var shakeCountIntensity = 0.0
@@ -174,7 +242,6 @@ class ScreenFXManager {
             shakeCountIntensity += intensity
             if shakeCountIntensity >= 20.0 {
                 self?.motionService.stopMonitoring()
-                self?.scene?.uiDelegate?.isOverAll(false)
                 self?.cleanPoopOverlayOnShake()
             }
         }
@@ -231,6 +298,9 @@ class ScreenFXManager {
                 .removeFromParent()
             ]))
         }
+        
+        // Remove o stun quando limpar o overlay
+        removeStun()
     }
     
     // MARK: Seeds
@@ -239,7 +309,6 @@ class ScreenFXManager {
         guard let parent = node.parent else { return }
         let origin = node.position
         
-        // Emitter de partículas rosa/verde (semente)
         let seedEmitter = SKEmitterNode()
         seedEmitter.particleTexture = nil
         seedEmitter.particleColor = .systemPink
@@ -247,7 +316,6 @@ class ScreenFXManager {
         seedEmitter.particleColorSequence = nil
         seedEmitter.particleColorBlendFactorSequence = nil
         
-        // Gradiente de cores para mais vida
         let colorSequence = SKKeyframeSequence(keyframeValues: [
             UIColor.systemPink,
             UIColor.systemGreen,
@@ -273,7 +341,6 @@ class ScreenFXManager {
         
         seedEmitter.run(.sequence([.wait(forDuration: 1.0), .removeFromParent()]))
         
-        // Flash rosa com efeito de ondas
         createImpactWaves(at: origin, in: parent)
         
         let seedFlash = SKShapeNode(circleOfRadius: 80)
@@ -294,7 +361,6 @@ class ScreenFXManager {
             .removeFromParent()
         ]))
         
-        // Animação de "plantio" - sementes nos blocos do grid
         if let gridManager = gridManager {
             animatePlanting(gridManager: gridManager)
         }
@@ -302,16 +368,19 @@ class ScreenFXManager {
         shake(intensity: 15, duration: 0.3)
         haptics.explosionBomb()
         haptics.complexSuccess()
-        applyStun(duration: 0.8)
+        applyStun(duration: 0.8, showOverlay: false)
         
-        if let entity = entity {
-            entityManager?.remove(entity: entity)
-        } else {
-            node.removeFromParent()
+        // Agenda a remoção da entidade após o stun
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(0.8))
+            if let entity = entity {
+                self?.entityManager?.remove(entity: entity)
+            } else {
+                node.removeFromParent()
+            }
         }
     }
 
-    // Ondas de impacto
     private func createImpactWaves(at position: CGPoint, in parent: SKNode) {
         for i in 0..<3 {
             let wave = SKShapeNode(circleOfRadius: 60)
@@ -339,8 +408,6 @@ class ScreenFXManager {
         guard let scene = scene else { return }
         
         let totalBlocks = gridManager.blocks.count
-        
-        // Criar um padrão de ondas radiais do centro
         let centerIndex = totalBlocks / 2
         var blockDistances: [(index: Int, distance: CGFloat)] = []
         
@@ -359,7 +426,6 @@ class ScreenFXManager {
             }
         }
         
-        // Ordena por distância para criar efeito de onda
         blockDistances.sort { $0.distance < $1.distance }
         
         for (index, item) in blockDistances.enumerated() {
@@ -377,7 +443,6 @@ class ScreenFXManager {
                 seedItem.zPosition = 2000
                 scene.addChild(seedItem)
                 
-                // Trail de partículas para a semente caindo
                 let trail = SKEmitterNode()
                 trail.particleTexture = nil
                 trail.particleColor = .systemGreen
@@ -392,7 +457,6 @@ class ScreenFXManager {
                 trail.zPosition = 1999
                 seedItem.addChild(trail)
                 
-                // Delay baseado na distância para efeito de onda
                 let delay = Double(index) * 0.04
                 
                 let moveDown = SKAction.moveTo(y: blockPosition.y, duration: 0.35)
@@ -431,19 +495,16 @@ class ScreenFXManager {
                     SKAction.removeFromParent()
                 ]))
                 
-                // PARTÍCULAS DE IMPACTO no chão
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.35) {
                     self.createGroundImpact(at: blockPosition, in: scene)
                 }
                 
-                // Animação do bloco
                 let elasticWiggle = SKAction.customAction(withDuration: 0.5) { node, elapsedTime in
                     let progress = elapsedTime / 0.5
-                    let angle = sin(progress * .pi * 4) * 0.08 * (1 - progress) // Dampening
+                    let angle = sin(progress * .pi * 4) * 0.08 * (1 - progress)
                     node.zRotation = angle
                 }
                 
-                // Squeeze effect
                 let squashStretch = SKAction.sequence([
                     .group([
                         .scaleX(to: 1.15, duration: 0.08),
@@ -464,7 +525,6 @@ class ScreenFXManager {
                     .group([elasticWiggle, squashStretch])
                 ]))
                 
-                // Atualiza o layer do bloco após a animação
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay + 0.8) {
                     let newLayer: Int
                     
@@ -475,17 +535,13 @@ class ScreenFXManager {
                     }
                     
                     gridManager.updateBlockLayer(at: i, to: newLayer)
-                    
-                    // Efeito de brilho no bloco após mudança
                     self.createBlockShine(on: blockNode)
                 }
             }
         }
     }
 
-    // Impacto no chão
     private func createGroundImpact(at position: CGPoint, in parent: SKNode) {
-        // Pequena explosão de partículas
         let impact = SKEmitterNode()
         impact.particleTexture = nil
         impact.particleColor = .systemGreen
@@ -506,7 +562,6 @@ class ScreenFXManager {
         
         impact.run(.sequence([.wait(forDuration: 0.5), .removeFromParent()]))
         
-        // Ondinha no chão
         let groundWave = SKShapeNode(circleOfRadius: 20)
         groundWave.strokeColor = .systemGreen.withAlphaComponent(0.6)
         groundWave.lineWidth = 4
@@ -524,7 +579,6 @@ class ScreenFXManager {
         ]))
     }
 
-    // Brilho no bloco
     private func createBlockShine(on blockNode: SKNode) {
         let shine = SKShapeNode(rectOf: CGSize(width: 40, height: 40), cornerRadius: 5)
         shine.fillColor = .clear
