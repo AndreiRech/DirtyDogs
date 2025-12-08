@@ -29,6 +29,7 @@ struct TutorialView: View {
                 }
             }
             .offset(y: 40)
+            .zIndex(2)
             
             TabView(selection: $viewModel.currentPage) {
                 ForEach(1...viewModel.numberOfPages, id: \.self) { index in
