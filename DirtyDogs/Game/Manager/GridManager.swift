@@ -19,7 +19,7 @@ class GridManager {
     
     private let rows = 4
     private let cols = 3
-    private let spacing: CGFloat = -4
+    private let spacing: CGFloat = -10
     private var blockSize: CGSize = .zero
     private var lastDraggedIndex: Int?
     
