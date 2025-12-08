@@ -15,7 +15,25 @@ struct GameView: View {
         ZStack {
             SpriteView(scene: viewModel.gameScene, options: [.allowsTransparency])
                 .ignoresSafeArea()
+            
+            if viewModel.showQuitConfirmation {
+                Color.black.opacity(0.6)
+                    .ignoresSafeArea()
+                    .zIndex(19)
+                    .onTapGesture {
+                        viewModel.showQuitConfirmation = false
+                    }
                 
+                GameAlert(
+                    onCancel: {
+                        viewModel.showQuitConfirmation = false
+                    },
+                    onConfirm: {
+                        viewModel.endGame(with: .quit)
+                    }
+                )
+                .zIndex(20)
+            }
             
             if !viewModel.isOverAll {
                 VStack {
@@ -87,10 +105,6 @@ struct GameView: View {
             viewModel.onDisappear()
             AudioService.shared.stopSimpleLoop(sound: "MatchSound.mp3")
         }
-        .alert("Leave the game?", isPresented: $viewModel.showQuitConfirmation) {
-            Button("Cancel", role: .cancel) { }
-            Button("Leave", role: .destructive) { viewModel.endGame(with: .quit) }
-        } message: { Text("Are you sure that you want to leave?") }
     }
 }
 
