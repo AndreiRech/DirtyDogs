@@ -24,13 +24,13 @@ struct LottieView: UIViewRepresentable {
         animationView.loopMode = loopMode
         
         if let animation {
-            let totalFrames = animation.endFrame
-            let fps = animation.framerate
+            let duration = animation.duration
             
-            let framesToCut = Int(fps * 3.0)
-            let visibleEndFrame = max(0, totalFrames - CGFloat(framesToCut))
+            let cutSeconds: Double = 3.0
             
-            animationView.play(fromFrame: 0, toFrame: visibleEndFrame) { finished in
+            let cutProgress = max(0, 1.0 - (cutSeconds / duration))
+            
+            animationView.play(fromProgress: 0, toProgress: cutProgress) { finished in
                 if finished { onComplete?() }
             }
         }

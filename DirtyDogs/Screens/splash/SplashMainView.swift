@@ -10,9 +10,10 @@ import Combine
 import Lottie
 
 struct SplashToPawsView: View {
-    @State private var showHome = false
     @State private var showBackground = false
-        
+    
+    let onFinished: () -> Void
+    
     var body: some View {
         ZStack {
             LottieView(
@@ -21,12 +22,6 @@ struct SplashToPawsView: View {
                 onComplete: {
                     withAnimation(.easeIn(duration: 0.2)) {
                         showBackground = true
-                    }
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        withAnimation {
-                            showHome = true
-                        }
                     }
                 }
             )
@@ -38,22 +33,17 @@ struct SplashToPawsView: View {
                     .scaledToFill()
                     .ignoresSafeArea()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            if showHome {
-                MenuView(
-                    viewModel: MenuViewModel(
-                        matchManager: MatchManager(),
-                        hapticsService: HapticsService(),
-                        settingsService: SettingsService()
-                    )
-                )
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            onFinished()
+                        }
+                    }
             }
         }
-        
     }
 }
 
 
 #Preview {
-    SplashToPawsView()
+    SplashToPawsView(onFinished: {})
 }
