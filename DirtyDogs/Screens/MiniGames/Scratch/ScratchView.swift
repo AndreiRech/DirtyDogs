@@ -81,7 +81,7 @@ struct ScratchView: View {
                            
                             if !isScratching {
                                 isScratching = true
-                                AudioService.shared.playLoop(sound: "Excavation.wav", volume: 0.5)
+                                AudioService.shared.playLoop(sound: "Excavation.wav", volume: 0.2)
                             }
                             
                             let p = value.location
@@ -198,7 +198,7 @@ struct ScratchView: View {
                         viewModel.playHaptics()
                         if viewModel.getRewardImage() != "" {
                             AudioService.shared.stop(sound: "Excavation.wav")
-                            AudioService.shared.play(sound: "ReceiveItem.wav")
+                            AudioService.shared.play(sound: "ReceiveItem.wav", volume: 0.2)
                         }
                     }
                     
