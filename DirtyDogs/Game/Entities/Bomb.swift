@@ -46,7 +46,7 @@ public class Bomb: GKEntity, GameEntity {
         container.physicsBody?.restitution = 0.9
         container.physicsBody?.friction = 0.0
         container.physicsBody?.usesPreciseCollisionDetection = true
-        container.zPosition = 100
+        container.zPosition = 9999
 
         addComponent(GKSKNodeComponent(node: container))
 

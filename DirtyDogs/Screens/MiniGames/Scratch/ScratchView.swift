@@ -10,6 +10,7 @@ import SwiftUI
 struct ScratchView: View {
     @Environment(\.dismiss) private var dismiss
     @State var viewModel: ScratchViewModelProtocol
+    @State private var isScratching = false
     
     var body: some View {
         GeometryReader { geo in
@@ -77,6 +78,12 @@ struct ScratchView: View {
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
+                           
+                            if !isScratching {
+                                isScratching = true
+                                AudioService.shared.playLoop(sound: "Excavation.wav", volume: 0.5)
+                            }
+                            
                             let p = value.location
                             let rectWidth = size.width * 0.8
                             let rectHeight = size.height * 0.6
@@ -101,6 +108,12 @@ struct ScratchView: View {
                                 }
                             }
                             if changed { viewModel.updateRevealRatio() }
+                        }
+                        .onEnded { _ in
+                            if isScratching {
+                                isScratching = false
+                                AudioService.shared.stop(sound: "Excavation.wav")
+                            }
                         }
                 )
                 
@@ -191,6 +204,9 @@ struct ScratchView: View {
                         dismiss()
                     }
                 }
+            }
+            .onDisappear {
+                AudioService.shared.stop(sound: "Excavation.wav")
             }
         }
     }
