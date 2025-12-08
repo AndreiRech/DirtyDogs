@@ -53,8 +53,10 @@ class ScreenFXManager {
         if showOverlay {
             // Container para o efeito de blur
             let blurContainer = SKNode()
+            
+            let currentMaxZ = scene.children.map { $0.zPosition }.max() ?? 0
+            blurContainer.zPosition = currentMaxZ + 10
             blurContainer.name = "stunOverlay"
-            blurContainer.zPosition = 1500
             
             // Cria múltiplas camadas para simular blur
             let overlaySize = CGSize(width: scene.size.width * 1.5, height: scene.size.height * 1.5)
@@ -65,6 +67,8 @@ class ScreenFXManager {
                                            size: overlaySize)
             baseOverlay.position = overlayPosition
             baseOverlay.alpha = 0
+            baseOverlay.zPosition = blurContainer.zPosition + 1
+            
             blurContainer.addChild(baseOverlay)
             
             // Camadas adicionais deslocadas para criar efeito de blur
@@ -86,6 +90,7 @@ class ScreenFXManager {
                                             size: overlaySize)
                     layer.position = pos
                     layer.alpha = 0
+                    layer.zPosition = 3001
                     blurContainer.addChild(layer)
                 }
             }
@@ -184,8 +189,6 @@ class ScreenFXManager {
         guard let scene = scene, let parent = node.parent else { return }
         
         AudioService.shared.play(sound: "Spray.wav", volume: -0.5)
-        
-        scene.uiDelegate?.isOverAll(true)
         
         let origin = node.position
         
