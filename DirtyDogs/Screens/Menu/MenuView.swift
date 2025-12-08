@@ -63,9 +63,6 @@ struct MenuView: View {
             }
             .background( MovingBackground())
             .padding(.top, 20)
-            .onAppear {
-                viewModel.prepareHaptics()
-            }
             .navigationDestination(isPresented: $viewModel.showTutorial) {
                 TutorialView(viewModel: TutorialViewModel())
             }

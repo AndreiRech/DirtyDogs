@@ -44,9 +44,6 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
         self.gameScene.inventoryDelegate = self
     }
     
-    func onAppear() {
-    }
-    
     func onDisappear() {
         if !matchManager.isGameOver {
             matchManager.endGame(with: .quit)
