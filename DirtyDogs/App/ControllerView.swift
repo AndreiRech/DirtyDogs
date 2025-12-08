@@ -19,7 +19,7 @@ struct ControllerView: View {
             } else if matchManager.gameState == .inGame {
                 GameView(viewModel: GameViewModel(matchManager: matchManager, hapticsService: hapticsService))
             } else {
-                SplashToPawsView()
+                MenuView(viewModel: MenuViewModel(matchManager: matchManager, hapticsService: hapticsService, settingsService: settingsService))
             }
         }
         .onAppear {
