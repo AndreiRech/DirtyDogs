@@ -62,6 +62,7 @@ public class GameScene: SKScene {
         setupBorders()
         
         _ = gridManager.createMap(horizontal: 3, vertical: 4)
+        
     }
     
     public override func update(_ currentTime: TimeInterval) {
