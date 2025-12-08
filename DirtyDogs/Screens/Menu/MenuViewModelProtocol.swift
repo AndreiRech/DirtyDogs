@@ -12,7 +12,6 @@ protocol MenuViewModelProtocol {
     var hapticsEnabled: Bool { get set }
     var showTutorial: Bool { get set }
     
-    func prepareHaptics()
     func playButtonTapped()
     func toggleSound()
     func toggleHaptics()

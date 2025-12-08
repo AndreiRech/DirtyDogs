@@ -39,13 +39,8 @@ class MenuViewModel: MenuViewModelProtocol {
         matchManager.authenticatingState != .authenticated || matchManager.gameState == .inGame
     }
     
-    func prepareHaptics() {
-        hapticsService.prepareHaptics()
-    }
-    
     func playButtonTapped() {
         matchManager.startMatchmaking()
-        hapticsService.complexSuccess()
     }
     
     func toggleSound() {
