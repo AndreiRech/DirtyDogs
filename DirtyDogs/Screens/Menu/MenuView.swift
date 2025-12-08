@@ -67,7 +67,7 @@ struct MenuView: View {
                 viewModel.prepareHaptics()
             }
             .navigationDestination(isPresented: $viewModel.showTutorial) {
-                TutorialView()
+                TutorialView(viewModel: TutorialViewModel())
             }
         }
     }
