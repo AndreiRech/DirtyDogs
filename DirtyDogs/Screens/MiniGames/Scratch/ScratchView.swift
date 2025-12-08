@@ -196,6 +196,10 @@ struct ScratchView: View {
                     withAnimation(.spring()) {
                         viewModel.showResult = true
                         viewModel.playHaptics()
+                        if viewModel.getRewardImage() != "" {
+                            AudioService.shared.stop(sound: "Excavation.wav")
+                            AudioService.shared.play(sound: "ReceiveItem.wav")
+                        }
                     }
                     
                     Task { @MainActor in
