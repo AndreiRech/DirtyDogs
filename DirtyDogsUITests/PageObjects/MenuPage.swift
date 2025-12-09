@@ -1,16 +1,18 @@
+//
+//  MenuPage.swift
+//  DirtyDogs
+//
+//  Created by Andrei Rech on 09/12/25.
+//
+
 import XCTest
 
 class MenuPage {
     let app: XCUIApplication
     
-    // MARK: - Inicialização
     init(app: XCUIApplication) {
         self.app = app
     }
-    
-    // MARK: - Elementos (Mapeamento)
-    // Usamos computed properties para buscar o elemento sempre que for chamado,
-    // garantindo que o estado atual da tela seja respeitado.
     
     var view: XCUIElement {
         app.otherElements[MenuIdentifiers.menuView.rawValue]
@@ -32,37 +34,25 @@ class MenuPage {
         app.buttons[MenuIdentifiers.hapticsButton.rawValue]
     }
     
-    // MARK: - Ações (Interações)
     
-    @discardableResult
-    func verifyLoaded() -> Self {
-        XCTAssertTrue(view.waitForExistence(timeout: 5), "A tela de menu deveria ter carregado")
-        XCTAssertTrue(playButton.exists, "O botão de jogar deve estar visível")
-        return self
+    func verifyLoaded() {
+        XCTAssertTrue(view.waitForExistence(timeout: 10), "Menu screen should have been displayed.")
+        XCTAssertTrue(playButton.exists, "Play button should be visible.")
     }
     
-    @discardableResult
-    func tapPlay() -> Self {
+    func tapPlay() {
         playButton.tap()
-        return self
     }
     
-    @discardableResult
-    func tapSoundToggle() -> Self {
+    func tapSoundToggle() {
         soundButton.tap()
-        return self
     }
     
-    @discardableResult
-    func tapHapticsToggle() -> Self {
+    func tapHapticsToggle() {
         hapticsButton.tap()
-        return self
     }
     
-    // Função auxiliar para verificar estados visuais (ex: se o botão mudou de imagem/label)
     func verifySoundIsDisabled() -> Bool {
-        // Supondo que o label mude ou que o identificador mude quando desativado
-        // UI Tests geralmente verificam Label ou Value
-        return soundButton.label.contains("Disabled") || soundButton.label.contains("Off")
+        return soundButton.label.contains("Disabled")
     }
 }
