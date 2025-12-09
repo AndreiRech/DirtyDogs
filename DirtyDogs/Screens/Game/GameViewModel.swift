@@ -11,7 +11,6 @@ import SwiftUI
 
 @Observable
 class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate {
-    
     var gameScene: GameScene
     var matchManager: MatchManager
     var hapticsService: HapticsServiceProtocol
@@ -45,7 +44,13 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
         self.gameScene.inventoryDelegate = self
     }
     
+    func onAppear() {
+        AudioService.shared.playLoopSimple(sound: "MatchSound.mp3", volume: 0.1)
+    }
+    
     func onDisappear() {
+        AudioService.shared.stopSimpleLoop(sound: "MatchSound.mp3")
+        
         if !matchManager.isGameOver {
             matchManager.endGame(with: .quit)
         }
