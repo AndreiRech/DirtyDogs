@@ -21,6 +21,8 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     var slotThatShouldAnimate: Int? = nil
     var isOverAll: Bool = false
     
+    var blowService = AudioBlowService()
+    
     var availableItems: [InventoryItem?] = [
         nil,
         nil,
@@ -44,6 +46,20 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
         self.gameScene.uiDelegate = self
         self.gameScene.inventoryDelegate = self
     }
+    
+    func startListeningForBlow() {
+        blowService.start { [weak self] level in
+            self?.handleBlow(level)
+        }
+    }
+    
+    func handleBlow(_ level: CGFloat) {
+        // Sopro forte
+        if level > 0.7 {
+            throwBombWithBlow()
+        }
+    }
+
     
     func onDisappear() {
         if !matchManager.isGameOver {
@@ -153,5 +169,9 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     
     func isOverAll(_ isOver: Bool) {
         isOverAll = isOver
+    }
+    
+    func didReceiveBomb(_ bomb: Bomb) {
+        print("bomba chegou")
     }
 }

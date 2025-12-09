@@ -20,6 +20,8 @@ public class GameScene: SKScene {
     var gridManager: GridManager!
     var backgroundNode: SKSpriteNode?
     
+    var currentBomb: Bomb?
+    
     weak var uiDelegate: GameSceneDelegate? {
         didSet {
             gridManager?.uiDelegate = uiDelegate
@@ -284,5 +286,13 @@ public class GameScene: SKScene {
     func getBlockPosition(at index: Int) -> CGPoint? {
         gridManager.getPositionForBlock(at: index)
     }
+    
+    func blowBombAway() {
+        if let bomb = currentBomb { // ou como você guarda aBomb
+            let impulse = CGVector(dx: 50, dy: 80)
+            bomb.physicsBody?.applyImpulse(impulse)
+        }
+    }
+
 }
 

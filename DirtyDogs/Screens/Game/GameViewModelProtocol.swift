@@ -31,4 +31,6 @@ protocol GameViewModelProtocol {
     func completeScratch(at index: Int)
     func cancelScratch()
     func playHaptics(sound: SoundEffect)
+    
+    handleBlow(_ level: CGFloat)
 }

@@ -14,6 +14,8 @@ public class Bomb: GKEntity, GameEntity {
   
     private var wasReceived: Bool = false
     private var bombSize: CGFloat = 45
+    var canExplode: Bool = true
+    var isIncoming: Bool = false
 
     public var node: SKNode? {
         component(ofType: GKSKNodeComponent.self)?.node

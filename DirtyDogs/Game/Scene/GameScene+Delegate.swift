@@ -13,15 +13,22 @@ extension GameScene: MatchManagerDelegate {
         let arrivingSide: EdgeSide = data.side
         let type = data.objectType
         
-        switch type {
-        case .ball:
-            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .ball)
-        case .bomb:
-            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .bomb)
-        case .tint:
-            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .tint)
-        case .seed:
-            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .seed)
+        let entity = spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: type)
+
+        if let bomb = entity as? Bomb {
+            bomb.setReceived(value: true)
+            uiDelegate?.didReceiveBomb(bomb)
         }
+        
+//        switch type {
+//        case .ball:
+//            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .ball)
+//        case .bomb:
+//            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .bomb)
+//        case .tint:
+//            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .tint)
+//        case .seed:
+//            spawnManager.spawnItem(at: spawnPoint, goingTo: arrivingSide, entity: .seed)
+//        }
     }
 }

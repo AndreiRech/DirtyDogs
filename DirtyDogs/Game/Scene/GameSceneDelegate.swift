@@ -8,6 +8,8 @@
 protocol GameSceneDelegate: AnyObject {
     func didTapBlock(_ index: Int)
     func isOverAll(_ isOver: Bool)
+    func didReceiveBomb(_ bomb: Bomb)
+    func blowBombAway()
 }
 
 protocol InventoryDelegate: AnyObject {

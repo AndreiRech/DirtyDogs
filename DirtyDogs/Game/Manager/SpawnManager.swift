@@ -33,6 +33,11 @@ class SpawnManager {
         
         value.setPosition(to: point)
         value.setReceived(value: true)
+        
+        if let bomb = value as? Bomb {
+            bomb.isIncoming = true
+            bomb.canExplode = false
+        }
         entityManager?.add(entity: value)
         
         value.body?.applyForce(.init(dx: 0, dy: -30000))
@@ -59,7 +64,9 @@ class SpawnManager {
             
             Task { @MainActor [weak self] in
                 try? await Task.sleep(for: .seconds(0.75))
-                guard let self = self, let fx = self.fxManager else { return }
+                guard let self = self,
+                      let fx = self.fxManager,
+                      bomb.canExplode == true else { return }
                 if let node = bomb.node {
                     fx.explode(node: node, entity: bomb)
                 }
