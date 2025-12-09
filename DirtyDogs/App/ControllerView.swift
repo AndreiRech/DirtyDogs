@@ -11,6 +11,7 @@ struct ControllerView: View {
     @State var matchManager: MatchManager
     var hapticsService: HapticsServiceProtocol
     var settingsService: SettingsServiceProtocol
+    @State var showMenu: Bool = false
    
     var body: some View {
         ZStack {
@@ -18,8 +19,12 @@ struct ControllerView: View {
                 GameOverView(viewModel: GameOverViewModel(matchManager: matchManager))
             } else if matchManager.gameState == .inGame {
                 GameView(viewModel: GameViewModel(matchManager: matchManager, hapticsService: hapticsService))
-            } else {
+            } else if showMenu {
                 MenuView(viewModel: MenuViewModel(matchManager: matchManager, hapticsService: hapticsService, settingsService: settingsService))
+            } else {
+                SplashToPawsView(onFinished: {
+                    showMenu = true
+                })
             }
         }
         .onAppear {
