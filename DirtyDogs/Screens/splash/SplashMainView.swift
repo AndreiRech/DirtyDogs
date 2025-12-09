@@ -20,7 +20,7 @@ struct SplashToPawsView: View {
                 name: "splash screen",
                 loopMode: .playOnce,
                 onComplete: {
-                    withAnimation(.easeIn(duration: 0.2)) {
+                    withAnimation(.easeIn(duration: 0.1)) {
                         showBackground = true
                     }
                 }
@@ -34,7 +34,7 @@ struct SplashToPawsView: View {
                     .ignoresSafeArea()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.0) {
                             onFinished()
                         }
                     }
