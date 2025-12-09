@@ -133,7 +133,7 @@ class ScreenFXManager {
     }
     
     func explode(node: SKNode, entity: GKEntity?) {
-        guard let scene = scene, let parent = node.parent else { return }
+        guard let _ = scene, let parent = node.parent else { return }
 
         let origin = node.position
 
