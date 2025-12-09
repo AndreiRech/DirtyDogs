@@ -37,6 +37,8 @@ class ScreenFXManager {
             haptics.cleanScreen()
         case .gridTouch:
             haptics.feedbackGenerator(.medium)
+        case .inventoryCollect:
+            haptics.feedbackGenerator(.heavy)
         }
     }
     
