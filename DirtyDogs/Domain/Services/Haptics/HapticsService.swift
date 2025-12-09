@@ -11,6 +11,8 @@ import UIKit
 class HapticsService: HapticsServiceProtocol {
     private var engine: CHHapticEngine?
     
+    var isHapticsEnabled: Bool = true
+    
     func prepareHaptics() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
         
@@ -23,6 +25,7 @@ class HapticsService: HapticsServiceProtocol {
     }
     
     func complexSuccess() {
+        guard isHapticsEnabled else { return }
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
         var events = [CHHapticEvent]()
         
@@ -50,6 +53,7 @@ class HapticsService: HapticsServiceProtocol {
     }
     
     func explosionBomb() {
+        guard isHapticsEnabled else { return }
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
         
         var events = [CHHapticEvent]()
@@ -92,6 +96,7 @@ class HapticsService: HapticsServiceProtocol {
     }
     
     func findItem() {
+        guard isHapticsEnabled else { return }
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
         var events = [CHHapticEvent]()
         
@@ -112,11 +117,13 @@ class HapticsService: HapticsServiceProtocol {
     }
     
     func cleanScreen() {
+        guard isHapticsEnabled else { return }
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
     }
     
     func feedbackGenerator(_ style : UIImpactFeedbackGenerator.FeedbackStyle) {
+        guard isHapticsEnabled else { return }
         let generator = UIImpactFeedbackGenerator(style: style)
         generator.prepare()
         generator.impactOccurred()

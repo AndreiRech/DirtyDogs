@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ControllerView: View {
     @State var matchManager: MatchManager
-    @State var hapticsService: HapticsServiceProtocol = HapticsService()
-    @State var settingsService: SettingsServiceProtocol = SettingsService()
+    var hapticsService: HapticsServiceProtocol
+    var settingsService: SettingsServiceProtocol
    
     var body: some View {
         ZStack {

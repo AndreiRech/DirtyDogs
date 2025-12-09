@@ -9,6 +9,8 @@ import Foundation
 import AVFoundation
 
 protocol AudioServiceProtocol {
+    var isSoundEnabled: Bool { get set }
+    
     func preload(sound: String)
     func preload(sounds: [String])
     

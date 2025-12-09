@@ -9,7 +9,6 @@ import Foundation
 import AVFoundation
 
 class AudioService: AudioServiceProtocol {
-    
     static let shared = AudioService()
     private var players: [String: AVAudioPlayer] = [:]
     
@@ -18,6 +17,16 @@ class AudioService: AudioServiceProtocol {
     
     private var loopTimers: [String: Timer] = [:]
     private var simpleLoopPlayers: [String: AVAudioPlayer] = [:]
+    
+    var isSoundEnabled: Bool = true {
+        didSet {
+            if !isSoundEnabled {
+                stopAll()
+                simpleLoopPlayers.values.forEach { $0.stop() }
+                simpleLoopPlayers.removeAll()
+            }
+        }
+    }
     
     private init() {}
     
@@ -34,6 +43,8 @@ class AudioService: AudioServiceProtocol {
     }
     
     func play(sound: String, volume: Float = 1.0) {
+        guard isSoundEnabled else { return }
+        
         guard let player = loadOneTimePlayer(for: sound) else { return }
         
         player.volume = volume
@@ -43,14 +54,15 @@ class AudioService: AudioServiceProtocol {
     }
     
     func playLoop(sound: String, volume: Float = 1.0) {
-        // Se já está tocando em loop, não tocar de novo
+        guard isSoundEnabled else { return }
+        
         if loopTimers[sound] != nil { return }
         
         guard
             let playerA = loadLoopPlayerA(for: sound),
             let playerB = loadLoopPlayerB(for: sound)
         else {
-            print("❌ AudioService: loop players not loaded for \(sound)")
+            print("AudioService: loop players not loaded for \(sound)")
             return
         }
         
@@ -81,7 +93,6 @@ class AudioService: AudioServiceProtocol {
     func stop(sound: String) {
         loopTimers[sound]?.invalidate()
         loopTimers.removeValue(forKey: sound)
-        // Para players
         loopPlayersA[sound]?.stop()
         loopPlayersB[sound]?.stop()
     }
@@ -101,7 +112,7 @@ class AudioService: AudioServiceProtocol {
         }
         
         guard let url = Bundle.main.url(forResource: name, withExtension: nil) else {
-            print("❌ AudioService: sound not found -> \(name)")
+            print("AudioService: sound not found -> \(name)")
             return nil
         }
         
@@ -122,7 +133,7 @@ class AudioService: AudioServiceProtocol {
         }
         
         guard let url = Bundle.main.url(forResource: name, withExtension: nil) else {
-            print("❌ AudioService: sound not found -> \(name)")
+            print("AudioService: sound not found -> \(name)")
             return nil
         }
         
@@ -143,7 +154,7 @@ class AudioService: AudioServiceProtocol {
         }
         
         guard let url = Bundle.main.url(forResource: name, withExtension: nil) else {
-            print("❌ AudioService: sound not found -> \(name)")
+            print("AudioService: sound not found -> \(name)")
             return nil
         }
         
@@ -156,30 +167,31 @@ class AudioService: AudioServiceProtocol {
         
         return player
     }
-
+    
     func playLoopSimple(sound: String, volume: Float = 1.0) {
-       
+        guard isSoundEnabled else { return }
+        
         if let existing = simpleLoopPlayers[sound], existing.isPlaying {
             existing.volume = volume
             return
         }
-
+        
         guard let url = Bundle.main.url(forResource: sound, withExtension: nil) else {
             print("AudioService: sound not found -> \(sound)")
             return
         }
-
+        
         do {
             let player = try AVAudioPlayer(contentsOf: url)
             player.numberOfLoops = -1
             player.volume = volume
             player.prepareToPlay()
             player.play()
-
+            
             simpleLoopPlayers[sound] = player
-
+            
         } catch {
-            print("❌ Error loading loop audio:", error)
+            print("Error loading loop audio:", error)
         }
     }
     
@@ -187,6 +199,4 @@ class AudioService: AudioServiceProtocol {
         simpleLoopPlayers[sound]?.stop()
         simpleLoopPlayers.removeValue(forKey: sound)
     }
-
-
 }

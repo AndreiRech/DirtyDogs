@@ -9,9 +9,11 @@ import SwiftUI
 
 
 class SettingsService: SettingsServiceProtocol {
-    
     private let soundKey = "soundEnabled"
     private let hapticsKey = "hapticsEnabled"
+    
+    var onSoundChanged: ((Bool) -> Void)?
+    var onHapticsChanged: ((Bool) -> Void)?
     
     init() {
         if UserDefaults.standard.object(forKey: soundKey) == nil {
@@ -24,11 +26,17 @@ class SettingsService: SettingsServiceProtocol {
     
     var soundEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: soundKey) }
-        set { UserDefaults.standard.set(newValue, forKey: soundKey) }
+        set {
+            UserDefaults.standard.set(newValue, forKey: soundKey)
+            onSoundChanged?(newValue)
+        }
     }
     
     var hapticsEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: hapticsKey) }
-        set { UserDefaults.standard.set(newValue, forKey: hapticsKey) }
+        set {
+            UserDefaults.standard.set(newValue, forKey: hapticsKey)
+            onHapticsChanged?(newValue)
+        }
     }
 }
