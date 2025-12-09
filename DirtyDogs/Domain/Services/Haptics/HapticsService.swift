@@ -51,37 +51,82 @@ class HapticsService: HapticsServiceProtocol {
     
     func explosionBomb() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-        
-        var events = [CHHapticEvent]()
-        
-        // Pulso forte de impacto
-        let impact = CHHapticEvent(
-            eventType: .hapticTransient,
-            parameters: [
-                CHHapticEventParameter(parameterID: .hapticIntensity, value: 1.0),
-                CHHapticEventParameter(parameterID: .hapticSharpness, value: 1.0)
-            ],
-            relativeTime: 0
-        )
-        events.append(impact)
-        
-        // Ondas de vibração diminuindo — sensação de explosão
-        for i in stride(from: 0.05, through: 0.35, by: 0.05) {
-            let intensity = Float(max(0.5, 1.0 - i * 1.5))
-            let sharpness = Float(max(0.2, 1.0 - i))
-            
-            let wave = CHHapticEvent(
+        var events: [CHHapticEvent] = []
+
+        // 1. Impacto inicial — pico instantâneo, muito forte e muito agudo
+        events.append(
+            CHHapticEvent(
                 eventType: .hapticTransient,
                 parameters: [
-                    CHHapticEventParameter(parameterID: .hapticIntensity, value: intensity),
-                    CHHapticEventParameter(parameterID: .hapticSharpness, value: sharpness)
+                    .init(parameterID: .hapticIntensity, value: 1.0),
+                    .init(parameterID: .hapticSharpness, value: 1.0)
                 ],
-                relativeTime: i
+                relativeTime: 0
             )
-            
-            events.append(wave)
-        }
-        
+        )
+
+        // 2. Micro-pulsos logo após — simulam fragmentos / sub-explosões
+        events.append(
+            CHHapticEvent(
+                eventType: .hapticTransient,
+                parameters: [
+                    .init(parameterID: .hapticIntensity, value: 0.8),
+                    .init(parameterID: .hapticSharpness, value: 0.9)
+                ],
+                relativeTime: 0.03
+            )
+        )
+
+        events.append(
+            CHHapticEvent(
+                eventType: .hapticTransient,
+                parameters: [
+                    .init(parameterID: .hapticIntensity, value: 0.6),
+                    .init(parameterID: .hapticSharpness, value: 0.7)
+                ],
+                relativeTime: 0.06
+            )
+        )
+
+        // 3. Onda de choque — início forte e queda rápida (efeito "whoom")
+        events.append(
+            CHHapticEvent(
+                eventType: .hapticContinuous,
+                parameters: [
+                    .init(parameterID: .hapticIntensity, value: 0.9),
+                    .init(parameterID: .hapticSharpness, value: 0.4)
+                ],
+                relativeTime: 0.08,
+                duration: 0.15
+            )
+        )
+
+        // 4. Tremor profundo — baixa intensidade, sharpness baixo (efeito terremoto)
+        events.append(
+            CHHapticEvent(
+                eventType: .hapticContinuous,
+                parameters: [
+                    .init(parameterID: .hapticIntensity, value: 0.35),
+                    .init(parameterID: .hapticSharpness, value: 0.2)
+                ],
+                relativeTime: 0.23,
+                duration: 0.4
+            )
+        )
+
+        // 5. Fade-out — resquício de vibração, quase sumindo
+        events.append(
+            CHHapticEvent(
+                eventType: .hapticContinuous,
+                parameters: [
+                    .init(parameterID: .hapticIntensity, value: 0.15),
+                    .init(parameterID: .hapticSharpness, value: 0.1)
+                ],
+                relativeTime: 0.63,
+                duration: 0.25
+            )
+        )
+
         do {
             let pattern = try CHHapticPattern(events: events, parameters: [])
             let player = try engine?.makePlayer(with: pattern)
@@ -90,6 +135,7 @@ class HapticsService: HapticsServiceProtocol {
             print("Failed to play explosion haptic: \(error.localizedDescription)")
         }
     }
+
     
     func findItem() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
@@ -122,3 +168,4 @@ class HapticsService: HapticsServiceProtocol {
         generator.impactOccurred()
     }
 }
+

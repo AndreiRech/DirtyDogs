@@ -19,12 +19,21 @@ struct ControllerView: View {
                 GameOverView(viewModel: GameOverViewModel(matchManager: matchManager))
             } else if matchManager.gameState == .inGame {
                 GameView(viewModel: GameViewModel(matchManager: matchManager, hapticsService: hapticsService))
+<<<<<<< HEAD
+            } else {
+                SplashToPawsView(
+                    matchManager: matchManager,
+                    hapticsService: hapticsService,
+                    settingsService: settingsService
+                )
+=======
             } else if showMenu {
                 MenuView(viewModel: MenuViewModel(matchManager: matchManager, hapticsService: hapticsService, settingsService: settingsService))
             } else {
                 SplashToPawsView(onFinished: {
                     showMenu = true
                 })
+>>>>>>> dev
             }
         }
         .onAppear {

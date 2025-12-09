@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Popup de Confirmação.png",
+      "filename" : "background.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Popup de Confirmação@2x.png",
+      "filename" : "background2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Popup de Confirmação@3x.png",
+      "filename" : "background3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
