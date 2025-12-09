@@ -145,9 +145,7 @@ public class GameScene: SKScene {
     }
     
     private func collect(entity: GameEntity) {
-        let generator = UIImpactFeedbackGenerator(style: .heavy)
-        generator.prepare()
-        generator.impactOccurred()
+        fxManager.playHaptics(with: .inventoryCollect)
         
         entityManager.remove(entity: entity)
         

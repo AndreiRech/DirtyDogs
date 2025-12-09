@@ -9,11 +9,34 @@ import SwiftUI
 
 @main
 struct DirtyDogsApp: App {
-    @State var matchManager = MatchManager()
+    @State private var matchManager = MatchManager()
+    private let settingsService = SettingsService()
+    private let hapticsService = HapticsService()
+    
+    init() {
+        setupServices()
+    }
     
     var body: some Scene {
         WindowGroup {
-            ControllerView(matchManager: matchManager)
+            ControllerView(
+                matchManager: matchManager,
+                hapticsService: hapticsService,
+                settingsService: settingsService
+            )
+        }
+    }
+    
+    private func setupServices() {
+        hapticsService.isHapticsEnabled = settingsService.hapticsEnabled
+        AudioService.shared.isSoundEnabled = settingsService.soundEnabled
+        
+        settingsService.onSoundChanged = { isEnabled in
+            AudioService.shared.isSoundEnabled = isEnabled
+        }
+        
+        settingsService.onHapticsChanged = { [weak hapticsService] isEnabled in
+            hapticsService?.isHapticsEnabled = isEnabled
         }
     }
 }

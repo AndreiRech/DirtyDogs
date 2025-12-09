@@ -10,4 +10,7 @@ import SwiftUI
 protocol SettingsServiceProtocol {
     var soundEnabled: Bool { get set }
     var hapticsEnabled: Bool { get set }
+    
+    var onSoundChanged: ((Bool) -> Void)? { get set }
+    var onHapticsChanged: ((Bool) -> Void)? { get set }
 }

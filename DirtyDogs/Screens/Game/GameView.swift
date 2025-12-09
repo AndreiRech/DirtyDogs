@@ -102,7 +102,6 @@ struct GameView: View {
         }
         .onDisappear {
             viewModel.onDisappear()
-            AudioService.shared.stopSimpleLoop(sound: "MatchSound.mp3")
         }
     }
 }
