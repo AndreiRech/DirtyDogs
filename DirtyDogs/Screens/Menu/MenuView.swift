@@ -66,6 +66,12 @@ struct MenuView: View {
             .navigationDestination(isPresented: $viewModel.showTutorial) {
                 TutorialView(viewModel: TutorialViewModel())
             }
+            .onAppear{
+                AudioService.shared.playLoopSimple(sound: "MenuSound.mp3", volume: 0.1)
+            }
+            .onDisappear {
+                AudioService.shared.stopSimpleLoop(sound: "MenuSound.mp3")
+            }
         }
     }
 }
