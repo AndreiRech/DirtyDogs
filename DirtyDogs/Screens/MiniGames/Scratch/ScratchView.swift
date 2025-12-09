@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Lottie
 
 struct ScratchView: View {
     @Environment(\.dismiss) private var dismiss
@@ -140,36 +141,47 @@ struct ScratchView: View {
                                     .frame(height: 100)
                                     .background(
                                         ZStack {
-                                            Circle()
-                                                .fill(
-                                                    RadialGradient(
-                                                        colors: [
-                                                            Color.white,
-                                                            Color.white.opacity(0.0)
-                                                        ],
-                                                        center: .center,
-                                                        startRadius: 0,
-                                                        endRadius: 55
+                                            LottieView(
+                                                name: "rewardAnimation",
+                                                loopMode: .loop,
+                                                onComplete: nil
+                                            )
+                                            .frame(width: 200, height: 200)
+                                            .scaleEffect(1.3)
+                                            .allowsHitTesting(false)
+                                            .clipped()
+
+                                            ZStack {
+                                                Circle()
+                                                    .fill(
+                                                        RadialGradient(
+                                                            colors: [
+                                                                Color.white,
+                                                                Color.white.opacity(0.0)
+                                                            ],
+                                                            center: .center,
+                                                            startRadius: 0,
+                                                            endRadius: 55
+                                                        )
                                                     )
-                                                )
-                                                .frame(width: 120, height: 120)
-                                                .blur(radius: 5)
-                                            
-                                            Circle()
-                                                .fill(
-                                                    RadialGradient(
-                                                        colors: [
-                                                            Color.white.opacity(0.6),
-                                                            Color.white.opacity(0.0)
-                                                        ],
-                                                        center: .center,
-                                                        startRadius: 30,
-                                                        endRadius: 80
+                                                    .frame(width: 120, height: 120)
+                                                    .blur(radius: 5)
+
+                                                Circle()
+                                                    .fill(
+                                                        RadialGradient(
+                                                            colors: [
+                                                                Color.white.opacity(0.6),
+                                                                Color.white.opacity(0.0)
+                                                            ],
+                                                            center: .center,
+                                                            startRadius: 30,
+                                                            endRadius: 80
+                                                        )
                                                     )
-                                                )
-                                                .frame(width: 160, height: 160)
-                                                .blur(radius: 20)
-                                        }
+                                                    .frame(width: 160, height: 160)
+                                                    .blur(radius: 20)
+                                            }
                                             .scaleEffect(viewModel.isAnimating ? 1.15 : 0.85)
                                             .opacity(viewModel.isAnimating ? 1.0 : 0.6)
                                             .onAppear {
@@ -177,7 +189,25 @@ struct ScratchView: View {
                                                     viewModel.isAnimating = true
                                                 }
                                             }
+                                        }
                                     )
+                                    .overlay (
+                                        Image("light-animation-reward")
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 100, height: 100)
+                                                        .offset(x: viewModel.lightX, y: viewModel.lightY)
+                                                        .blendMode(.screen)
+                                                        .mask(
+                                                            Image(viewModel.getRewardImage())
+                                                                .resizable()
+                                                                .scaledToFit()
+                                                        )
+                                        
+                                    )
+                            }
+                            .onAppear {
+                                viewModel.startLightSweep(size: 50)
                             }
                         }
                     }
@@ -214,4 +244,20 @@ struct ScratchView: View {
             }
         }
     }
+}
+
+#Preview {
+    ScratchView(
+        viewModel: ScratchViewModel(
+            layer: 0,
+            isClear: true,
+            reward: .bomb,
+            onComplete: {
+                print("Scratch completed!")
+            },
+            playHaptics: {
+                print("Playing haptics")
+            }
+        )
+    )
 }

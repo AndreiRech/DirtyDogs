@@ -27,8 +27,12 @@ protocol ScratchViewModelProtocol {
     var targetRevealRatio: CGFloat { get }
     var wasCleared: Bool { get set }
     
+    var lightX: CGFloat { get set }
+    var lightY: CGFloat { get set }
+    
     func setupGrid(in size: CGSize)
     func updateRevealRatio()
     func getImage(nextLayer: Bool) -> String
     func getRewardImage() -> String
+    func startLightSweep(size: CGFloat)
 }

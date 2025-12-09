@@ -27,6 +27,10 @@ class ScratchViewModel: ScratchViewModelProtocol {
     let targetRevealRatio: CGFloat = 0.7
     var wasCleared: Bool = false
     
+    var lightX: CGFloat = 0
+    var lightY: CGFloat = 0
+
+    
     init(layer: Int, isClear: Bool, reward: Reward, onComplete: @escaping () -> Void, playHaptics: @escaping () -> Void, clearedCells: Set<Int> = [], gridPoints: [CGPoint] = [], cols: Int = 26, rows: Int = 0, revealRatio: CGFloat = 0) {
         self.layer = layer
         self.isClear = isClear
@@ -91,4 +95,19 @@ class ScratchViewModel: ScratchViewModelProtocol {
     func updateRevealRatio() {
         revealRatio = CGFloat(clearedCells.count) / CGFloat(gridPoints.count)
     }
+    
+    func startLightSweep(size: CGFloat) {
+        lightX = -size
+            lightY = -size
+            
+            withAnimation(
+                .snappy(duration: 0.7)
+                    .repeatForever(autoreverses: true)
+            ) {
+                // ponto final (outro canto)
+                lightX = size
+                lightY = size
+            }
+    }
+
 }
