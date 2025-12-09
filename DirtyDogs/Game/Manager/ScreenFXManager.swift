@@ -132,7 +132,9 @@ class ScreenFXManager {
     
     func explode(node: SKNode, entity: GKEntity?) {
         guard let scene = scene, let parent = node.parent else { return }
-
+        
+        AudioService.shared.play(sound: "Explosion.wav", volume: 0.4)
+        
         let origin = node.position
 
         let emitter = SKEmitterNode()
