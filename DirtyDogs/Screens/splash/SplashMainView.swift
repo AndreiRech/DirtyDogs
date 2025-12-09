@@ -12,23 +12,8 @@ import Lottie
 struct SplashToPawsView: View {
     @State private var showBackground = false
     
-<<<<<<< HEAD
-    let matchManager: MatchManager
-    let hapticsService: HapticsServiceProtocol
-    let settingsService: SettingsServiceProtocol
-    
-    init(matchManager: MatchManager, hapticsService: HapticsServiceProtocol, settingsService: SettingsServiceProtocol) {
-        self.matchManager = matchManager
-        self.hapticsService = hapticsService
-        self.settingsService = settingsService
-    }
-    
-    
-        
-=======
     let onFinished: () -> Void
     
->>>>>>> dev
     var body: some View {
         ZStack {
             LottieView(
@@ -48,23 +33,11 @@ struct SplashToPawsView: View {
                     .scaledToFill()
                     .ignoresSafeArea()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-<<<<<<< HEAD
-            }
-            if showHome {
-                MenuView(
-                    viewModel: MenuViewModel(
-                        matchManager: matchManager,
-                        hapticsService: hapticsService,
-                        settingsService: settingsService
-                    )
-                )
-=======
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.0) {
                             onFinished()
                         }
                     }
->>>>>>> dev
             }
         }
     }
@@ -72,9 +45,5 @@ struct SplashToPawsView: View {
 
 
 #Preview {
-<<<<<<< HEAD
-    SplashToPawsView(matchManager: MatchManager(), hapticsService: HapticsService(), settingsService: SettingsService())
-=======
     SplashToPawsView(onFinished: {})
->>>>>>> dev
 }
