@@ -7,6 +7,7 @@
 
 import SpriteKit
 import GameplayKit
+import Lottie
 
 class ScreenFXManager {
     weak var scene: GameScene?
@@ -41,6 +42,8 @@ class ScreenFXManager {
             haptics.feedbackGenerator(.heavy)
         }
     }
+    
+    // MARK: Bomb
     
     func applyStun(duration: TimeInterval, showOverlay: Bool = false) {
         guard let scene = scene, !isStunned else { return }
@@ -89,7 +92,7 @@ class ScreenFXManager {
                 
                 for pos in positions {
                     let layer = SKSpriteNode(color: UIColor.white.withAlphaComponent(alpha),
-                                            size: overlaySize)
+                                             size: overlaySize)
                     layer.position = pos
                     layer.alpha = 0
                     layer.zPosition = 3001
@@ -108,7 +111,7 @@ class ScreenFXManager {
         } else {
             self.stunOverlay = nil
         }
-
+        
         Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(duration))
             self?.removeStun()
@@ -134,56 +137,32 @@ class ScreenFXManager {
     
     func explode(node: SKNode, entity: GKEntity?) {
         guard let scene = scene, let parent = node.parent else { return }
-        
+
         AudioService.shared.play(sound: "Explosion.wav", volume: 0.4)
-        
+
         let origin = node.position
-
-        let emitter = SKEmitterNode()
-        emitter.particleTexture = nil
-        emitter.particleColor = .orange
-        emitter.particleColorBlendFactor = 1.0
-        emitter.numParticlesToEmit = 200
-        emitter.particleBirthRate = 800
-        emitter.particleLifetime = 0.4
-        emitter.particleSpeed = 520
-        emitter.particleAlpha = 0.9
-        emitter.particleScale = 0.40
-        emitter.position = origin
-        emitter.zPosition = 998
-        parent.addChild(emitter)
-
-        emitter.run(.sequence([.wait(forDuration: 0.5), .removeFromParent()]))
-
-        let explosionCircle = SKShapeNode(circleOfRadius: 120)
-        explosionCircle.fillColor = .orange
-        explosionCircle.strokeColor = .yellow
-        explosionCircle.lineWidth = 22
-        explosionCircle.alpha = 0.85
-        explosionCircle.position = origin
-        explosionCircle.zPosition = 999
-        parent.addChild(explosionCircle)
-
-        explosionCircle.run(.sequence([
-            .group([.scale(to: 4.0, duration: 0.30), .fadeOut(withDuration: 0.25)]),
-            .removeFromParent()
-        ]))
+        
+        scene.uiDelegate?.isOverAll(true)
 
         shake(intensity: 18, duration: 0.35)
         applyBlast(from: origin, radius: 260, strength: 2200)
         playHaptics(with: .bombExploded)
-        
+
         // Aplica o stun ANTES de remover a entidade
         applyStun(duration: 1.0, showOverlay: true)
-        
+
         // Agenda a remoção da entidade após o stun
         Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(1.0))
+            
             if let entity = entity {
                 self?.entityManager?.remove(entity: entity)
             } else {
                 node.removeFromParent()
             }
+            
+            self?.scene?.uiDelegate?.isOverAll(false)
+
         }
     }
     
@@ -258,7 +237,7 @@ class ScreenFXManager {
         }
     }
     
-    private func applyBlast(from origin: CGPoint, radius: CGFloat, strength: CGFloat) {
+    func applyBlast(from origin: CGPoint, radius: CGFloat, strength: CGFloat) {
         guard let entities = entityManager?.getEntities() else { return }
         
         for entity in entities {
@@ -298,7 +277,7 @@ class ScreenFXManager {
     
     func cleanPoopOverlayOnShake() {
         guard let scene = scene else { return }
-
+        
         playHaptics(with: .poopSplash)
         
         let overlays = scene.children.filter { $0.name == "poopOverlay" }
@@ -391,8 +370,8 @@ class ScreenFXManager {
             }
         }
     }
-
-    private func createImpactWaves(at position: CGPoint, in parent: SKNode) {
+    
+    func createImpactWaves(at position: CGPoint, in parent: SKNode) {
         AudioService.shared.play(sound: "Plantation.wav", volume: -0.5)
         for i in 0..<3 {
             let wave = SKShapeNode(circleOfRadius: 60)
@@ -415,8 +394,8 @@ class ScreenFXManager {
             ]))
         }
     }
-
-    private func animatePlanting(gridManager: GridManager) {
+    
+    func animatePlanting(gridManager: GridManager) {
         guard let scene = scene else { return }
         
         let totalBlocks = gridManager.blocks.count
@@ -446,7 +425,7 @@ class ScreenFXManager {
             
             if let blockNode = gridManager.blockNodes.first(where: { $0.name == "block_\(i)" }) {
                 let blockPosition = scene.convert(blockNode.position, from: gridManager.gridContainer)
-               
+                
                 let texture = SKTexture(imageNamed: "Seed")
                 let seedItem = SKSpriteNode(texture: texture)
                 seedItem.size = CGSize(width: 70, height: 70)
@@ -552,8 +531,8 @@ class ScreenFXManager {
             }
         }
     }
-
-    private func createGroundImpact(at position: CGPoint, in parent: SKNode) {
+    
+    func createGroundImpact(at position: CGPoint, in parent: SKNode) {
         let impact = SKEmitterNode()
         impact.particleTexture = nil
         impact.particleColor = .systemGreen
@@ -590,8 +569,8 @@ class ScreenFXManager {
             .removeFromParent()
         ]))
     }
-
-    private func createBlockShine(on blockNode: SKNode) {
+    
+    func createBlockShine(on blockNode: SKNode) {
         let shine = SKShapeNode(rectOf: CGSize(width: 40, height: 40), cornerRadius: 5)
         shine.fillColor = .clear
         shine.strokeColor = .clear
@@ -611,7 +590,7 @@ class ScreenFXManager {
         let moveLeft = SKAction.moveBy(x: -4, y: 0, duration: 0.04)
         let moveRight = SKAction.moveBy(x: 8, y: 0, duration: 0.04)
         let moveCenter = SKAction.moveBy(x: -4, y: 0, duration: 0.04)
-
+        
         let sequence = SKAction.sequence([moveLeft, moveRight, moveCenter])
         node.run(sequence)
     }

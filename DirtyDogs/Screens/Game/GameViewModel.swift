@@ -11,6 +11,7 @@ import SwiftUI
 
 @Observable
 class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate {
+    
     var gameScene: GameScene
     var matchManager: MatchManager
     var hapticsService: HapticsServiceProtocol
@@ -19,6 +20,7 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     var showQuitConfirmation: Bool = false
     var slotThatShouldAnimate: Int? = nil
     var isOverAll: Bool = false
+    var showBombAnimation: Bool = false
     
     var availableItems: [InventoryItem?] = [
         nil,
