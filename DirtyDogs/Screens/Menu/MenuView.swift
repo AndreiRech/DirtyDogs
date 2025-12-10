@@ -24,7 +24,7 @@ struct MenuView: View {
                     .padding(.horizontal, 55)
                     .padding(.top, 40)
                     .fixedSize()
-                
+                    .accessibilityIdentifier(MenuIdentifiers.titleImage.rawValue)
                 
                 VStack (spacing: 32){
                     GameButton (
@@ -33,10 +33,12 @@ struct MenuView: View {
                     ){
                         viewModel.playButtonTapped()
                     }
+                    .accessibilityIdentifier(MenuIdentifiers.playButton.rawValue)
                     
                     GameButton(title: "tutorial") {
                         viewModel.showTutorial = true
                     }
+                    .accessibilityIdentifier(MenuIdentifiers.tutorialButton.rawValue)
                     
                 }
                 
@@ -48,6 +50,7 @@ struct MenuView: View {
                             viewModel.toggleSound()
                         }
                     )
+                    .accessibilityIdentifier(MenuIdentifiers.soundButton.rawValue)
                     
                     ConfigButton(
                         isActive: $viewModel.hapticsEnabled,
@@ -56,6 +59,7 @@ struct MenuView: View {
                             viewModel.toggleHaptics()
                         }
                     )
+                    .accessibilityIdentifier(MenuIdentifiers.hapticsButton.rawValue)
                 }
                 
                 Spacer()
@@ -73,6 +77,7 @@ struct MenuView: View {
                 AudioService.shared.stopSimpleLoop(sound: "MenuSound.mp3")
             }
         }
+        .accessibilityIdentifier(MenuIdentifiers.menuView.rawValue)
     }
 }
 

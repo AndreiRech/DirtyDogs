@@ -16,7 +16,7 @@ struct GridManagerTests {
     
     init() {
         let matchManager = MatchManager()
-        scene = GameScene(matchManager: matchManager, size: CGSize(width: 300, height: 400), hapticService: HapticsService())
+        scene = GameScene(matchManager: matchManager, size: CGSize(width: 300, height: 400), hapticService: MockHapticsService())
         gridManager = scene.gridManager
     }
     
@@ -84,5 +84,21 @@ struct GridManagerTests {
         // Then
         #expect(gridManager.blocks[0].layer == 0)
         #expect(gridManager.blocks.count == 12)
+    }
+    
+    @Test("Visual Feedback: X Mark when layer 3 is reached")
+    func xMarkLogic() {
+        // Given
+        _ = gridManager.createMap(horizontal: 3, vertical: 4)
+        gridManager.setupGrid()
+        
+        // When
+        gridManager.updateBlockLayer(at: 0, to: 3)
+        
+        // Then
+        let blockNode = gridManager.blockNodes[0]
+        let xMark = blockNode.childNode(withName: "xMarkOverlay")
+        
+        #expect(xMark != nil, "Should show X Mark on depleted block")
     }
 }

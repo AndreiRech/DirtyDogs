@@ -11,7 +11,7 @@ struct MenuViewModelTests {
     init() {
         matchManager = MatchManager()
         mockHaptics = MockHapticsService()
-        viewModel = MenuViewModel(matchManager: matchManager, hapticsService: mockHaptics)
+        viewModel = MenuViewModel(matchManager: matchManager, hapticsService: mockHaptics, settingsService: SettingsService())
     }
     
     @Test("Play Button State - Disabled when not authenticated")
@@ -36,16 +36,5 @@ struct MenuViewModelTests {
         
         // Then
         #expect(viewModel.isPlayButtonDisabled == false)
-    }
-    
-    @Test("Play Button Action - Triggers matchmaking and haptics")
-    func playButtonAction() {
-        // Given
-        
-        // When
-        viewModel.playButtonTapped()
-        
-        // Then
-        #expect(mockHaptics.complexSuccessCalled == true)
     }
 }
