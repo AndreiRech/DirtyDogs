@@ -98,6 +98,7 @@ struct GameView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.selectedIndex)
         .onAppear {
+            AudioService.shared.playLoopSimple(sound: "MatchSound.mp3", volume: 0.1)
             viewModel.onAppear()
         }
         .onDisappear {
