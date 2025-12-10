@@ -200,7 +200,10 @@ class ScreenFXManager {
         
         let poopEmitter = SKEmitterNode()
         poopEmitter.particleTexture = nil
-        poopEmitter.particleColor = UIColor(red: 0.32, green: 0.17, blue: 0.06, alpha: 1.0)
+
+        
+        poopEmitter.particleColor = UIColor(red: 0.20, green: 0.45, blue: 1.0, alpha: 1.0)
+
         poopEmitter.numParticlesToEmit = 180
         poopEmitter.particleBirthRate = 900
         poopEmitter.particleLifetime = 0.8
@@ -210,29 +213,38 @@ class ScreenFXManager {
         poopEmitter.zPosition = 998
         parent.addChild(poopEmitter)
         poopEmitter.run(.sequence([.wait(forDuration: 1.0), .removeFromParent()]))
-        
+
+       
         let poopFlash = SKShapeNode(circleOfRadius: 130)
-        poopFlash.fillColor = UIColor(red: 0.8, green: 0.65, blue: 0.3, alpha: 1.0)
-        poopFlash.strokeColor = .brown
+        poopFlash.fillColor = UIColor(red: 0.35, green: 0.60, blue: 1.0, alpha: 1.0)
+        poopFlash.strokeColor = UIColor(red: 0.45, green: 0.75, blue: 1.0, alpha: 1.0)
         poopFlash.lineWidth = 22
         poopFlash.position = origin
         poopFlash.zPosition = 999
         parent.addChild(poopFlash)
+
         poopFlash.run(.sequence([
-            .group([.scale(to: 3.8, duration: 0.25), .fadeOut(withDuration: 0.25)]),
+            .group([
+                .scale(to: 3.8, duration: 0.25),
+                .fadeOut(withDuration: 0.25)
+            ]),
             .removeFromParent()
         ]))
+
         
-        let poopOverlay = SKSpriteNode(color: UIColor(red: 0.22, green: 0.12, blue: 0.03, alpha: 1.0),
-                                       size: CGSize(width: scene.size.width * 2.5, height: scene.size.height * 2.5))
+        let poopOverlay = SKSpriteNode(
+            color: UIColor(red: 0.05, green: 0.07, blue: 0.20, alpha: 1.0),
+            size: CGSize(width: scene.size.width * 2.5, height: scene.size.height * 2.5)
+        )
+
         poopOverlay.position = CGPoint(x: scene.size.width / 2, y: scene.size.height / 2)
         poopOverlay.zPosition = 2000
         poopOverlay.alpha = 0
         poopOverlay.name = "poopOverlay"
         scene.addChild(poopOverlay)
-        
+
         poopOverlay.run(.sequence([
-            .fadeAlpha(to: 1.00, duration: 0.25),
+            .fadeAlpha(to: 1.0, duration: 0.25)
         ]))
         
         shake(intensity: 25, duration: 0.45)
