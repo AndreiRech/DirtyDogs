@@ -44,8 +44,7 @@ class ScreenFXManager {
     }
     
     // MARK: Bomb
-    
-    func applyStun(duration: TimeInterval, showOverlay: Bool = false) {
+    func applyStun(duration: TimeInterval, showOverlay: Bool = false, timer: Bool) {
         guard let scene = scene, !isStunned else { return }
         isStunned = true
         
@@ -112,9 +111,11 @@ class ScreenFXManager {
             self.stunOverlay = nil
         }
         
-        Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .seconds(duration))
-            self?.removeStun()
+        if timer {
+            Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(duration))
+                self?.removeStun()
+            }
         }
     }
     
@@ -149,8 +150,8 @@ class ScreenFXManager {
         playHaptics(with: .bombExploded)
 
         // Aplica o stun ANTES de remover a entidade
-        applyStun(duration: 1.0, showOverlay: true)
-
+        applyStun(duration: 1.0, showOverlay: true, timer: true)
+        
         // Agenda a remoção da entidade após o stun
         Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(1.0))
@@ -215,7 +216,7 @@ class ScreenFXManager {
         shake(intensity: 25, duration: 0.45)
         playHaptics(with: .poopSplash)
         applyBlast(from: origin, radius: 350, strength: 5000)
-        applyStun(duration: 1.5, showOverlay: false)
+        applyStun(duration: 1.5, showOverlay: false, timer: false)
         
         // Agenda a remoção da entidade após o stun
         Task { @MainActor [weak self] in
@@ -230,7 +231,7 @@ class ScreenFXManager {
         var shakeCountIntensity = 0.0
         motionService.startMonitoring { [weak self] intensity in
             shakeCountIntensity += intensity
-            if shakeCountIntensity >= 20.0 {
+            if shakeCountIntensity >= 12.0 {
                 self?.motionService.stopMonitoring()
                 self?.cleanPoopOverlayOnShake()
             }
@@ -358,7 +359,7 @@ class ScreenFXManager {
         shake(intensity: 15, duration: 0.3)
         haptics.explosionBomb()
         haptics.complexSuccess()
-        applyStun(duration: 0.8, showOverlay: false)
+        applyStun(duration: 0.8, showOverlay: false, timer: true)
         
         // Agenda a remoção da entidade após o stun
         Task { @MainActor [weak self] in

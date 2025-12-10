@@ -19,7 +19,11 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     var bonesFound: Int = 0
     var showQuitConfirmation: Bool = false
     var slotThatShouldAnimate: Int? = nil
-    var isOverAll: Bool = false
+    var isOverAll: Bool = false {
+        willSet {
+            print("isOverAll mudou para \(newValue)")
+        }
+    }
     var showBombAnimation: Bool = false
     
     var availableItems: [InventoryItem?] = [
