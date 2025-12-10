@@ -7,14 +7,31 @@
 
 import SwiftUI
 import SpriteKit
+import Lottie
 
 struct GameView: View {
     @State var viewModel: GameViewModelProtocol
     
     var body: some View {
         ZStack {
+            // Animação da Bomba
+            if viewModel.showBombAnimation {
+                LottieView(
+                    name: "bombAnimation",
+                    loopMode: .playOnce,
+                    onComplete: nil
+                )
+                .allowsHitTesting(false)
+                .zIndex(9999)
+                .onAppear {
+                    print("apareceu lottie??")
+                }
+            }
+            
+            
             SpriteView(scene: viewModel.gameScene, options: [.allowsTransparency])
                 .ignoresSafeArea()
+           
             
             if viewModel.showQuitConfirmation {
                 Color.black.opacity(0.6)

@@ -165,4 +165,8 @@ class GameViewModel: GameViewModelProtocol, GameSceneDelegate, InventoryDelegate
     func isOverAll(_ isOver: Bool) {
         isOverAll = isOver
     }
+    
+    func showBombAnimation(_ show: Bool) {
+        showBombAnimation = show
+    }
 }

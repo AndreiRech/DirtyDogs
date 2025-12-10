@@ -143,7 +143,7 @@ class ScreenFXManager {
 
         let origin = node.position
         
-        scene.uiDelegate?.isOverAll(true)
+        scene.uiDelegate?.showBombAnimation(true)
 
         shake(intensity: 18, duration: 0.35)
         applyBlast(from: origin, radius: 260, strength: 2200)
@@ -155,14 +155,15 @@ class ScreenFXManager {
         // Agenda a remoção da entidade após o stun
         Task { @MainActor [weak self] in
             try? await Task.sleep(for: .seconds(1.0))
-            
+
+            self?.scene?.uiDelegate?.showBombAnimation(false)
+
             if let entity = entity {
                 self?.entityManager?.remove(entity: entity)
             } else {
                 node.removeFromParent()
             }
             
-            self?.scene?.uiDelegate?.isOverAll(false)
 
         }
     }

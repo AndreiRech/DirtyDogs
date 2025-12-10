@@ -15,6 +15,7 @@ protocol GameViewModelProtocol {
     var showQuitConfirmation: Bool { get set }
     var slotThatShouldAnimate: Int? { get }
     var isOverAll: Bool { get }
+    var showBombAnimation: Bool { get set }
     var selectedIndex: Int? { get set }
     var availableItems: [InventoryItem?] { get }
     
