@@ -57,10 +57,14 @@ class SpawnManager {
         }
     }
     
+    // TODO: - algum dia, quando alguem quiser e tiver vontade, precisamos mudar o local dessas funcoes para outro Manager :)
     func executeAction(value: GameEntity) {
         if let bomb = value as? Bomb {
-            handleBomb(bomb: bomb)
-            return
+            Task { @MainActor in
+                try? await Task.sleep(for: .seconds(0.3))
+                handleBomb(bomb: bomb)
+                return
+            }
         }
         
         if let tint = value as? Tint {
@@ -90,16 +94,17 @@ class SpawnManager {
         
         if activeBombs.count == 1 {
             audioBlowService.start { [weak self] level in
-                if level > 0.4 {
+                guard let self = self else { return }
+                if level > 0.5 {
                     Task { @MainActor in
-                        self?.defuseAllBombs()
+                        self.defuseAllBombs()
                     }
                 }
             }
         }
         
         Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .seconds(2))
+            try? await Task.sleep(for: .seconds(3))
             self?.triggerExplosionIfActive(bomb: bomb)
         }
     }
@@ -108,18 +113,11 @@ class SpawnManager {
         guard !activeBombs.isEmpty else { return }
         
         for bomb in activeBombs {
-            if let node = bomb.node {
-                node.removeAllActions()
-                node.run(.sequence([
-                    .group([
-                        .scale(to: 0, duration: 0.2),
-                        .fadeOut(withDuration: 0.2),
-                        .moveBy(x: 0, y: 100, duration: 0.2)
-                    ]),
-                    .removeFromParent()
-                ]))
+            bomb.body?.applyForce(.init(dx: 0, dy: 36000))
+            Task {
+                try? await Task.sleep(for: .seconds(1))
+                entityManager?.remove(entity: bomb)
             }
-            entityManager?.remove(entity: bomb)
         }
         
         activeBombs.removeAll()

@@ -11,40 +11,37 @@ import AVFoundation
 @MainActor
 @Observable
 class AudioBlowService: AudioBlowServiceProtocol {
-
-    // MARK: - Propriedades
     private let engine = AVAudioEngine()
     private var levelHandler: ((CGFloat) -> Void)?
     private var isTapInstalled = false
 
-    // THRESHOLD mais rígido para evitar sensibilidade extrema
-    private let minDB: CGFloat = -20    // abaixo disso é ignorado
-    private let dbRange: CGFloat = 15   // db acima do threshold para normalizar
+    private let minDB: CGFloat = -20
+    private let dbRange: CGFloat = 15
 
-    // MARK: - Inicialização (Engine sempre ativa)
-    init() {
-        Task { @MainActor in
-            configureSession()
-            warmupEngineIfNeeded()
-        }
-    }
+    init() { }
 
-    // MARK: - Configura sessão do microfone
     private func configureSession() {
         let audioSession = AVAudioSession.sharedInstance()
 
         do {
             try audioSession.setCategory(.playAndRecord,
                                          mode: .measurement,
-                                         options: [.duckOthers, .allowBluetoothHFP])
+                                         options: [.duckOthers, .allowBluetoothHFP, .defaultToSpeaker])
             try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             print("Erro ao configurar sessão de áudio:", error)
         }
     }
 
-    // MARK: - Mantém engine sempre ligada 
-    private func warmupEngineIfNeeded() {
+    func start(levelHandler: @escaping (CGFloat) -> Void) {
+        self.levelHandler = levelHandler
+        
+        configureSession()
+        installTapIfNeeded()
+        startEngineIfNeeded()
+    }
+
+    private func startEngineIfNeeded() {
         if !engine.isRunning {
             do {
                 try engine.start()
@@ -54,18 +51,15 @@ class AudioBlowService: AudioBlowServiceProtocol {
         }
     }
 
-    // MARK: - Start
-    func start(levelHandler: @escaping (CGFloat) -> Void) {
-        self.levelHandler = levelHandler
-        installTapIfNeeded()
-    }
-
-    // MARK: - Instala TAP
     private func installTapIfNeeded() {
         if isTapInstalled { return }
 
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
+        
+        if format.sampleRate == 0 {
+            return
+        }
 
         input.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
             self?.processBuffer(buffer)
@@ -74,7 +68,6 @@ class AudioBlowService: AudioBlowServiceProtocol {
         isTapInstalled = true
     }
 
-    // MARK: - Processa áudio (RMS → dB → nível)
     private func processBuffer(_ buffer: AVAudioPCMBuffer) {
         guard let channelData = buffer.floatChannelData?[0] else { return }
         let frameCount = Int(buffer.frameLength)
@@ -99,9 +92,14 @@ class AudioBlowService: AudioBlowServiceProtocol {
         }
     }
 
-    // MARK: - Stop
     func stop() {
-        engine.inputNode.removeTap(onBus: 0)
-        isTapInstalled = false
+        if isTapInstalled {
+            engine.inputNode.removeTap(onBus: 0)
+            isTapInstalled = false
+        }
+        
+        if engine.isRunning {
+            engine.stop()
+        }
     }
 }

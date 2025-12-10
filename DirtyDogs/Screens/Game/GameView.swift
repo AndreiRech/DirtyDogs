@@ -103,6 +103,7 @@ struct GameView: View {
         .onDisappear {
             viewModel.onDisappear()
         }
+        .statusBarHidden()
     }
 }
 
