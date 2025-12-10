@@ -14,7 +14,7 @@ struct GameOverView: View {
         ZStack {
             MovingBackground()
             
-            VStack(spacing: 48) {
+            VStack {
                 
                 Image(viewModel.screenTextLines)
                     .resizable()
@@ -28,9 +28,8 @@ struct GameOverView: View {
                     Image(boneImage)
                         .resizable()
                         .scaledToFill()
-                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
-                        .frame(maxHeight: 180)
-                        .padding()
+                        .frame(width: 360, height: 180)
+                        .padding(.bottom, 16)
                 }
                 
                 

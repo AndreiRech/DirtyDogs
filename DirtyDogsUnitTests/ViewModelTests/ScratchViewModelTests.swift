@@ -19,19 +19,19 @@ struct ScratchViewModelTests {
         // When & Then
         #expect(vmLayer0.getImage(nextLayer: false) == "Grass-Light")
         // When & Then
-        #expect(vmLayer0.getImage(nextLayer: true) == "Dirt-Dark")
+        #expect(vmLayer0.getImage(nextLayer: true) == "Dirt-Light")
         
         // Given
         let vmLayer1 = ScratchViewModel(layer: 1, isClear: false, reward: .none, onComplete: {}, playHaptics: {})
         
         // When & Then
-        #expect(vmLayer1.getImage(nextLayer: false) == "Dirt-Light")
+        #expect(vmLayer1.getImage(nextLayer: false) == "Dirt-Dark")
         
         // Given
         let vmLayer2 = ScratchViewModel(layer: 2, isClear: true, reward: .none, onComplete: {}, playHaptics: {})
         
         // When & Then
-        #expect(vmLayer2.getImage(nextLayer: false) == "Stone-Dark")
+        #expect(vmLayer2.getImage(nextLayer: false) == "Stone-Light")
     }
     
     @Test("Reward Assets - Verify correct image names for reward types")

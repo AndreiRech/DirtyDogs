@@ -18,7 +18,7 @@ struct ScreenFXManagerTests {
         let fxManager = ScreenFXManager(scene: scene, entityManager: nil, hapticsService: HapticsService())
         
         // When
-        fxManager.applyStun(duration: 0.1)
+        fxManager.applyStun(duration: 0.1, timer: true)
         
         // Then
         #expect(fxManager.isStunned == true)

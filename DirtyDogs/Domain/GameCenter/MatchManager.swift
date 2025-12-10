@@ -14,7 +14,7 @@ class MatchManager: NSObject {
     weak var delegate: MatchManagerDelegate?
     
     var authenticatingState: PlayerAuthStateEnum = .authenticating
-    var gameState: GameState = .none
+    var gameState: GameState = .victory
     var isGameOver: Bool = false
     
     var match: GKMatch?
