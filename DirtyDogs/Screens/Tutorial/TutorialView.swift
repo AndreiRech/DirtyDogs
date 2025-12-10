@@ -52,6 +52,12 @@ struct TutorialView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden)
         .padding(.horizontal, 16)
+        .onAppear{
+            AudioService.shared.playLoopSimple(sound: "MenuTutorial.mp3", volume: 0.1)
+        }
+        .onDisappear {
+            AudioService.shared.stopSimpleLoop(sound: "MenuTutorial.mp3")
+        }
     }
 }
 
