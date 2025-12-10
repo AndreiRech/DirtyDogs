@@ -113,7 +113,7 @@ class SpawnManager {
         guard !activeBombs.isEmpty else { return }
         
         for bomb in activeBombs {
-            bomb.body?.applyForce(.init(dx: 0, dy: 36000))
+            bomb.body?.applyForce(.init(dx: 0, dy: 40000))
             Task {
                 try? await Task.sleep(for: .seconds(1))
                 entityManager?.remove(entity: bomb)
