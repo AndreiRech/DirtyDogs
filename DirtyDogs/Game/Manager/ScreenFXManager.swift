@@ -143,19 +143,26 @@ class ScreenFXManager {
 
         let origin = node.position
         
+        // Mostra a animação da bomba
         scene.uiDelegate?.showBombAnimation(true)
+        
+        print("🔥 EXPLOSÃO! showBombAnimation = true")
 
         shake(intensity: 18, duration: 0.35)
         applyBlast(from: origin, radius: 260, strength: 2200)
         playHaptics(with: .bombExploded)
 
-        // Aplica o stun ANTES de remover a entidade
-        applyStun(duration: 1.0, showOverlay: true, timer: true)
+        // COMENTADO TEMPORARIAMENTE - Aplica o stun
+        // Task { @MainActor [weak self] in
+        //     try? await Task.sleep(for: .seconds(0.1))
+        //     self?.applyStun(duration: 0.9, showOverlay: true, timer: true)
+        // }
         
-        // Agenda a remoção da entidade após o stun
+        // Agenda a remoção da entidade e esconde animação após 2 segundos (para testar)
         Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .seconds(1.0))
-
+            try? await Task.sleep(for: .seconds(2.0))
+            
+            print("🔥 Removendo bomba e escondendo animação")
             self?.scene?.uiDelegate?.showBombAnimation(false)
 
             if let entity = entity {
@@ -163,8 +170,6 @@ class ScreenFXManager {
             } else {
                 node.removeFromParent()
             }
-            
-
         }
     }
     

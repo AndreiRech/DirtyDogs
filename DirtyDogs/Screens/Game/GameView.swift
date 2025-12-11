@@ -4,7 +4,6 @@
 //
 //  Created by Júlia on 12/11/25.
 //
-
 import SwiftUI
 import SpriteKit
 import Lottie
@@ -14,24 +13,25 @@ struct GameView: View {
     
     var body: some View {
         ZStack {
-            // Animação da Bomba
-            if viewModel.showBombAnimation {
-                LottieView(
-                    name: "bombAnimation",
-                    loopMode: .playOnce,
-                    onComplete: nil
-                )
-                .allowsHitTesting(false)
-                .zIndex(9999)
-                .onAppear {
-                    print("apareceu lottie??")
-                }
-            }
-            
-            
             SpriteView(scene: viewModel.gameScene, options: [.allowsTransparency])
                 .ignoresSafeArea()
-           
+                .zIndex(0)
+            
+            // Animação da Bomba - com zIndex alto para ficar por cima de tudo
+            if viewModel.showBombAnimation {
+                Color.black
+                    .ignoresSafeArea()
+                    .overlay(
+                        LottieView(
+                            name: "rewardAnimation",
+                            loopMode: .playOnce,
+                            onComplete: nil
+                        )
+                        .frame(width: 300, height: 300)
+                        .allowsHitTesting(false)
+                    )
+                    .zIndex(2001)
+            }
             
             if viewModel.showQuitConfirmation {
                 Color.black.opacity(0.6)

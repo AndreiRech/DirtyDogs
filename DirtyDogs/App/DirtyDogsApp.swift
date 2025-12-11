@@ -19,11 +19,13 @@ struct DirtyDogsApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ControllerView(
-                matchManager: matchManager,
-                hapticsService: hapticsService,
-                settingsService: settingsService
-            )
+            MovingBackground()
+            
+//            ControllerView(
+//                matchManager: matchManager,
+//                hapticsService: hapticsService,
+//                settingsService: settingsService
+//            )
         }
     }
     
