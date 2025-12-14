@@ -19,7 +19,7 @@ class GridManager {
     
     private let rows = 4
     private let cols = 3
-    private let spacing: CGFloat = -4
+    private let spacing: CGFloat = -10
     private var blockSize: CGSize = .zero
     private var lastDraggedIndex: Int?
     
@@ -86,31 +86,35 @@ class GridManager {
         //  - 0 na camada 0 (grama)
         //  - 1 na camada 1 (terra)
         //  - 2 na camada 2 (pedra)
-        // Para os itens, deve existir entre 2 até 3 de cada e devem ser espalhados pelas 3 camadas
+        // Para os itens, deve existir entre 3 até 5 de cada e devem ser espalhados pelas 3 camadas
         // Para o restante, deve ser .none
         
         let totalBlocks = cols * rows
-        var newBlocks = Array(repeating: GridBlock(reward: .none, rewardLayer: 0), count: totalBlocks)
-        var availableIndices = Array(0..<totalBlocks).shuffled()
+        var newBlocks = Array(repeating: GridBlock(), count: totalBlocks)
+        var availableSlots: [(blockIndex: Int, layer: Int)] = []
+        
+        for i in 0..<totalBlocks {
+            for layer in 0..<3 {
+                availableSlots.append((blockIndex: i, layer: layer))
+            }
+        }
+        availableSlots.shuffle()
         
         let boneDepths = [1, 2, 2]
         for depth in boneDepths {
-            if let index = availableIndices.popLast() {
-                newBlocks[index].reward = .bone
-                newBlocks[index].rewardLayer = depth
+            if let slotIndex = availableSlots.firstIndex(where: { $0.layer == depth }) {
+                let slot = availableSlots.remove(at: slotIndex)
+                newBlocks[slot.blockIndex].rewards[depth] = .bone
             }
         }
         
-        let possibleItems: [Reward] = [.poop, .bomb, .seed]
+        let possibleItems: [Reward] = [.tint, .bomb, .seed]
         
         for item in possibleItems {
-            let itemCount = Int.random(in: 3...6)
+            let itemCount = Int.random(in: 3...5)
             for _ in 0..<itemCount {
-                if let index = availableIndices.popLast() {
-                    let randomDepth = Int.random(in: 0...2)
-                    
-                    newBlocks[index].reward = item
-                    newBlocks[index].rewardLayer = randomDepth
+                if let slot = availableSlots.popLast() {
+                    newBlocks[slot.blockIndex].rewards[slot.layer] = item
                 }
             }
         }
@@ -156,23 +160,46 @@ class GridManager {
     func completeScratch(at index: Int) -> Reward? {
         guard index < blocks.count else { return nil }
         
+        let scratchedLayer = blocks[index].layer
+        
         blocks[index].layer += 1
         let block = blocks[index]
         
         updateBlockLayer(at: index, to: block.layer)
         
-        if block.reward != .none && block.rewardLayer == block.layer - 1 {
-            switch block.reward {
-            case .bone:
-                return .bone
-            case .bomb, .poop, .seed:
-                return block.reward
-            default :
-                break
-            }
+        if let reward = block.rewards[scratchedLayer] {
+            return reward
         }
         
         return nil
+    }
+    
+    private func xMarkForBlock(at index: Int, shouldShow: Bool) {
+        guard index < blockNodes.count else { return }
+        
+        let blockNode = blockNodes[index]
+        let xMarkName = "xMarkOverlay"
+        
+        if shouldShow {
+            if blockNode.childNode(withName: xMarkName) == nil {
+                let xNode = SKLabelNode(text: "X")
+                xNode.fontName = "MachineGunk"
+                xNode.fontSize = blockSize.height * 0.4
+                xNode.fontColor = .black
+                xNode.verticalAlignmentMode = .center
+                xNode.horizontalAlignmentMode = .center
+                
+                xNode.name = xMarkName
+                xNode.alpha = 0.23
+                xNode.zPosition = 5
+                
+                blockNode.addChild(xNode)
+            }
+        } else {
+            if let existingMark = blockNode.childNode(withName: xMarkName) {
+                existingMark.removeFromParent()
+            }
+        }
     }
     
     func updateBlockLayer(at index: Int, to newLayer: Int) {
@@ -183,8 +210,9 @@ class GridManager {
         let node = blockNodes[index]
         
         node.color = .clear
-        // Natural growth animation for the new layer
         let newTexture = textureForLayer(layer: newLayer, index: index)
+        
+        xMarkForBlock(at: index, shouldShow: newLayer == 3 ? true : false)
         
         let growNode = SKSpriteNode(texture: newTexture)
         growNode.size = node.size
@@ -199,7 +227,6 @@ class GridManager {
             node.texture = newTexture
             growNode.removeFromParent()
         }
-        
     }
     
     func resetGrid() {
@@ -210,6 +237,14 @@ class GridManager {
     func updateData(blocks: [GridBlock]) {
         self.blocks = blocks
         setupGrid()
+    }
+    
+    func getPositionForBlock(at index: Int) -> CGPoint? {
+        guard index >= 0 && index < blockNodes.count else { return nil }
+        
+        let blockNode = blockNodes[index]
+        
+        return blockNode.position
     }
     
     func handleDrag(at position: CGPoint) {

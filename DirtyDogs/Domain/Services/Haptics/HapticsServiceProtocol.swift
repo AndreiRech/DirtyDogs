@@ -8,6 +8,8 @@
 import UIKit
 
 protocol HapticsServiceProtocol {
+    var isHapticsEnabled: Bool { get set }
+    
     func prepareHaptics()
     func complexSuccess()
     func explosionBomb()

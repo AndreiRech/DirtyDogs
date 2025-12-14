@@ -27,8 +27,21 @@ protocol ScratchViewModelProtocol {
     var targetRevealRatio: CGFloat { get }
     var wasCleared: Bool { get set }
     
+    var lightX: CGFloat { get set }
+    var lightY: CGFloat { get set }
+    var scratchColor: Color { get }
+    
+    // Partículas
+    var particles: [DustParticle] { get set }
+    var particleDuration: Double { get }
+    var particleEjectionSpeed: CGFloat { get }
+    var maxParticlesPerUpdate: Int { get }
+
     func setupGrid(in size: CGSize)
     func updateRevealRatio()
     func getImage(nextLayer: Bool) -> String
     func getRewardImage() -> String
+    func startLightSweep(size: CGFloat)
+    func createParticles(at point: CGPoint)
+    func updateParticles()
 }

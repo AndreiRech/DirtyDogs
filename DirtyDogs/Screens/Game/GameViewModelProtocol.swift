@@ -14,7 +14,7 @@ protocol GameViewModelProtocol {
     var bonesFound: Int { get set }
     var showQuitConfirmation: Bool { get set }
     var slotThatShouldAnimate: Int? { get }
-    
+    var isOverAll: Bool { get }
     var selectedIndex: Int? { get set }
     var availableItems: [InventoryItem?] { get }
     
@@ -23,7 +23,7 @@ protocol GameViewModelProtocol {
     
     func endGame(with event: PacketType)
     func resetGrid()
-    func spawnItem(type: PhysicsObjectType)
+    func spawnItem(type: PhysicsObjectType, spawnPoint: CGPoint?)
     
     func didUse(item: InventoryItem)
     func isInventoryFull() -> Bool

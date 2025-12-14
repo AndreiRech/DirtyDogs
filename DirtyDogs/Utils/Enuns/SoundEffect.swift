@@ -11,4 +11,5 @@ enum SoundEffect {
     case bombExploded
     case poopSplash
     case gridTouch
+    case inventoryCollect
 }

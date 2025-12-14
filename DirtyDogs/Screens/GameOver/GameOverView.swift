@@ -14,26 +14,30 @@ struct GameOverView: View {
         ZStack {
             MovingBackground()
             
-            VStack(spacing: 48) {
+            VStack {
                 
                 Image(viewModel.screenTextLines)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
+                    .frame(maxWidth: 287, alignment: .init(horizontal: .center, vertical: .center))
+                    .frame(maxHeight: 348)
                     .padding(.horizontal, 55)
+                    .fixedSize()
                 
                 if let boneImage = viewModel.boneImage {
                     Image(boneImage)
                         .resizable()
                         .scaledToFill()
-                        .frame(maxWidth: .infinity, alignment: .init(horizontal: .center, vertical: .center))
-                        .frame(maxHeight: 180)
-                        .padding()
+                        .frame(width: 360, height: 180)
+                        .padding(.bottom, 16)
                 }
                 
                 
                 
-                GameButton (title: "return to menu") {
+                GameButton (
+                    title: "return to menu",
+                    size: .large
+                ){
                     viewModel.returnToMenu()
                 }
                 .padding()

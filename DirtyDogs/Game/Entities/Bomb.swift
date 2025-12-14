@@ -26,21 +26,15 @@ public class Bomb: GKEntity, GameEntity {
     override public init() {
         super.init()
 
-        let circle = SKShapeNode(circleOfRadius: bombSize)
-        circle.fillColor = .black
-        circle.strokeColor = .gray
-        circle.lineWidth = 4
-
-        let fuse = SKShapeNode(rectOf: CGSize(width: 10, height: 22), cornerRadius: 3)
-        fuse.fillColor = .orange
-        fuse.strokeColor = .red
-        fuse.position = CGPoint(x: 0, y: bombSize + 12)
-        fuse.name = "fuse"
-
         let container = SKNode()
         container.name = "bomb"
-        container.addChild(circle)
-        container.addChild(fuse)
+
+        let bomb = SKSpriteNode(imageNamed: "Bomb")
+        bomb.size = CGSize(width: bombSize * 2, height: bombSize * 2)
+        bomb.name = "bomb"
+        container.addChild(bomb)
+
+        container.physicsBody = SKPhysicsBody(circleOfRadius: bombSize)
 
         container.physicsBody = SKPhysicsBody(circleOfRadius: bombSize)
         container.physicsBody?.affectedByGravity = false
@@ -52,7 +46,7 @@ public class Bomb: GKEntity, GameEntity {
         container.physicsBody?.restitution = 0.9
         container.physicsBody?.friction = 0.0
         container.physicsBody?.usesPreciseCollisionDetection = true
-        container.zPosition = 100
+        container.zPosition = 9999
 
         addComponent(GKSKNodeComponent(node: container))
 
@@ -69,23 +63,19 @@ public class Bomb: GKEntity, GameEntity {
     }
 
     public func startFuseAnimation() {
-        guard
-            let container = component(ofType: GKSKNodeComponent.self)?.node,
-            let fuse = container.children.first(where: { $0.name == "fuse" }) as? SKShapeNode
+        guard let container = component(ofType: GKSKNodeComponent.self)?.node,
+              let bombSprite = container.children.first(where: { $0.name == "bomb" }) as? SKSpriteNode
         else { return }
-
-        let flicker = SKAction.sequence([
-            .run { fuse.fillColor = .yellow },
-            .wait(forDuration: 0.08),
-            .run { fuse.fillColor = .red },
-            .wait(forDuration: 0.08)
-        ])
-
-        fuse.run(.repeatForever(flicker))
         
-        let pulseUp = SKAction.scale(to: 1.08, duration: 0.12)
-        let pulseDown = SKAction.scale(to: 1.0, duration: 0.12)
-        container.run(.repeatForever(.sequence([pulseUp, pulseDown])))
+        let frame1 = SKTexture(imageNamed: "Bomb")
+        let frame2 = SKTexture(imageNamed: "Red")
+
+        let flicker = SKAction.animate(with: [frame1, frame2],
+                                       timePerFrame: 0.08,
+                                       resize: false,
+                                       restore: false)
+
+        bombSprite.run(.repeatForever(flicker))
     }
     
     func setReceived(value: Bool) { wasReceived = value }
