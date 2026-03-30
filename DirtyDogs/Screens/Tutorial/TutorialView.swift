@@ -58,6 +58,7 @@ struct TutorialView: View {
         .onDisappear {
             AudioService.shared.stopSimpleLoop(sound: "MenuTutorial.mp3")
         }
+        .statusBarHidden()
     }
 }
 
