@@ -30,5 +30,6 @@ struct ControllerView: View {
         .onAppear {
             matchManager.authenticatePlayer()
         }
+        .statusBarHidden()
     }
 }

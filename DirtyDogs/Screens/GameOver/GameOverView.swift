@@ -48,6 +48,7 @@ struct GameOverView: View {
             }
             .padding(.top, 20)
         }
+        .statusBarHidden()
     }
 }
 

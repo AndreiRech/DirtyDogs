@@ -168,6 +168,9 @@ class GridManager {
         updateBlockLayer(at: index, to: block.layer)
         
         if let reward = block.rewards[scratchedLayer] {
+            if reward == .bone {
+                blocks[index].rewards[scratchedLayer] = nil
+            }
             return reward
         }
         

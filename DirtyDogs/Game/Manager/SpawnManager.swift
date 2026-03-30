@@ -103,7 +103,7 @@ class SpawnManager {
             }
         }
         
-        Task { @MainActor [weak self] in
+        Task { [weak self] in
             try? await Task.sleep(for: .seconds(3))
             self?.triggerExplosionIfActive(bomb: bomb)
         }

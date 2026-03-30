@@ -78,6 +78,7 @@ struct MenuView: View {
             }
         }
         .accessibilityIdentifier(MenuIdentifiers.menuView.rawValue)
+        .statusBarHidden()
     }
 }
 
