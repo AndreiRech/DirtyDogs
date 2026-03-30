@@ -10,6 +10,7 @@ import SpriteKit
 
 struct GameView: View {
     @State var viewModel: GameViewModelProtocol
+    @State private var randomGameIndex: Int = 0
     
     var body: some View {
         ZStack {
@@ -49,26 +50,50 @@ struct GameView: View {
                     let block = viewModel.gameScene.gridManager.blocks[index]
                     let rewardForThisLayer: Reward = block.rewards[block.layer] ?? .none
                     
-                    ScratchView(
-                        viewModel: ScratchViewModel(
-                            layer: viewModel.gameScene.gridManager.blocks[index].layer,
-                            isClear: index % 2 == 0,
-                            reward: rewardForThisLayer,
-                            onComplete: {
-                                viewModel.completeScratch(at: index)
-                            },
-                            playHaptics: {
-                                switch rewardForThisLayer {
-                                case .bomb, .tint, .seed:
-                                    viewModel.playHaptics(sound: .itemFound)
-                                case .bone:
-                                    viewModel.playHaptics(sound: .success)
-                                default:
-                                    break
-                                }
-                            }
-                        )
-                    )
+                    let playHaptics: () -> Void = {
+                        switch rewardForThisLayer {
+                        case .bomb, .tint, .seed:
+                            viewModel.playHaptics(sound: .itemFound)
+                        case .bone:
+                            viewModel.playHaptics(sound: .success)
+                        default:
+                            break
+                        }
+                    }
+                    
+                    Group {
+                        if randomGameIndex == 0 {
+                            ScratchView(
+                                viewModel: ScratchViewModel(
+                                    layer: block.layer,
+                                    isClear: index % 2 == 0,
+                                    reward: rewardForThisLayer,
+                                    onComplete: { viewModel.completeScratch(at: index) },
+                                    playHaptics: playHaptics
+                                )
+                            )
+                        } else if randomGameIndex == 1 {
+                            WindMiniGameView(
+                                viewModel: WindMiniGameViewModel(
+                                    layer: block.layer,
+                                    audioService: AudioBlowService(),
+                                    reward: rewardForThisLayer,
+                                    onComplete: { viewModel.completeScratch(at: index) },
+                                    onCancel: { viewModel.cancelScratch() },
+                                    playHaptics: playHaptics
+                                )
+                            )
+                        } else {
+                            HitCenterMiniGameView(
+                                viewModel: HitCenterMiniGameViewModel(
+                                    layer: block.layer,
+                                    reward: rewardForThisLayer,
+                                    onComplete: { viewModel.completeScratch(at: index) },
+                                    playHaptics: playHaptics
+                                )
+                            )
+                        }
+                    }
                     .id("\(index)-\(block.layer)")
                     .zIndex(2)
                     .transition(.opacity)
@@ -97,6 +122,12 @@ struct GameView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.selectedIndex)
+        .onChange(of: viewModel.selectedIndex) { oldValue, newValue in
+            if newValue != nil {
+//                randomGameIndex = Int.random(in: 0...2)
+                randomGameIndex = 0
+            }
+        }
         .onAppear {
             AudioService.shared.playLoopSimple(sound: "MatchSound.mp3", volume: 0.1)
             viewModel.onAppear()
@@ -106,14 +137,4 @@ struct GameView: View {
         }
         .statusBarHidden()
     }
-}
-
-#Preview {
-    GameView(
-        viewModel:
-            GameViewModel(
-                matchManager: MatchManager(),
-                hapticsService: HapticsService()
-            )
-    )
 }

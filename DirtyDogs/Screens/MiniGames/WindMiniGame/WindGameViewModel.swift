@@ -1,5 +1,5 @@
 //
-//  WindViewModel.swift
+//  WindMiniGameViewModel.swift
 //  DirtyDogs
 //
 //  Created by Eduardo Ferrari on 27/11/25.
@@ -13,15 +13,17 @@ import Combine
 class WindMiniGameViewModel: WindMiniGameViewModelProtocol {
 
     let layer: Int
+    let reward: Reward
     private let audioService: AudioBlowServiceProtocol
     private let onComplete: () -> Void
     private let onCancel: () -> Void
+    private let playHaptics: () -> Void
 
     private var timer: AnyCancellable?
     private var particleTimer: AnyCancellable?
 
     private let gravity: CGFloat = 2.5
-    private let windMultiplier: CGFloat = 28
+    private let windMultiplier: CGFloat = 18 // Reduzido para exigir um sopro mais forte
     private let tolerance: CGFloat = 65
 
     var balloonOffset: CGFloat = 180
@@ -29,16 +31,25 @@ class WindMiniGameViewModel: WindMiniGameViewModelProtocol {
     let requiredTime: CGFloat = 1.2
 
     var particles: [WindParticle] = []
+    
+    var showResult: Bool = false
+    var isAnimating: Bool = false
+    var lightX: CGFloat = 0
+    var lightY: CGFloat = 0
 
     init(layer: Int,
          audioService: AudioBlowServiceProtocol,
+         reward: Reward,
          onComplete: @escaping () -> Void,
-         onCancel: @escaping () -> Void)
+         onCancel: @escaping () -> Void,
+         playHaptics: @escaping () -> Void)
     {
         self.layer = layer
         self.audioService = audioService
+        self.reward = reward
         self.onComplete = onComplete
         self.onCancel = onCancel
+        self.playHaptics = playHaptics
     }
 
     func start() {
@@ -65,14 +76,19 @@ class WindMiniGameViewModel: WindMiniGameViewModelProtocol {
         particleTimer?.cancel()
     }
 
-    // MARK: - Logica de vento
     private var windLevel: CGFloat = 0
 
     private func handleAudio(_ level: CGFloat) {
-        windLevel = level
+        if level > 0.15 {
+            windLevel = level
+        } else {
+            windLevel = 0
+        }
     }
 
     private func updatePhysics() {
+        if showResult { return }
+        
         balloonOffset += gravity
 
         if windLevel > 0 {
@@ -90,11 +106,10 @@ class WindMiniGameViewModel: WindMiniGameViewModelProtocol {
             centerProgress = 0
         }
 
-        if centerProgress >= requiredTime {
-            onComplete()
+        if centerProgress >= requiredTime && !showResult {
+            triggerWin()
         }
 
-        // "envelhece" partículas
         for i in particles.indices {
             particles[i].life += 0.03
         }
@@ -102,11 +117,45 @@ class WindMiniGameViewModel: WindMiniGameViewModelProtocol {
     }
 
     private func spawnParticles() {
-        guard windLevel > 0 else { return }
+        guard windLevel > 0, !showResult else { return }
         let count = Int(windLevel * 15)
 
         for _ in 0..<count {
             particles.append(WindParticle())
+        }
+    }
+    
+    private func triggerWin() {
+        showResult = true
+        cancel()
+        playHaptics()
+        
+        if getRewardImage() != "" {
+            AudioService.shared.play(sound: "ReceiveItem.wav", volume: 0.2)
+        }
+        
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(1.2))
+            onComplete()
+        }
+    }
+    
+    func getRewardImage() -> String {
+        switch reward {
+        case .bomb: return "Bomb-Button"
+        case .tint: return "Tint-Button"
+        case .seed: return "Seed-Button"
+        case .bone: return "Bone"
+        default: return ""
+        }
+    }
+    
+    func startLightSweep(size: CGFloat) {
+        lightX = -size
+        lightY = -size
+        withAnimation(.snappy(duration: 0.7).repeatForever(autoreverses: true)) {
+            lightX = size
+            lightY = size
         }
     }
 }
