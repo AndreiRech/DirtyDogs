@@ -1,6 +1,17 @@
 # 🐾 Dirty Dogs
 
-Adicionar descrição
+**The Fastest, Furriest Duel on the Yard!**
+
+Dirty Dogs é um jogo indie de estratégia e arcade 2D desenvolvido durante o programa **Apple Developer Academy 2025**. Inspirado em clássicos como Batalha Naval e Campo Minado, o objetivo é cavar buracos no quintal para encontrar os ossos escondidos pelo cachorro do vizinho antes que ele encontre os seus.
+
+### 🎮 Gameplay & Mecânicas
+* **Objetivo:** Seja o primeiro a encontrar **3 ossos** escondidos no grid.
+* **Exploração:** O mapa possui camadas de Grama, Terra e Pedra. Cuidado com a Obsidian, ela é inquebrável!
+* **Minigames:** Cada escavação aciona um minigame, como a "Raspadinha" ou desafios de sopro e equilíbrio.
+* **Itens de Trapaça:** Encontre e envie itens para atrapalhar o oponente:
+    * **Bomba:** Atordoa o inimigo (removível ao soprar).
+    * **Tinta:** Obstrui a visão (limpável ao chacoalhar o celular).
+    * **Semente:** Adiciona novas camadas de blocos ao grid adversário.
 
 ---
 
